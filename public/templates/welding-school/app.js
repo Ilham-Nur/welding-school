@@ -408,7 +408,7 @@
     { id: "home", label: "Beranda" },
     { id: "about", label: "Tentang Kami" },
     { id: "programs", label: "Program Publik" },
-    { id: "news", label: "Berita & Event" },
+    { id: "news", label: "Aktivitas" },
     { id: "article", label: "Artikel" },
     { id: "welders", label: "Daftar Welder & Alumni" },
     { id: "recruiter-account", label: "Akun Recruiter" },
@@ -1027,14 +1027,14 @@
   function newsCard(article, compact = false) {
     return `
       <article class="academy-news-card${article.featured ? " academy-news-card--featured" : ""}${compact ? " academy-news-card--compact" : ""}">
-        <button class="academy-news-card__media" data-action="open-article" data-id="${article.id}" type="button" style="--news-position:${article.imagePosition}" aria-label="Baca ${escapeHtml(article.title)}">
+        <button class="academy-news-card__media" data-action="open-article" data-id="${article.id}" type="button" style="--news-position:${article.imagePosition}" aria-label="Lihat ${escapeHtml(article.title)}">
           <span>${escapeHtml(article.category)}</span>
         </button>
         <div class="academy-news-card__body">
           <time>${escapeHtml(article.date)}</time>
           <h3>${escapeHtml(article.title)}</h3>
           <p>${escapeHtml(article.excerpt)}</p>
-          <button class="academy-arrow-link" data-action="open-article" data-id="${article.id}" type="button">Baca selengkapnya <span aria-hidden="true">&rarr;</span></button>
+          <button class="academy-arrow-link" data-action="open-article" data-id="${article.id}" type="button">Lihat aktivitas <span aria-hidden="true">&rarr;</span></button>
         </div>
       </article>
     `;
@@ -1166,8 +1166,8 @@
 
       <section class="page-shell academy-latest">
         <div class="company-section-heading">
-          <div><span class="eyebrow">KABAR TERBARU</span><h2>Aktivitas, cerita, dan perkembangan terbaru dari akademi.</h2></div>
-          <button class="text-link company-all-programs" data-action="go-public-page" data-target="news" type="button">Lihat semua berita &rarr;</button>
+          <div><h2>Aktivitas terbaru Alpha Academy.</h2></div>
+          <button class="text-link company-all-programs" data-action="go-public-page" data-target="news" type="button">Lihat semua aktivitas &rarr;</button>
         </div>
         <div class="academy-latest__grid">
           ${academyNews.slice(0, 3).map((article) => newsCard(article, true)).join("")}
@@ -1278,39 +1278,53 @@
 
   function renderNews() {
     const featured = academyNews[0];
+    const popularActivities = academyNews.slice(1, 4);
+    const popularViews = ["8.420", "6.315", "4.860"];
     return `
-      <section class="academy-news-hero">
-        <div class="page-shell academy-news-hero__heading">
-          <div><h1>Kabar terbaru dari<br><em>Alpha Academy.</em></h1></div>
-          <p>Ikuti kegiatan pelatihan, cerita alumni, kolaborasi industri, dan agenda terbaru dari workshop kami.</p>
+      <section class="academy-activity-page">
+        <div class="page-shell academy-activity-heading">
+          <h1>Aktivitas Alpha Academy</h1>
+          <p>Dokumentasi pelatihan, kegiatan peserta, kolaborasi industri, dan agenda terbaru dari workshop kami.</p>
         </div>
-        <div class="page-shell academy-featured-story">
-          <button class="academy-featured-story__visual" data-action="open-article" data-id="${featured.id}" type="button" aria-label="Baca berita utama"></button>
-          <div class="academy-featured-story__copy">
-            <span>${featured.category} &middot; ${featured.date}</span>
-            <h2>${featured.title}</h2>
-            <p>${featured.excerpt}</p>
-            <button class="academy-arrow-link" data-action="open-article" data-id="${featured.id}" type="button">Baca berita utama <span>&rarr;</span></button>
-          </div>
-        </div>
-      </section>
 
-      <section class="page-shell academy-newsroom">
-        <div class="academy-newsroom__toolbar">
-          <div class="academy-chip-row" aria-label="Kategori berita">
-            <button class="is-active" type="button">Semua</button><button type="button">Kegiatan</button><button type="button">Alumni</button><button type="button">Industri</button><button type="button">Safety</button>
-          </div>
-          <label class="academy-news-search"><span aria-hidden="true">&#9906;</span><input type="search" placeholder="Cari berita..." aria-label="Cari berita"></label>
+        <div class="page-shell academy-activity-lead">
+          <article class="academy-activity-featured">
+            <button class="academy-activity-featured__media" data-action="open-article" data-id="${featured.id}" type="button" style="--activity-position:${featured.imagePosition}" aria-label="Lihat ${escapeHtml(featured.title)}"></button>
+            <div class="academy-activity-featured__body">
+              <div class="academy-activity-meta"><span>${escapeHtml(featured.category)}</span><time>${escapeHtml(featured.date)}</time><span>&#9673; 12.680 dilihat</span></div>
+              <h2>${escapeHtml(featured.title)}</h2>
+              <p>${escapeHtml(featured.excerpt)}</p>
+              <button class="academy-activity-link" data-action="open-article" data-id="${featured.id}" type="button">Lihat selengkapnya &rarr;</button>
+            </div>
+          </article>
+
+          <aside class="academy-activity-popular">
+            <header><h2>Aktivitas Terpopuler</h2></header>
+            <div class="academy-activity-popular__list">
+              ${popularActivities
+                .map(
+                  (article, index) => `
+                    <button class="academy-activity-popular__item" data-action="open-article" data-id="${article.id}" type="button">
+                      <span class="academy-activity-popular__thumb" style="--activity-position:${article.imagePosition}"></span>
+                      <span class="academy-activity-popular__copy"><strong>${escapeHtml(article.title)}</strong><small><span>&#9638; ${escapeHtml(article.date)}</span><span>&#9673; ${popularViews[index]} dilihat</span></small></span>
+                    </button>`,
+                )
+                .join("")}
+            </div>
+          </aside>
         </div>
-        <div class="academy-news-grid">
-          ${academyNews.slice(1).map((article) => newsCard(article)).join("")}
-        </div>
-        <button class="academy-load-more" data-action="load-more-news" type="button">Muat lebih banyak</button>
+
+        <section class="page-shell academy-activity-latest">
+          <div class="academy-activity-latest__heading"><div><h2>Aktivitas Terbaru</h2><p>Ikuti perkembangan kegiatan di Alpha Academy Welding School.</p></div><label class="academy-news-search"><span aria-hidden="true">&#9906;</span><input type="search" placeholder="Cari aktivitas..." aria-label="Cari aktivitas"></label></div>
+          <div class="academy-chip-row" aria-label="Kategori aktivitas"><button class="is-active" type="button">Semua</button><button type="button">Pelatihan</button><button type="button">Alumni</button><button type="button">Industri</button><button type="button">Safety</button></div>
+          <div class="academy-news-grid">${academyNews.slice(1).map((article) => newsCard(article)).join("")}</div>
+          <button class="academy-load-more" data-action="load-more-news" type="button">Muat lebih banyak aktivitas</button>
+        </section>
       </section>
 
       <section class="academy-newsletter">
         <div class="page-shell">
-          <div><span class="eyebrow eyebrow--light">ALPHA UPDATE</span><h2>Jangan lewatkan kabar dan agenda terbaru.</h2></div>
+          <div><h2>Jangan lewatkan aktivitas dan agenda terbaru.</h2></div>
           <form data-form="newsletter"><label><span class="sr-only">Alamat email</span><input type="email" placeholder="Alamat email Anda" required></label><button class="button button--primary" type="submit">Berlangganan</button></form>
         </div>
       </section>
@@ -1323,7 +1337,7 @@
     return `
       <article class="academy-article">
         <header class="academy-article__header page-shell">
-          <button class="academy-back-link" data-action="go-public-page" data-target="news" type="button">&larr; Kembali ke berita</button>
+          <button class="academy-back-link" data-action="go-public-page" data-target="news" type="button">&larr; Kembali ke aktivitas</button>
           <span>${escapeHtml(article.category)} &middot; ${escapeHtml(article.date)}</span>
           <h1>${escapeHtml(article.title)}</h1>
           <p>${escapeHtml(article.excerpt)}</p>
@@ -1342,7 +1356,7 @@
         </div>
       </article>
       <section class="page-shell academy-related-news">
-        <div class="company-section-heading"><div><span class="eyebrow">BERITA LAINNYA</span><h2>Mungkin menarik untuk Anda.</h2></div></div>
+        <div class="company-section-heading"><div><h2>Aktivitas lainnya.</h2></div></div>
         <div class="academy-latest__grid">${related.map((item) => newsCard(item, true)).join("")}</div>
       </section>
     `;
@@ -3681,7 +3695,7 @@
       showToast("Form minat dan kontak akan dihubungkan pada fase berikutnya.", "info");
     }
     if (action === "load-more-news") {
-      showToast("Seluruh berita contoh sudah ditampilkan.", "info");
+      showToast("Seluruh aktivitas sudah ditampilkan.", "info");
     }
     if (action === "go-home-section") {
       event.preventDefault();

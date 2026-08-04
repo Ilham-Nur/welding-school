@@ -38,7 +38,7 @@
                 <a class="{{ request()->routeIs('home') ? 'is-active' : '' }}" href="{{ route('home') }}#home" data-action="go-home" data-public-route="home">Beranda</a>
                 <a href="{{ route('home') }}#about" data-action="go-public-page" data-target="about" data-public-route="about">Tentang</a>
                 <a href="{{ route('home') }}#programs" data-action="go-programs" data-public-route="programs">Program</a>
-                <a href="{{ route('home') }}#news" data-action="go-public-page" data-target="news" data-public-route="news">Berita</a>
+                <a href="{{ route('home') }}#news" data-action="go-public-page" data-target="news" data-public-route="news">Aktivitas</a>
                 <a href="{{ route('home') }}#welders" data-action="go-public-page" data-target="welders" data-public-route="welders">Daftar Welder</a>
                 <a href="{{ route('home') }}#certificate" data-action="go-public-page" data-target="certificate" data-public-route="certificate">Verifikasi</a>
                 <a class="public-nav__account" href="{{ route('home') }}#{{ auth()->check() ? 'member-programs' : 'account' }}" data-action="go-account">{{ auth()->check() ? 'Buka Dashboard' : 'Login' }}</a>
@@ -76,7 +76,7 @@
                     <strong>Jelajahi</strong>
                     <a href="{{ route('home') }}#about" data-action="go-public-page" data-target="about">Tentang Kami</a>
                     <a href="{{ route('home') }}#programs" data-action="go-programs">Program Pelatihan</a>
-                    <a href="{{ route('home') }}#news" data-action="go-public-page" data-target="news">Berita &amp; Event</a>
+                    <a href="{{ route('home') }}#news" data-action="go-public-page" data-target="news">Aktivitas</a>
                 </div>
                 <div>
                     <strong>Terhubung</strong>

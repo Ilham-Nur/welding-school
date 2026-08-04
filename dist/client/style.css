@@ -2922,6 +2922,286 @@ body.welder-detail-open {
   }
 }
 
+/* =========================================================
+   ACTIVITY PAGE
+   Editorial layout: featured documentation + popular list.
+   ========================================================= */
+
+.academy-activity-page {
+  background: #f8fafb;
+  padding: 58px 0 90px;
+}
+
+.academy-activity-heading {
+  align-items: end;
+  display: flex;
+  gap: 50px;
+  justify-content: space-between;
+  margin-bottom: 30px;
+}
+
+.academy-activity-heading h1 {
+  color: var(--navy-950);
+  font-size: clamp(36px, 4vw, 54px);
+  letter-spacing: -0.045em;
+  line-height: 1.05;
+  margin: 0;
+}
+
+.academy-activity-heading p {
+  color: var(--muted);
+  line-height: 1.65;
+  margin: 0 0 3px;
+  max-width: 560px;
+}
+
+.academy-activity-lead {
+  align-items: stretch;
+  display: grid;
+  gap: 28px;
+  grid-template-columns: minmax(0, 2.05fr) minmax(330px, 0.95fr);
+}
+
+.academy-activity-featured,
+.academy-activity-popular {
+  background: white;
+  border: 1px solid #dfe5ea;
+  border-radius: 10px;
+  box-shadow: 0 8px 28px rgba(6, 26, 44, 0.05);
+  overflow: hidden;
+}
+
+.academy-activity-featured__media {
+  background:
+    linear-gradient(180deg, rgba(6, 26, 44, 0.01), rgba(6, 26, 44, 0.12)),
+    url("assets/images/welding-hero.png") var(--activity-position, 72% center) / cover;
+  border: 0;
+  cursor: pointer;
+  display: block;
+  min-height: 500px;
+  width: 100%;
+}
+
+.academy-activity-featured__body {
+  padding: 26px 30px 30px;
+}
+
+.academy-activity-meta {
+  align-items: center;
+  color: #687681;
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 12px;
+  gap: 8px 16px;
+}
+
+.academy-activity-meta > span:first-child {
+  color: var(--brand-green);
+  font-weight: 850;
+}
+
+.academy-activity-featured__body h2 {
+  color: var(--navy-950);
+  font-size: clamp(25px, 2.7vw, 36px);
+  letter-spacing: -0.035em;
+  line-height: 1.18;
+  margin: 14px 0 10px;
+}
+
+.academy-activity-featured__body p {
+  color: var(--muted);
+  line-height: 1.65;
+  margin: 0 0 18px;
+}
+
+.academy-activity-link {
+  background: transparent;
+  border: 0;
+  color: var(--brand-green);
+  cursor: pointer;
+  font-weight: 850;
+  padding: 0;
+}
+
+.academy-activity-popular header {
+  border-bottom: 4px solid #edf0f2;
+  padding: 22px 26px 17px;
+  position: relative;
+}
+
+.academy-activity-popular header::after {
+  background: var(--brand-green);
+  bottom: -4px;
+  content: "";
+  height: 4px;
+  left: 0;
+  position: absolute;
+  width: 110px;
+}
+
+.academy-activity-popular h2 {
+  color: var(--navy-950);
+  font-size: 23px;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.academy-activity-popular__list {
+  padding: 8px 26px;
+}
+
+.academy-activity-popular__item {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid #e5e9ec;
+  color: inherit;
+  cursor: pointer;
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 112px minmax(0, 1fr);
+  padding: 24px 0;
+  text-align: left;
+  width: 100%;
+}
+
+.academy-activity-popular__item:last-child {
+  border-bottom: 0;
+}
+
+.academy-activity-popular__thumb {
+  background:
+    linear-gradient(180deg, rgba(6, 26, 44, 0.02), rgba(6, 26, 44, 0.22)),
+    url("assets/images/welding-hero.png") var(--activity-position, 72% center) / cover;
+  border-radius: 5px;
+  display: block;
+  height: 88px;
+}
+
+.academy-activity-popular__copy strong {
+  color: var(--navy-950);
+  display: block;
+  font-size: 16px;
+  line-height: 1.4;
+}
+
+.academy-activity-popular__copy small {
+  color: #6d7a84;
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 12px;
+  gap: 5px 10px;
+  margin-top: 10px;
+}
+
+.academy-activity-popular__item:hover strong,
+.academy-activity-popular__item:focus-visible strong {
+  color: var(--brand-green);
+}
+
+.academy-activity-popular__item:focus-visible {
+  outline: 2px solid var(--brand-green);
+  outline-offset: 3px;
+}
+
+.academy-activity-latest {
+  padding-top: 74px;
+}
+
+.academy-activity-latest__heading {
+  align-items: end;
+  display: flex;
+  gap: 30px;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.academy-activity-latest__heading h2 {
+  color: var(--navy-950);
+  font-size: 34px;
+  letter-spacing: -0.035em;
+  margin: 0 0 5px;
+}
+
+.academy-activity-latest__heading p {
+  color: var(--muted);
+  margin: 0;
+}
+
+.academy-activity-latest .academy-chip-row {
+  border-top: 1px solid #dfe5ea;
+  margin-bottom: 30px;
+  padding-top: 18px;
+}
+
+.academy-activity-latest .academy-news-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+@media (max-width: 1040px) {
+  .academy-activity-lead {
+    grid-template-columns: 1fr;
+  }
+
+  .academy-activity-popular__list {
+    display: grid;
+    gap: 0 24px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .academy-activity-popular__item {
+    align-items: start;
+    grid-template-columns: 1fr;
+  }
+
+  .academy-activity-popular__thumb {
+    height: 130px;
+  }
+
+  .academy-activity-latest .academy-news-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 680px) {
+  .academy-activity-page {
+    padding-top: 36px;
+  }
+
+  .academy-activity-heading,
+  .academy-activity-latest__heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .academy-activity-featured__media {
+    min-height: 320px;
+  }
+
+  .academy-activity-featured__body {
+    padding: 22px;
+  }
+
+  .academy-activity-popular__list,
+  .academy-activity-latest .academy-news-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .academy-activity-popular__item {
+    grid-template-columns: 100px minmax(0, 1fr);
+  }
+
+  .academy-activity-popular__thumb {
+    height: 82px;
+  }
+
+  .academy-activity-latest__heading .academy-news-search,
+  .academy-activity-latest__heading .academy-news-search input {
+    width: 100%;
+  }
+}
+
 /* Alpha Alumni and Talent Connect interactive prototype */
 
 .portal-demo {
