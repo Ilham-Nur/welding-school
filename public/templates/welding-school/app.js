@@ -240,7 +240,8 @@
       excerpt:
         "Rangkaian evaluasi praktik, inspeksi visual, dan pengujian hasil las menutup pelatihan intensif Batch Juli.",
       featured: true,
-      imagePosition: "72% center",
+      image: "assets/images/activity-fabrication.jpg",
+      imagePosition: "50% center",
     },
     {
       id: "safety-induction",
@@ -249,7 +250,8 @@
       title: "Safety induction membuka program pelatihan Batch Agustus",
       excerpt:
         "Peserta memulai perjalanan belajar dengan pengenalan budaya K3, APD, dan tata kerja workshop.",
-      imagePosition: "42% center",
+      image: "assets/images/activity-workshop.jpg",
+      imagePosition: "50% 40%",
     },
     {
       id: "industry-sharing",
@@ -258,7 +260,8 @@
       title: "Praktisi fabrikasi berbagi kebutuhan kompetensi welder terkini",
       excerpt:
         "Sesi industry sharing membantu peserta memahami standar kualitas, disiplin kerja, dan peluang karier.",
-      imagePosition: "84% center",
+      image: "assets/images/activity-welding-sparks.jpg",
+      imagePosition: "50% center",
     },
     {
       id: "alumni-day",
@@ -267,6 +270,7 @@
       title: "Alumni Day 2026 mempertemukan lulusan dan mitra recruiter",
       excerpt:
         "Forum jejaring perdana membuka akses mentoring, informasi lowongan, dan pembaruan profil kompetensi.",
+      image: "assets/images/welding-hero.png",
       imagePosition: "60% center",
     },
     {
@@ -276,7 +280,8 @@
       title: "Open House Workshop: melihat langsung proses belajar di Alpha Academy",
       excerpt:
         "Calon peserta dan keluarga diajak menjelajahi fasilitas, bertemu instruktur, dan mencoba simulasi dasar.",
-      imagePosition: "92% center",
+      image: "assets/images/activity-workshop.jpg",
+      imagePosition: "50% 58%",
     },
   ];
 
@@ -1027,7 +1032,7 @@
   function newsCard(article, compact = false) {
     return `
       <article class="academy-news-card${article.featured ? " academy-news-card--featured" : ""}${compact ? " academy-news-card--compact" : ""}">
-        <button class="academy-news-card__media" data-action="open-article" data-id="${article.id}" type="button" style="--news-position:${article.imagePosition}" aria-label="Lihat ${escapeHtml(article.title)}">
+        <button class="academy-news-card__media" data-action="open-article" data-id="${article.id}" type="button" style="--news-image:url('${escapeHtml(article.image)}');--news-position:${article.imagePosition}" aria-label="Lihat ${escapeHtml(article.title)}">
           <span>${escapeHtml(article.category)}</span>
         </button>
         <div class="academy-news-card__body">
@@ -1289,7 +1294,7 @@
 
         <div class="page-shell academy-activity-lead">
           <article class="academy-activity-featured">
-            <button class="academy-activity-featured__media" data-action="open-article" data-id="${featured.id}" type="button" style="--activity-position:${featured.imagePosition}" aria-label="Lihat ${escapeHtml(featured.title)}"></button>
+            <button class="academy-activity-featured__media" data-action="open-article" data-id="${featured.id}" type="button" style="--activity-image:url('${escapeHtml(featured.image)}');--activity-position:${featured.imagePosition}" aria-label="Lihat ${escapeHtml(featured.title)}"></button>
             <div class="academy-activity-featured__body">
               <div class="academy-activity-meta"><span>${escapeHtml(featured.category)}</span><time>${escapeHtml(featured.date)}</time><span>&#9673; 12.680 dilihat</span></div>
               <h2>${escapeHtml(featured.title)}</h2>
@@ -1305,7 +1310,7 @@
                 .map(
                   (article, index) => `
                     <button class="academy-activity-popular__item" data-action="open-article" data-id="${article.id}" type="button">
-                      <span class="academy-activity-popular__thumb" style="--activity-position:${article.imagePosition}"></span>
+                      <span class="academy-activity-popular__thumb" style="--activity-image:url('${escapeHtml(article.image)}');--activity-position:${article.imagePosition}"></span>
                       <span class="academy-activity-popular__copy"><strong>${escapeHtml(article.title)}</strong><small><span>&#9638; ${escapeHtml(article.date)}</span><span>&#9673; ${popularViews[index]} dilihat</span></small></span>
                     </button>`,
                 )
@@ -1342,7 +1347,7 @@
           <h1>${escapeHtml(article.title)}</h1>
           <p>${escapeHtml(article.excerpt)}</p>
         </header>
-        <div class="academy-article__image" role="img" aria-label="Dokumentasi kegiatan Alpha Academy"></div>
+        <div class="academy-article__image" role="img" aria-label="Dokumentasi kegiatan Alpha Academy" style="--article-image:url('${escapeHtml(article.image)}');--article-position:${article.imagePosition}"></div>
         <div class="academy-article__layout page-shell">
           <aside><strong>BAGIKAN</strong><button type="button">in</button><button type="button">f</button><button type="button">&#8599;</button></aside>
           <div class="academy-article__body">
@@ -1746,6 +1751,19 @@
     return "is-working";
   }
 
+  function welderAvatar(profile, large = false) {
+    const tones = {
+      "andi-ramadhan": "navy",
+      "dimas-saputra": "blue",
+      "rizky-firmansyah": "green",
+      "siti-nurhaliza": "teal",
+      "bagas-pratama": "slate",
+      "naufal-hidayat": "cyan",
+    };
+    const tone = tones[profile.id] || "navy";
+    return `<span class="welder-avatar welder-avatar--${tone}${large ? " welder-avatar--large" : ""}"><span>${escapeHtml(profile.initials)}</span></span>`;
+  }
+
   function renderWelderRows(items) {
     return items
       .map((profile) => {
@@ -1756,7 +1774,7 @@
           <tr class="${selected ? "is-selected" : ""}">
             <td>
               <button class="welder-person" data-action="select-welder" data-id="${profile.id}" type="button">
-                <span class="welder-avatar">${escapeHtml(profile.initials)}</span>
+                ${welderAvatar(profile)}
                 <span><strong>${escapeHtml(profile.name)}</strong><small>ID: WELD-${meta.graduationYear}-${profile.id.slice(0, 3).toUpperCase()}</small><i>Lihat profil</i></span>
               </button>
             </td>
@@ -1785,7 +1803,7 @@
           <div><button class="welder-detail-close" data-action="close-welder-detail" type="button" aria-label="Tutup detail welder">&times;</button></div>
         </div>
         <div class="welder-detail-identity">
-          <span class="welder-avatar welder-avatar--large">${escapeHtml(profile.initials)}</span>
+          ${welderAvatar(profile, true)}
           <div><h2>${escapeHtml(profile.name)}</h2><span class="welder-status ${welderStatusClass(profile.employmentStatus)}">${escapeHtml(profile.employmentStatus)}</span><p>ID: WELD-${meta.graduationYear}-${profile.id.slice(0, 3).toUpperCase()}</p><small>${escapeHtml(meta.domicile)} &middot; ${escapeHtml(profile.availability)}</small></div>
         </div>
         <div class="welder-detail-actions">
@@ -1856,7 +1874,7 @@
   function recruiterCandidateSummary() {
     const profile = state.recruiterCandidate;
     const meta = directoryMeta(profile);
-    return `<div class="recruiter-candidate-summary"><span class="welder-avatar">${escapeHtml(profile.initials)}</span><div><small>KANDIDAT YANG DIMINATI</small><strong>${escapeHtml(profile.name)}</strong><p>${escapeHtml(profile.role)} &middot; ${escapeHtml(meta.domicile)}</p></div><button data-action="go-public-page" data-target="welders" type="button">Ganti</button></div>`;
+    return `<div class="recruiter-candidate-summary">${welderAvatar(profile)}<div><small>KANDIDAT YANG DIMINATI</small><strong>${escapeHtml(profile.name)}</strong><p>${escapeHtml(profile.role)} &middot; ${escapeHtml(meta.domicile)}</p></div><button data-action="go-public-page" data-target="welders" type="button">Ganti</button></div>`;
   }
 
   function renderRecruiterAccount() {

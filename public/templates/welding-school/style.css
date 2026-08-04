@@ -158,7 +158,7 @@
 .academy-news-card__media {
   background:
     linear-gradient(180deg, rgba(6, 26, 44, 0.02), rgba(6, 26, 44, 0.58)),
-    url("assets/images/welding-hero.png") var(--news-position, 72% center) / cover;
+    var(--news-image, url("assets/images/welding-hero.png")) var(--news-position, 72% center) / cover;
   border: 0;
   display: flex;
   min-height: 225px;
@@ -742,7 +742,7 @@
 .academy-article__image {
   background:
     linear-gradient(180deg, rgba(6, 26, 44, 0), rgba(6, 26, 44, 0.22)),
-    url("assets/images/welding-hero.png") 72% center / cover;
+    var(--article-image, url("assets/images/welding-hero.png")) var(--article-position, 72% center) / cover;
   min-height: 560px;
 }
 
@@ -2174,8 +2174,8 @@
 .welder-avatar {
   align-items: center;
   background:
-    radial-gradient(circle at 50% 32%, #ffe7d1 0 20%, transparent 21%),
-    linear-gradient(145deg, #223847, #09151e);
+    linear-gradient(145deg, rgba(255, 255, 255, 0.2), transparent 48%),
+    linear-gradient(145deg, var(--avatar-start, #0b314f), var(--avatar-end, #14699b));
   border: 2px solid white;
   border-radius: 50%;
   box-shadow: 0 0 0 1px #ccd5db;
@@ -2187,6 +2187,48 @@
   height: 42px;
   justify-content: center;
   width: 42px;
+}
+
+.welder-avatar > span {
+  align-items: center;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 50%;
+  display: inline-flex;
+  height: 72%;
+  justify-content: center;
+  letter-spacing: 0.03em;
+  width: 72%;
+}
+
+.welder-avatar--navy {
+  --avatar-start: #071f34;
+  --avatar-end: #1d658c;
+}
+
+.welder-avatar--blue {
+  --avatar-start: #164a7a;
+  --avatar-end: #3b91c8;
+}
+
+.welder-avatar--green {
+  --avatar-start: #0b5649;
+  --avatar-end: #15977c;
+}
+
+.welder-avatar--teal {
+  --avatar-start: #075668;
+  --avatar-end: #24a0ad;
+}
+
+.welder-avatar--slate {
+  --avatar-start: #34424d;
+  --avatar-end: #738693;
+}
+
+.welder-avatar--cyan {
+  --avatar-start: #09647b;
+  --avatar-end: #35a9c5;
 }
 
 .welder-avatar--large {
@@ -2974,7 +3016,7 @@ body.welder-detail-open {
 .academy-activity-featured__media {
   background:
     linear-gradient(180deg, rgba(6, 26, 44, 0.01), rgba(6, 26, 44, 0.12)),
-    url("assets/images/welding-hero.png") var(--activity-position, 72% center) / cover;
+    var(--activity-image, url("assets/images/welding-hero.png")) var(--activity-position, 72% center) / cover;
   border: 0;
   cursor: pointer;
   display: block;
@@ -3072,7 +3114,7 @@ body.welder-detail-open {
 .academy-activity-popular__thumb {
   background:
     linear-gradient(180deg, rgba(6, 26, 44, 0.02), rgba(6, 26, 44, 0.22)),
-    url("assets/images/welding-hero.png") var(--activity-position, 72% center) / cover;
+    var(--activity-image, url("assets/images/welding-hero.png")) var(--activity-position, 72% center) / cover;
   border-radius: 5px;
   display: block;
   height: 88px;
