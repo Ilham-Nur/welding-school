@@ -280,6 +280,130 @@
     },
   ];
 
+  const alumniProfiles = [
+    {
+      id: "andi-ramadhan",
+      initials: "AR",
+      name: "Andi Ramadhan",
+      role: "SMAW Welder 3G",
+      company: "PT Nusantara Fabrikasi",
+      location: "Cilegon, Banten",
+      experience: "2 tahun",
+      employmentStatus: "Sedang bekerja",
+      availability: "Terbuka untuk peluang",
+      skills: ["SMAW", "3G Plate", "Carbon Steel", "WPS", "K3 Welding"],
+      certifications: ["SMAW 3G", "Basic Safety", "Fit-up & Visual"],
+      program: "SMAW Welder 3G",
+      graduation: "Batch November 2024",
+      score: "92 / 100",
+      currentSince: "Januari 2025",
+      summary:
+        "Welder fabrikasi dengan pengalaman proyek struktur baja dan konsisten bekerja mengikuti WPS serta prosedur K3.",
+    },
+    {
+      id: "dimas-saputra",
+      initials: "DS",
+      name: "Dimas Saputra",
+      role: "FCAW Welder 3G",
+      company: "PT Krakatau Engineering",
+      location: "Serang, Banten",
+      experience: "1 tahun 8 bulan",
+      employmentStatus: "Sedang bekerja",
+      availability: "Tidak mencari aktif",
+      skills: ["FCAW", "3G Plate", "Flux Core", "Grinding", "Drawing"],
+      certifications: ["FCAW 3G", "Work at Height"],
+      program: "FCAW Welder",
+      graduation: "Batch Februari 2025",
+      score: "89 / 100",
+      currentSince: "April 2025",
+      summary:
+        "Berpengalaman pada pekerjaan struktur dan sambungan fillet dengan perhatian kuat pada produktivitas serta kualitas hasil las.",
+    },
+    {
+      id: "rizky-firmansyah",
+      initials: "RF",
+      name: "Rizky Firmansyah",
+      role: "GTAW Welder 6G",
+      company: "PT Petro Jaya Services",
+      location: "Bekasi, Jawa Barat",
+      experience: "3 tahun",
+      employmentStatus: "Kontrak proyek",
+      availability: "Siap dalam 30 hari",
+      skills: ["GTAW", "6G Pipe", "Stainless Steel", "Root Pass", "Purging"],
+      certifications: ["GTAW 6G", "SMAW 6G", "Confined Space"],
+      program: "GTAW Welder 6G",
+      graduation: "Batch Juli 2023",
+      score: "95 / 100",
+      currentSince: "September 2025",
+      summary:
+        "Pipe welder dengan fokus pada root pass presisi untuk pekerjaan maintenance dan instalasi sistem perpipaan.",
+    },
+    {
+      id: "siti-nurhaliza",
+      initials: "SN",
+      name: "Siti Nurhaliza",
+      role: "Welding Inspector Junior",
+      company: "PT Banten Quality Inspection",
+      location: "Tangerang, Banten",
+      experience: "1 tahun",
+      employmentStatus: "Sedang bekerja",
+      availability: "Terbuka untuk peluang",
+      skills: ["Visual Inspection", "WPS", "Report", "Weld Map", "QC"],
+      certifications: ["Welding Inspector Dasar", "ISO 9001 Awareness"],
+      program: "Welding Inspector Dasar",
+      graduation: "Batch Januari 2025",
+      score: "91 / 100",
+      currentSince: "Maret 2025",
+      summary:
+        "Inspector junior yang terbiasa melakukan pemeriksaan visual, dokumentasi weld map, dan penyusunan laporan kualitas.",
+    },
+    {
+      id: "bagas-pratama",
+      initials: "BP",
+      name: "Bagas Pratama",
+      role: "GMAW Welder 2G",
+      company: "Belum bekerja",
+      location: "Cilegon, Banten",
+      experience: "Fresh graduate",
+      employmentStatus: "Mencari pekerjaan",
+      availability: "Siap segera",
+      skills: ["GMAW", "2G Plate", "MIG/MAG", "Fit-up", "Basic Drawing"],
+      certifications: ["GMAW 2G", "Basic Safety"],
+      program: "GMAW Welder",
+      graduation: "Batch Juli 2026",
+      score: "88 / 100",
+      currentSince: "-",
+      summary:
+        "Lulusan baru dengan jam praktik intensif, disiplin workshop yang baik, dan kesiapan ditempatkan untuk pekerjaan manufaktur.",
+    },
+    {
+      id: "naufal-hidayat",
+      initials: "NH",
+      name: "Naufal Hidayat",
+      role: "SMAW & FCAW Welder",
+      company: "Freelance Project",
+      location: "Jakarta Utara",
+      experience: "4 tahun",
+      employmentStatus: "Freelance",
+      availability: "Terbuka untuk proyek",
+      skills: ["SMAW", "FCAW", "3G/4G", "Structural", "Repair Welding"],
+      certifications: ["SMAW 4G", "FCAW 3G", "Rigging Basic"],
+      program: "Welder Qualification Test",
+      graduation: "Batch Mei 2024",
+      score: "93 / 100",
+      currentSince: "Agustus 2024",
+      summary:
+        "Welder multi-process untuk proyek struktur, repair, dan pekerjaan lapangan dengan mobilitas tinggi.",
+    },
+  ];
+
+  const recruiterPipeline = [
+    { name: "Andi Ramadhan", role: "SMAW Welder 3G", stage: "Interview", date: "6 Agu 2026" },
+    { name: "Rizky Firmansyah", role: "GTAW Welder 6G", stage: "Undangan dikirim", date: "4 Agu 2026" },
+    { name: "Bagas Pratama", role: "GMAW Welder 2G", stage: "Shortlist", date: "3 Agu 2026" },
+    { name: "Naufal Hidayat", role: "SMAW & FCAW Welder", stage: "Penawaran", date: "1 Agu 2026" },
+  ];
+
   const steps = [
     { id: "home", label: "Beranda" },
     { id: "about", label: "Tentang Kami" },
@@ -327,6 +451,10 @@
     search: "",
     level: "Semua Level",
     selectedArticle: academyNews[0],
+    alumniPortalView: "directory",
+    recruiterPortalView: "talent",
+    selectedTalent: alumniProfiles[0],
+    recruitmentSent: false,
     verification: {
       pending: Boolean(backend.verification?.pending),
       email: backend.verification?.email || "",
@@ -1218,6 +1346,181 @@
     `;
   }
 
+  function refreshPortal(sectionId) {
+    render();
+    window.setTimeout(() => {
+      document.getElementById(sectionId)?.scrollIntoView({ block: "start" });
+    }, 20);
+  }
+
+  function talentCard(profile, portal) {
+    const isAvailable = profile.availability !== "Tidak mencari aktif";
+    return `
+      <article class="portal-talent-card">
+        <div class="portal-talent-card__top">
+          <span class="portal-avatar">${escapeHtml(profile.initials)}</span>
+          <span class="portal-status${isAvailable ? " portal-status--available" : ""}">${escapeHtml(profile.employmentStatus)}</span>
+        </div>
+        <h3>${escapeHtml(profile.name)} <i title="Profil terverifikasi">&check;</i></h3>
+        <strong>${escapeHtml(profile.role)}</strong>
+        <p class="portal-talent-card__company">${escapeHtml(profile.company)}</p>
+        <div class="portal-talent-card__meta"><span>${escapeHtml(profile.location)}</span><span>${escapeHtml(profile.experience)}</span></div>
+        <div class="portal-skill-row">${profile.skills.slice(0, 3).map((skill) => `<span>${escapeHtml(skill)}</span>`).join("")}</div>
+        <footer>
+          <small>${escapeHtml(profile.availability)}</small>
+          <button data-action="select-talent" data-id="${profile.id}" data-portal="${portal}" type="button">Lihat profil <span>&rarr;</span></button>
+        </footer>
+      </article>
+    `;
+  }
+
+  function alumniPortalNav() {
+    return `
+      <nav class="portal-app-nav" aria-label="Menu demo alumni">
+        <span>RUANG ALUMNI</span>
+        <button class="${state.alumniPortalView === "directory" ? "is-active" : ""}" data-action="switch-alumni-view" data-view="directory" type="button"><b>&#9783;</b> Direktori Alumni</button>
+        <button class="${state.alumniPortalView === "profile" ? "is-active" : ""}" data-action="switch-alumni-view" data-view="profile" type="button"><b>&#9673;</b> Profil Karier</button>
+        <button class="${state.alumniPortalView === "opportunities" ? "is-active" : ""}" data-action="switch-alumni-view" data-view="opportunities" type="button"><b>&#9638;</b> Peluang Kerja <i>12</i></button>
+        <button class="${state.alumniPortalView === "network" ? "is-active" : ""}" data-action="switch-alumni-view" data-view="network" type="button"><b>&#9672;</b> Jejaring</button>
+      </nav>
+    `;
+  }
+
+  function renderAlumniPortalContent() {
+    const profile = state.selectedTalent || alumniProfiles[0];
+
+    if (state.alumniPortalView === "profile") {
+      return `
+        <div class="portal-view-heading portal-view-heading--with-action"><div><span>PROFIL KOMPETENSI</span><h3>${escapeHtml(profile.name)}</h3><p>Informasi karier dan kompetensi yang dapat diperbarui oleh alumni.</p></div><button class="portal-secondary-button" data-action="mock-profile-edit" type="button">Edit profil</button></div>
+        <article class="alumni-profile-panel">
+          <header>
+            <span class="portal-avatar portal-avatar--large">${escapeHtml(profile.initials)}</span>
+            <div><div class="portal-profile-labels"><span class="portal-status portal-status--available">${escapeHtml(profile.employmentStatus)}</span><span class="portal-verified">&check; Alumni terverifikasi</span></div><h2>${escapeHtml(profile.name)}</h2><strong>${escapeHtml(profile.role)}</strong><p>${escapeHtml(profile.location)} &middot; ${escapeHtml(profile.experience)} pengalaman</p></div>
+            <div class="portal-availability"><small>STATUS PELUANG</small><strong>${escapeHtml(profile.availability)}</strong></div>
+          </header>
+          <div class="alumni-profile-panel__body">
+            <div class="alumni-profile-panel__main">
+              <section><span class="portal-section-label">TENTANG</span><p>${escapeHtml(profile.summary)}</p></section>
+              <section><span class="portal-section-label">PEKERJAAN SAAT INI</span><div class="portal-work-record"><i></i><div><strong>${escapeHtml(profile.role)}</strong><p>${escapeHtml(profile.company)}</p><small>${escapeHtml(profile.currentSince)} &middot; ${escapeHtml(profile.location)}</small></div></div></section>
+              <section><span class="portal-section-label">KEAHLIAN</span><div class="portal-skill-row portal-skill-row--large">${profile.skills.map((skill) => `<span>${escapeHtml(skill)}</span>`).join("")}</div></section>
+            </div>
+            <aside>
+              <section><span class="portal-section-label">PENDIDIKAN ALPHA</span><strong>${escapeHtml(profile.program)}</strong><p>${escapeHtml(profile.graduation)}</p><dl><div><dt>Nilai akhir</dt><dd>${escapeHtml(profile.score)}</dd></div><div><dt>Status</dt><dd class="text-green">Lulus</dd></div></dl></section>
+              <section><span class="portal-section-label">SERTIFIKASI</span>${profile.certifications.map((item) => `<div class="portal-certificate-item"><span>&check;</span><p><strong>${escapeHtml(item)}</strong><small>Terverifikasi Alpha Academy</small></p></div>`).join("")}</section>
+            </aside>
+          </div>
+        </article>
+      `;
+    }
+
+    if (state.alumniPortalView === "opportunities") {
+      return `
+        <div class="portal-view-heading"><span>PELUANG TERKURASI</span><h3>Lowongan yang cocok untuk Anda</h3><p>Rekomendasi berdasarkan kompetensi, pengalaman, dan lokasi pilihan.</p></div>
+        <div class="alumni-job-match-summary"><div><strong>12</strong><span>Lowongan cocok</span></div><div><strong>04</strong><span>Minat recruiter</span></div><div><strong>02</strong><span>Proses aktif</span></div><p>Profil Anda paling banyak dicari untuk <b>SMAW 3G</b> di area Banten.</p></div>
+        <div class="alumni-job-list">
+          <article><div><span class="job-match">96% cocok</span><h4>SMAW Welder 3G</h4><strong>PT Nusantara Steel Works</strong><p>Cilegon &middot; Kontrak 12 bulan &middot; On-site</p><div class="portal-skill-row"><span>SMAW</span><span>3G</span><span>Carbon Steel</span></div></div><button data-action="mock-job-interest" type="button">Saya tertarik</button></article>
+          <article><div><span class="job-match">91% cocok</span><h4>Structural Welder</h4><strong>PT Banten Heavy Industry</strong><p>Serang &middot; Karyawan tetap &middot; On-site</p><div class="portal-skill-row"><span>WPS</span><span>Fit-up</span><span>K3</span></div></div><button data-action="mock-job-interest" type="button">Saya tertarik</button></article>
+          <article><div><span class="job-match">87% cocok</span><h4>Maintenance Welder</h4><strong>PT Cipta Energi Nasional</strong><p>Bekasi &middot; Project based &middot; Rotasi</p><div class="portal-skill-row"><span>SMAW</span><span>Repair</span><span>Drawing</span></div></div><button data-action="mock-job-interest" type="button">Saya tertarik</button></article>
+        </div>
+      `;
+    }
+
+    if (state.alumniPortalView === "network") {
+      return `
+        <div class="portal-view-heading"><span>JEJARING PROFESIONAL</span><h3>Tetap terhubung dengan keluarga Alpha</h3><p>Ikuti perkembangan rekan alumni, agenda industri, dan kesempatan mentoring.</p></div>
+        <div class="alumni-network-grid">
+          <section><header><h4>Ringkasan jejaring</h4></header><div class="alumni-network-stats"><p><strong>1.248</strong><span>Total alumni</span></p><p><strong>18</strong><span>Mitra industri</span></p><p><strong>07</strong><span>Koneksi Anda</span></p></div></section>
+          <section><header><h4>Aktivitas terbaru</h4></header><ul><li><span class="portal-avatar">DS</span><p><strong>Dimas memulai posisi baru</strong><small>FCAW Welder di PT Krakatau Engineering</small></p></li><li><span class="portal-avatar">SN</span><p><strong>Siti memperbarui sertifikasi</strong><small>ISO 9001 Awareness &middot; 2 hari lalu</small></p></li><li><span class="portal-avatar">NH</span><p><strong>Naufal tersedia untuk proyek</strong><small>Structural welding &middot; Jakarta dan sekitarnya</small></p></li></ul></section>
+          <section class="alumni-mentor-card"><span>MENTORING BULAN INI</span><h4>Menyiapkan karier sebagai Pipe Welder</h4><p>Bersama praktisi proyek oil & gas dan alumni GTAW 6G.</p><footer><small>15 Agustus 2026 &middot; Online</small><button data-action="mock-network-register" type="button">Daftar</button></footer></section>
+        </div>
+      `;
+    }
+
+    return `
+      <div class="portal-view-heading"><span>DIREKTORI ALUMNI</span><h3>Lihat perjalanan karier alumni Alpha Academy</h3><p>Status pekerjaan, keahlian, dan sertifikasi ditampilkan dalam satu profil profesional.</p></div>
+      <div class="portal-directory-toolbar"><label><span aria-hidden="true">&#9906;</span><input type="search" placeholder="Cari nama, keahlian, atau perusahaan..." aria-label="Cari alumni"></label><select aria-label="Filter status kerja"><option>Semua status kerja</option><option>Sedang bekerja</option><option>Mencari pekerjaan</option><option>Freelance</option></select><select aria-label="Filter keahlian"><option>Semua keahlian</option><option>SMAW</option><option>FCAW</option><option>GTAW</option><option>GMAW</option></select></div>
+      <div class="portal-directory-summary"><span>Menampilkan <strong>${alumniProfiles.length} profil contoh</strong></span><span class="portal-demo-badge">DATA SIMULASI</span></div>
+      <div class="portal-talent-grid">${alumniProfiles.map((item) => talentCard(item, "alumni")).join("")}</div>
+    `;
+  }
+
+  function recruiterPortalNav() {
+    return `
+      <nav class="portal-app-nav" aria-label="Menu demo recruiter">
+        <span>RECRUITER WORKSPACE</span>
+        <button class="${state.recruiterPortalView === "dashboard" ? "is-active" : ""}" data-action="switch-recruiter-view" data-view="dashboard" type="button"><b>&#9638;</b> Dashboard</button>
+        <button class="${["talent", "candidate"].includes(state.recruiterPortalView) ? "is-active" : ""}" data-action="switch-recruiter-view" data-view="talent" type="button"><b>&#9783;</b> Cari Talent</button>
+        <button class="${state.recruiterPortalView === "shortlist" ? "is-active" : ""}" data-action="switch-recruiter-view" data-view="shortlist" type="button"><b>&#9734;</b> Shortlist <i>3</i></button>
+        <button class="${["pipeline", "invite"].includes(state.recruiterPortalView) ? "is-active" : ""}" data-action="switch-recruiter-view" data-view="pipeline" type="button"><b>&#8644;</b> Rekrutmen <i>4</i></button>
+      </nav>
+    `;
+  }
+
+  function recruiterPipelineMarkup() {
+    return `
+      <div class="recruiter-pipeline-table">
+        <header><span>KANDIDAT</span><span>POSISI</span><span>TAHAP</span><span>PEMBARUAN</span><span></span></header>
+        ${recruiterPipeline.map((item) => `<article><span><b>${item.name.split(" ").map((part) => part[0]).slice(0, 2).join("")}</b><strong>${escapeHtml(item.name)}</strong></span><span>${escapeHtml(item.role)}</span><span><i class="pipeline-stage pipeline-stage--${item.stage.toLowerCase().replaceAll(" ", "-")}">${escapeHtml(item.stage)}</i></span><span>${escapeHtml(item.date)}</span><button data-action="mock-pipeline-detail" type="button">&middot;&middot;&middot;</button></article>`).join("")}
+      </div>
+    `;
+  }
+
+  function renderRecruiterPortalContent() {
+    const profile = state.selectedTalent || alumniProfiles[0];
+
+    if (state.recruiterPortalView === "dashboard") {
+      return `
+        <div class="portal-view-heading portal-view-heading--with-action"><div><span>SELAMAT DATANG, PT NUSANTARA STEEL</span><h3>Recruitment overview</h3><p>Pantau pencarian kandidat dan proses rekrutmen dalam satu ruang kerja.</p></div><button class="portal-primary-button" data-action="switch-recruiter-view" data-view="talent" type="button">+ Cari kandidat</button></div>
+        <div class="recruiter-metric-grid"><article><span>PROFIL DILIHAT</span><strong>38</strong><small>+12 minggu ini</small></article><article><span>SHORTLIST</span><strong>03</strong><small>2 kandidat baru</small></article><article><span>PROSES AKTIF</span><strong>04</strong><small>1 menunggu respons</small></article><article><span>INTERVIEW</span><strong>02</strong><small>Jadwal pekan ini</small></article></div>
+        <section class="recruiter-dashboard-section"><header><div><span>PROSES TERBARU</span><h4>Kandidat dalam pipeline</h4></div><button data-action="switch-recruiter-view" data-view="pipeline" type="button">Lihat semua &rarr;</button></header>${recruiterPipelineMarkup()}</section>
+        <div class="recruiter-insight-grid"><section><span>TALENT INSIGHT</span><h4>Kompetensi paling banyak tersedia</h4><div><p><b>SMAW</b><i style="width:88%"></i><strong>184</strong></p><p><b>FCAW</b><i style="width:70%"></i><strong>126</strong></p><p><b>GTAW</b><i style="width:48%"></i><strong>82</strong></p><p><b>GMAW</b><i style="width:35%"></i><strong>61</strong></p></div></section><section class="recruiter-recommendation"><span>REKOMENDASI UNTUK ANDA</span><h4>12 kandidat baru sesuai kebutuhan SMAW 3G</h4><p>Seluruh kandidat telah menyelesaikan verifikasi profil dan sertifikat.</p><button data-action="switch-recruiter-view" data-view="talent" type="button">Tinjau kandidat</button></section></div>
+      `;
+    }
+
+    if (state.recruiterPortalView === "candidate") {
+      return `
+        <button class="portal-back-button" data-action="switch-recruiter-view" data-view="talent" type="button">&larr; Kembali ke hasil pencarian</button>
+        <article class="recruiter-candidate-profile">
+          <header><span class="portal-avatar portal-avatar--large">${escapeHtml(profile.initials)}</span><div><div class="portal-profile-labels"><span class="portal-status portal-status--available">${escapeHtml(profile.availability)}</span><span class="portal-verified">&check; Data terverifikasi</span></div><h2>${escapeHtml(profile.name)}</h2><strong>${escapeHtml(profile.role)}</strong><p>${escapeHtml(profile.location)} &middot; ${escapeHtml(profile.experience)} pengalaman</p></div><div class="recruiter-candidate-actions"><button class="portal-secondary-button" data-action="shortlist-talent" type="button">&#9734; Simpan shortlist</button><button class="portal-primary-button" data-action="recruit-candidate" type="button">Undang rekrutmen</button></div></header>
+          <div class="recruiter-candidate-profile__body"><main><section><span class="portal-section-label">RINGKASAN PROFIL</span><p>${escapeHtml(profile.summary)}</p></section><section><span class="portal-section-label">STATUS PEKERJAAN</span><div class="portal-employment-card"><span>&#9642;</span><div><strong>${escapeHtml(profile.employmentStatus)}</strong><p>${escapeHtml(profile.role)} di ${escapeHtml(profile.company)}</p><small>Sejak ${escapeHtml(profile.currentSince)}</small></div><b>${escapeHtml(profile.availability)}</b></div></section><section><span class="portal-section-label">KEAHLIAN TEKNIS</span><div class="portal-skill-row portal-skill-row--large">${profile.skills.map((skill) => `<span>${escapeHtml(skill)}</span>`).join("")}</div></section><section><span class="portal-section-label">SERTIFIKASI</span><div class="recruiter-certificate-grid">${profile.certifications.map((item) => `<article><span>&check;</span><div><strong>${escapeHtml(item)}</strong><small>Status valid &middot; Alpha Academy</small></div></article>`).join("")}</div></section></main><aside><section><span class="portal-section-label">HASIL PELATIHAN</span><strong>${escapeHtml(profile.program)}</strong><p>${escapeHtml(profile.graduation)}</p><div class="candidate-score"><span>Nilai akhir</span><b>${escapeHtml(profile.score)}</b></div></section><section><span class="portal-section-label">KECOCOKAN KANDIDAT</span><strong class="candidate-match">94%</strong><p>Sangat sesuai untuk kebutuhan SMAW Welder 3G.</p><ul><li>&check; Proses las sesuai</li><li>&check; Lokasi sesuai</li><li>&check; Pengalaman memenuhi</li></ul></section><small class="portal-privacy-note">Kontak pribadi hanya dibagikan setelah alumni menyetujui undangan.</small></aside></div>
+        </article>
+      `;
+    }
+
+    if (state.recruiterPortalView === "invite") {
+      return `
+        <button class="portal-back-button" data-action="switch-recruiter-view" data-view="candidate" type="button">&larr; Kembali ke profil kandidat</button>
+        <div class="recruiter-invite-layout">
+          <form class="recruiter-invite-form" data-form="recruitment-demo">
+            <div class="portal-view-heading"><span>UNDANGAN REKRUTMEN</span><h3>Kirim peluang kepada kandidat</h3><p>Alumni akan menerima ringkasan posisi dan dapat menyatakan minat sebelum kontak dibagikan.</p></div>
+            <div class="recruiter-invitee"><span class="portal-avatar">${escapeHtml(profile.initials)}</span><p><strong>${escapeHtml(profile.name)}</strong><small>${escapeHtml(profile.role)} &middot; ${escapeHtml(profile.location)}</small></p><span class="portal-verified">&check; Terverifikasi</span></div>
+            <div class="recruiter-form-grid"><label><span>Nama posisi</span><input name="position" value="SMAW Welder 3G" required></label><label><span>Tipe pekerjaan</span><select name="employment_type"><option>Karyawan kontrak</option><option>Karyawan tetap</option><option>Project based</option></select></label><label><span>Lokasi kerja</span><input name="location" value="Cilegon, Banten" required></label><label><span>Target mulai</span><input name="start_date" type="date" value="2026-09-01" required></label><label><span>Kisaran kompensasi</span><input name="salary" value="Rp7.500.000 - Rp9.000.000"></label><label><span>Tahap selanjutnya</span><select name="next_step"><option>Interview HR</option><option>Technical test</option><option>Interview user</option></select></label><label class="recruiter-form-grid__full"><span>Pesan untuk kandidat</span><textarea name="message" rows="5">Halo Andi, kami tertarik dengan profil dan kompetensi SMAW 3G Anda. Kami ingin mengundang Anda berdiskusi mengenai posisi Welder pada proyek fabrikasi kami.</textarea></label></div>
+            <label class="recruiter-consent"><input type="checkbox" required checked><span>Saya memahami kontak kandidat hanya dibagikan setelah kandidat menyetujui undangan.</span></label>
+            <div class="recruiter-form-actions"><button class="portal-secondary-button" data-action="switch-recruiter-view" data-view="candidate" type="button">Batal</button><button class="portal-primary-button" type="submit">Kirim undangan rekrutmen</button></div>
+          </form>
+          <aside class="recruiter-invite-preview"><span>PRATINJAU UNTUK ALUMNI</span><div><small>UNDANGAN DARI</small><h4>PT Nusantara Steel Works</h4><p>SMAW Welder 3G</p><dl><div><dt>Lokasi</dt><dd>Cilegon, Banten</dd></div><div><dt>Tipe</dt><dd>Karyawan kontrak</dd></div><div><dt>Tahap</dt><dd>Interview HR</dd></div></dl><blockquote>“Kami tertarik dengan profil dan kompetensi SMAW 3G Anda...”</blockquote><button type="button">Saya tertarik</button><button type="button">Belum tertarik</button></div></aside>
+        </div>
+      `;
+    }
+
+    if (state.recruiterPortalView === "pipeline") {
+      return `
+        <div class="portal-view-heading portal-view-heading--with-action"><div><span>PROSES REKRUTMEN</span><h3>Pipeline kandidat</h3><p>Pantau undangan, interview, hingga penawaran kandidat.</p></div><button class="portal-primary-button" data-action="switch-recruiter-view" data-view="talent" type="button">+ Tambah kandidat</button></div>
+        <div class="recruiter-pipeline-summary"><span><strong>01</strong> Shortlist</span><span><strong>${state.recruitmentSent ? "02" : "01"}</strong> Undangan</span><span><strong>01</strong> Interview</span><span><strong>01</strong> Penawaran</span></div>
+        ${state.recruitmentSent ? `<div class="portal-success-banner"><span>&check;</span><p><strong>Undangan demo berhasil dibuat</strong><small>${escapeHtml(profile.name)} ditambahkan ke tahap Undangan dikirim.</small></p></div>` : ""}
+        ${recruiterPipelineMarkup()}
+      `;
+    }
+
+    const talentItems = state.recruiterPortalView === "shortlist" ? alumniProfiles.filter((_, index) => [0, 2, 4].includes(index)) : alumniProfiles;
+    return `
+      <div class="portal-view-heading portal-view-heading--with-action"><div><span>${state.recruiterPortalView === "shortlist" ? "SHORTLIST KANDIDAT" : "ALPHA TALENT DIRECTORY"}</span><h3>${state.recruiterPortalView === "shortlist" ? "Kandidat yang sudah disimpan" : "Temukan kompetensi yang tepat"}</h3><p>Jelajahi profil alumni berdasarkan keahlian, posisi, pengalaman, lokasi, dan kesiapan kerja.</p></div><span class="portal-demo-badge">DATA SIMULASI</span></div>
+      <div class="portal-directory-toolbar portal-directory-toolbar--recruiter"><label><span aria-hidden="true">&#9906;</span><input type="search" value="SMAW 3G" aria-label="Cari kandidat"></label><select aria-label="Filter lokasi"><option>Lokasi: Semua</option><option>Banten</option><option>Jawa Barat</option><option>Jakarta</option></select><select aria-label="Filter status"><option>Siap bekerja</option><option>Sedang bekerja</option><option>Freelance</option></select><button type="button">Filter lanjutan &#9776;</button></div>
+      <div class="portal-directory-summary"><span>Ditemukan <strong>${talentItems.length} kandidat contoh</strong></span><span>Urutkan: <b>Paling sesuai</b></span></div>
+      <div class="portal-talent-grid">${talentItems.map((item) => talentCard(item, "recruiter")).join("")}</div>
+    `;
+  }
+
   function renderAlumni() {
     return `
       <section class="academy-portal-hero academy-portal-hero--alumni">
@@ -1235,6 +1538,14 @@
             <div class="academy-dashboard-mock__stats"><span><b>03</b> Sertifikat</span><span><b>12</b> Lowongan cocok</span><span><b>07</b> Koneksi</span></div>
             <div class="academy-dashboard-mock__job"><small>REKOMENDASI PEKERJAAN</small><strong>Welder SMAW 3G</strong><span>PT Nusantara Fabrikasi &middot; Cilegon</span><button type="button">Lihat Lowongan &rarr;</button></div>
           </div>
+        </div>
+      </section>
+
+      <section class="portal-demo" id="alumni-demo">
+        <div class="page-shell portal-demo__heading"><div><span class="eyebrow">DEMO PLATFORM ALUMNI</span><h2>Lihat seluruh pengalaman alumni.</h2><p>Jelajahi direktori, detail karier, peluang kerja, dan jejaring dalam simulasi frontend berikut.</p></div><span class="portal-demo-badge">PROTOTYPE &middot; TANPA BACKEND</span></div>
+        <div class="page-shell portal-app-shell">
+          <header class="portal-app-topbar"><a href="#alumni" data-action="go-public-page" data-target="alumni"><span class="portal-app-logo">A</span><strong>ALPHA <i>ALUMNI</i></strong></a><div><button type="button" aria-label="Notifikasi">&#9675;<b>3</b></button><span>Andi Ramadhan<small>SMAW Welder 3G</small></span><i class="portal-avatar">AR</i></div></header>
+          <div class="portal-app-body"><aside>${alumniPortalNav()}<div class="portal-app-sidebar-card"><span>PROFIL ANDA</span><strong>85% lengkap</strong><i><b style="width:85%"></b></i><button data-action="switch-alumni-view" data-view="profile" type="button">Lengkapi profil &rarr;</button></div></aside><main>${renderAlumniPortalContent()}</main></div>
         </div>
       </section>
 
@@ -1281,6 +1592,14 @@
             <article><b>RF</b><div><strong>Rizky Firmansyah <i>&check;</i></strong><small>GTAW Welder &middot; 6G</small><p>3 tahun pengalaman &middot; Bekasi</p></div><button type="button">Lihat</button></article>
             <footer>Menampilkan 3 dari 126 kandidat cocok</footer>
           </div>
+        </div>
+      </section>
+
+      <section class="portal-demo portal-demo--recruiter" id="recruiter-demo">
+        <div class="page-shell portal-demo__heading"><div><span class="eyebrow">DEMO RECRUITER WORKSPACE</span><h2>Dari pencarian hingga undangan rekrutmen.</h2><p>Coba seluruh alur recruiter melalui tampilan frontend interaktif berikut.</p></div><span class="portal-demo-badge">PROTOTYPE &middot; TANPA BACKEND</span></div>
+        <div class="page-shell portal-app-shell portal-app-shell--recruiter">
+          <header class="portal-app-topbar"><a href="#recruiters" data-action="go-public-page" data-target="recruiters"><span class="portal-app-logo">A</span><strong>ALPHA <i>TALENT CONNECT</i></strong></a><div><button type="button" aria-label="Notifikasi recruiter">&#9675;<b>2</b></button><span>PT Nusantara Steel<small>Recruiter Account</small></span><i class="portal-company-avatar">NS</i></div></header>
+          <div class="portal-app-body"><aside>${recruiterPortalNav()}<div class="portal-app-sidebar-card"><span>PAKET RECRUITER</span><strong>Partner Access</strong><small>126 profil dapat diakses</small><button data-action="proposal-interest" type="button">Kelola akses &rarr;</button></div></aside><main>${renderRecruiterPortalContent()}</main></div>
         </div>
       </section>
 
@@ -2748,6 +3067,14 @@
       return;
     }
 
+    if (form.dataset.form === "recruitment-demo") {
+      state.recruitmentSent = true;
+      state.recruiterPortalView = "pipeline";
+      refreshPortal("recruiter-demo");
+      showToast("Undangan rekrutmen simulasi berhasil dibuat.", "success");
+      return;
+    }
+
     if (form.dataset.form === "account") {
       storeForm(form);
       const submitButton = form.querySelector('button[type="submit"]');
@@ -2989,10 +3316,45 @@
         input.focus();
       }
     }
-    if (action === "alumni-login") {
-      showToast("Tampilan login alumni akan diaktifkan pada fase implementasi.", "info");
+    if (action === "switch-alumni-view") {
+      state.alumniPortalView = button.dataset.view || "directory";
+      refreshPortal("alumni-demo");
     }
-    if (action === "recruiter-demo" || action === "proposal-interest") {
+    if (action === "switch-recruiter-view") {
+      state.recruiterPortalView = button.dataset.view || "dashboard";
+      refreshPortal("recruiter-demo");
+    }
+    if (action === "select-talent") {
+      state.selectedTalent =
+        alumniProfiles.find((profile) => profile.id === button.dataset.id) ||
+        alumniProfiles[0];
+      if (button.dataset.portal === "recruiter") {
+        state.recruiterPortalView = "candidate";
+        refreshPortal("recruiter-demo");
+      } else {
+        state.alumniPortalView = "profile";
+        refreshPortal("alumni-demo");
+      }
+    }
+    if (action === "recruit-candidate") {
+      state.recruiterPortalView = "invite";
+      refreshPortal("recruiter-demo");
+    }
+    if (action === "shortlist-talent") {
+      showToast("Kandidat ditambahkan ke shortlist simulasi.", "success");
+    }
+    if (["mock-profile-edit", "mock-job-interest", "mock-network-register", "mock-pipeline-detail"].includes(action)) {
+      showToast("Interaksi frontend berhasil. Penyimpanan data akan tersedia setelah integrasi backend.", "info");
+    }
+    if (action === "alumni-login") {
+      state.alumniPortalView = "directory";
+      refreshPortal("alumni-demo");
+    }
+    if (action === "recruiter-demo") {
+      state.recruiterPortalView = "dashboard";
+      refreshPortal("recruiter-demo");
+    }
+    if (action === "proposal-interest") {
       showToast("Form minat dan kontak akan dihubungkan pada fase berikutnya.", "info");
     }
     if (action === "load-more-news") {

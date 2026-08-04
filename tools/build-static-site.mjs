@@ -15,8 +15,8 @@ await cp(resolve(root, 'public/templates/welding-school'), client, {
 });
 await cp(resolve(root, 'public/favicon.ico'), resolve(client, 'favicon.ico'));
 await cp(
-  resolve(root, 'public/alpha-academy-og.png'),
-  resolve(client, 'alpha-academy-og.png'),
+  resolve(root, 'public/alpha-academy-ecosystem-og.png'),
+  resolve(client, 'alpha-academy-ecosystem-og.png'),
 );
 
 const worker = `const securityHeaders = {

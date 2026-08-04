@@ -11,11 +11,11 @@
         <meta property="og:type" content="website">
         <meta property="og:title" content="@yield('title', $brand['name'])">
         <meta property="og:description" content="@yield('description', $brand['service'].' '.$brand['name'])">
-        <meta property="og:image" content="{{ url('alpha-academy-og.png') }}">
+        <meta property="og:image" content="{{ url('alpha-academy-ecosystem-og.png') }}">
         <meta name="twitter:card" content="summary_large_image">
         <meta name="twitter:title" content="@yield('title', $brand['name'])">
         <meta name="twitter:description" content="@yield('description', $brand['service'].' '.$brand['name'])">
-        <meta name="twitter:image" content="{{ url('alpha-academy-og.png') }}">
+        <meta name="twitter:image" content="{{ url('alpha-academy-ecosystem-og.png') }}">
         <title>@yield('title', $brand['name'])</title>
         <link rel="icon" href="{{ asset('favicon.ico') }}" sizes="any">
         <link rel="stylesheet" href="{{ asset('templates/welding-school/style.css') }}?v={{ filemtime(public_path('templates/welding-school/style.css')) }}">
