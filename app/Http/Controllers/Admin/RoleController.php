@@ -1,0 +1,120 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
+use Illuminate\View\View;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
+
+class RoleController extends Controller
+{
+    public function index(): View
+    {
+        return view('admin.roles.index', [
+            'roles' => Role::query()
+                ->with('permissions')
+                ->withCount('users')
+                ->orderBy('name')
+                ->get(),
+            'permissions' => Permission::query()->orderBy('name')->get(),
+            'permissionLabels' => config('admin.permission_labels'),
+        ]);
+    }
+
+    public function store(Request $request): RedirectResponse
+    {
+        $validated = $this->validateRole($request);
+        $name = Str::lower($validated['name']);
+
+        if (in_array($name, ['super-admin', 'admin', 'participant'], true)) {
+            throw ValidationException::withMessages([
+                'name' => 'Nama role sistem tersebut sudah dicadangkan.',
+            ]);
+        }
+
+        $role = Role::create([
+            'name' => $name,
+            'guard_name' => 'web',
+        ]);
+        $role->syncPermissions($validated['permissions'] ?? []);
+
+        return back()->with('success', 'Role baru berhasil dibuat.');
+    }
+
+    public function update(Request $request, Role $role): RedirectResponse
+    {
+        if ($role->name === 'super-admin') {
+            throw ValidationException::withMessages([
+                'role' => 'Role super-admin dikunci agar akses utama tidak terputus.',
+            ]);
+        }
+
+        $validated = $this->validateRole($request, $role);
+        $name = Str::lower($validated['name']);
+
+        if (
+            in_array($role->name, ['admin', 'participant'], true)
+            && $name !== $role->name
+        ) {
+            throw ValidationException::withMessages([
+                'name' => 'Nama role sistem tidak dapat diubah.',
+            ]);
+        }
+
+        $role->update(['name' => $name]);
+        $role->syncPermissions($validated['permissions'] ?? []);
+
+        return back()->with('success', 'Role dan izin berhasil diperbarui.');
+    }
+
+    public function destroy(Role $role): RedirectResponse
+    {
+        if (in_array($role->name, ['super-admin', 'admin', 'participant'], true)) {
+            throw ValidationException::withMessages([
+                'role' => 'Role bawaan sistem tidak dapat dihapus.',
+            ]);
+        }
+
+        if ($role->users()->exists()) {
+            throw ValidationException::withMessages([
+                'role' => 'Role masih digunakan oleh pengguna. Pindahkan pengguna ke role lain terlebih dahulu.',
+            ]);
+        }
+
+        $role->delete();
+
+        return to_route('admin.roles.index')
+            ->with('success', 'Role berhasil dihapus.');
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function validateRole(Request $request, ?Role $role = null): array
+    {
+        return $request->validate([
+            'name' => [
+                'required',
+                'string',
+                'max:80',
+                'regex:/^[a-z0-9-]+$/',
+                Rule::unique('roles', 'name')
+                    ->where('guard_name', 'web')
+                    ->ignore($role),
+            ],
+            'permissions' => ['sometimes', 'array'],
+            'permissions.*' => [
+                'string',
+                Rule::exists('permissions', 'name')->where('guard_name', 'web'),
+            ],
+        ], [
+            'name.regex' => 'Gunakan huruf kecil, angka, dan tanda hubung untuk nama role.',
+        ]);
+    }
+}

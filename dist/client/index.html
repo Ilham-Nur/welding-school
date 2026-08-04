@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Company profile dan platform pelatihan welding profesional PT. Alpha Teknik Pratama."
+    />
+    <meta property="og:title" content="ALPHA ACADEMY Welding School" />
+    <meta
+      property="og:description"
+      content="Kompeten. Tersertifikasi. Siap Kerja."
+    />
+    <meta property="og:image" content="alpha-academy-og.png" />
+    <title>ALPHA ACADEMY Welding School</title>
+    <link rel="icon" href="favicon.ico" sizes="any" />
+    <link rel="stylesheet" href="style.css" />
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#app">Lewati ke konten utama</a>
+
+    <header class="site-header">
+      <a class="brand" href="#home" data-action="go-home" aria-label="ALPHA ACADEMY Welding School">
+        <span class="brand__mark" aria-hidden="true"><img src="assets/images/alpha-teknik-pratama-logo-hd.png" alt="" /></span>
+        <span class="brand__copy">
+          <strong>ALPHA ACADEMY</strong>
+          <small>WELDING SCHOOL</small>
+        </span>
+      </a>
+
+      <nav class="public-nav" aria-label="Navigasi utama">
+        <a class="is-active" href="#home" data-action="go-home" data-public-route="home">Beranda</a>
+        <a href="#about" data-action="go-public-page" data-target="about" data-public-route="about">Tentang</a>
+        <a href="#programs" data-action="go-programs" data-public-route="programs">Program</a>
+        <a href="#news" data-action="go-public-page" data-target="news" data-public-route="news">Berita</a>
+        <a href="#alumni" data-action="go-public-page" data-target="alumni" data-public-route="alumni">Alumni</a>
+        <a href="#recruiters" data-action="go-public-page" data-target="recruiters" data-public-route="recruiters">Recruiter</a>
+        <a href="#certificate" data-action="go-public-page" data-target="certificate" data-public-route="certificate">Verifikasi</a>
+        <a class="public-nav__account" href="#account" data-action="go-account">Portal Akademi</a>
+      </nav>
+
+      <button class="login-button" data-action="go-account" type="button">
+        <span aria-hidden="true">○</span>
+        Portal Akademi
+      </button>
+
+      <button
+        class="mobile-menu-button"
+        data-action="toggle-menu"
+        type="button"
+        aria-label="Buka menu"
+        aria-expanded="false"
+      >
+        ☰
+      </button>
+    </header>
+
+    <main id="app" tabindex="-1"></main>
+
+    <footer class="site-footer">
+      <div class="site-footer__main page-shell">
+        <div>
+          <a class="brand" href="#home" data-action="go-home">
+            <span class="brand__mark" aria-hidden="true"><img src="assets/images/alpha-teknik-pratama-logo-hd.png" alt="" /></span>
+            <span class="brand__copy">
+              <strong>ALPHA ACADEMY</strong>
+              <small>WELDING SCHOOL</small>
+            </span>
+          </a>
+          <p>
+            Ekosistem pelatihan, sertifikasi, alumni, dan rekrutmen welder
+            profesional dari PT. Alpha Teknik Pratama.
+          </p>
+        </div>
+        <div>
+          <strong>Jelajahi</strong>
+          <a href="#about" data-action="go-public-page" data-target="about">Tentang Kami</a>
+          <a href="#programs" data-action="go-programs">Program Pelatihan</a>
+          <a href="#news" data-action="go-public-page" data-target="news">Berita &amp; Event</a>
+        </div>
+        <div>
+          <strong>Terhubung</strong>
+          <a href="#alumni" data-action="go-public-page" data-target="alumni">Platform Alumni</a>
+          <a href="#recruiters" data-action="go-public-page" data-target="recruiters">Untuk Recruiter</a>
+          <a href="#certificate" data-action="go-public-page" data-target="certificate">Verifikasi Sertifikat</a>
+        </div>
+        <div>
+          <strong>Hubungi Kami</strong>
+          <span>Cilegon, Banten</span>
+          <span>info@alphaacademy.id</span>
+          <span>+62 254 123 456</span>
+        </div>
+      </div>
+      <div class="site-footer__bottom">
+        &copy; 2026 ALPHA ACADEMY Welding School &middot; PT. Alpha Teknik Pratama
+      </div>
+    </footer>
+
+    <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+  </body>
+</html>

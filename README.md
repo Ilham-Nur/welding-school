@@ -1,98 +1,136 @@
-# vinext-starter
+# PT. Alpha Teknik Pratama · Welding School
 
-A clean full-stack starter running on
-[vinext](https://github.com/cloudflare/vinext), with optional Cloudflare D1 and
-Drizzle support.
+Fondasi aplikasi pelatihan welding PT. Alpha Teknik Pratama menggunakan Laravel 13, Blade, dan MySQL.
+Tampilan statis sebelumnya disimpan sebagai template referensi di
+`public/templates/welding-school`, lalu dipakai kembali oleh layout Blade.
 
-## Prerequisites
+## Persiapan lokal
 
-- Node.js `>=22.13.0`
+1. Salin `.env.example` menjadi `.env`.
+2. Buat database MySQL bernama `welding_school`.
+3. Sesuaikan `DB_USERNAME` dan `DB_PASSWORD` pada `.env`.
+4. Jalankan `composer install`.
+5. Jalankan `php artisan key:generate`.
+6. Jalankan `php artisan migrate --seed`.
+7. Jalankan `php artisan serve`.
 
-## Quick Start
+Halaman utama tersedia di `/`, sedangkan katalog komponen Blade tersedia di
+`/template/components`.
 
-```bash
-npm install
-npm run dev
-npm run build
+Setelah menjalankan seeder, akun super-admin lokal dapat digunakan dengan:
+
+```text
+Email: admin@welding-school.test
+Password: superadmin12345
 ```
 
-This starter does not use `wrangler.jsonc`.
+## Login dan pendaftaran
 
-## Included Shape
+Form pada `/#account` sudah terhubung ke autentikasi Laravel:
 
-- edit site code under `app/`
-- `.openai/hosting.json` declares optional Sites D1 and R2 bindings
-- `vite.config.ts` simulates declared bindings for local development
-- `db/schema.ts` starts intentionally empty
-- `examples/d1/` contains an optional D1 example surface
-- `drizzle.config.ts` supports local migration generation when needed
+- daftar menggunakan nama, email, dan password;
+- login menggunakan email dan password;
+- opsi ingat saya;
+- logout yang menghapus sesi;
+- login atau daftar menggunakan akun Google.
 
-## Workspace Auth Headers
+Password minimal 8 karakter dan harus berisi huruf serta angka. Pesan login
+yang gagal dibuat umum agar tidak membocorkan apakah sebuah email terdaftar.
 
-OpenAI workspace sites can read the current user's email from
-`oai-authenticated-user-email`.
+### Testing verifikasi email di lokal
 
-SIWC-authenticated workspace sites may also receive
-`oai-authenticated-user-full-name` when the user's SIWC profile has a non-empty
-`name` claim. The full-name value is percent-encoded UTF-8 and is accompanied by
-`oai-authenticated-user-full-name-encoding: percent-encoded-utf-8`.
+Pendaftaran menggunakan email memakai kode OTP 6 digit:
 
-Treat the full name as optional and fall back to email when it is absent:
+1. Pengguna mendaftar.
+2. Kode dikirim melalui mailer Laravel dan berlaku selama 10 menit.
+3. Pengguna memasukkan kode pada halaman `/#verification`.
+4. Setelah benar, `email_verified_at` diisi dan pengguna masuk ke dashboard.
 
-```tsx
-import { headers } from "next/headers";
+Konfigurasi lokal menggunakan `MAIL_MAILER=log`, sehingga salinan email dapat
+dilihat pada `storage/logs/laravel.log`. Ketika `APP_ENV=local`, kode testing
+juga ditampilkan langsung pada halaman verifikasi agar alur dapat diuji tanpa
+domain atau server email. Kode testing tersebut tidak ditampilkan ketika
+aplikasi menggunakan `APP_ENV=production`.
 
-export default async function Home() {
-  const requestHeaders = await headers();
-  const email = requestHeaders.get("oai-authenticated-user-email");
-  const encodedFullName = requestHeaders.get("oai-authenticated-user-full-name");
-  const fullName =
-    encodedFullName &&
-    requestHeaders.get("oai-authenticated-user-full-name-encoding") ===
-      "percent-encoded-utf-8"
-      ? decodeURIComponent(encodedFullName)
-      : null;
+Kode hanya dapat dicoba lima kali. Pengiriman ulang memiliki jeda 60 detik dan
+selalu menggantikan kode sebelumnya.
 
-  const displayName = fullName ?? email;
-  // ...
-}
+## Mengaktifkan login Google
+
+1. Buka Google Auth Platform dan buat atau pilih sebuah project.
+2. Lengkapi halaman Branding/consent screen.
+3. Buat OAuth Client dengan tipe **Web application**.
+4. Tambahkan Authorized redirect URI berikut untuk pengembangan lokal:
+   `http://localhost:8000/auth/google/callback`.
+5. Salin Client ID dan Client Secret ke `.env`:
+
+```dotenv
+GOOGLE_CLIENT_ID=client-id-dari-google
+GOOGLE_CLIENT_SECRET=client-secret-dari-google
+GOOGLE_REDIRECT_URI="${APP_URL}/auth/google/callback"
 ```
 
-## Optional Dispatch-Owned ChatGPT Sign-In
+6. Pastikan `APP_URL=http://localhost:8000`, lalu jalankan
+   `php artisan config:clear`.
 
-Import the ready-to-use helpers from `app/chatgpt-auth.ts` when the site needs
-optional or required ChatGPT sign-in:
+Untuk domain produksi, ganti `APP_URL` ke alamat HTTPS produksi dan daftarkan
+URI callback produksi yang sama persis di Google Auth Platform.
 
-- Use `getChatGPTUser()` for optional signed-in UI.
-- Use `requireChatGPTUser(returnTo)` for server-rendered pages that should send
-  anonymous visitors through Sign in with ChatGPT.
-- Use `chatGPTSignInPath(returnTo)` and `chatGPTSignOutPath(returnTo)` for
-  browser links or actions.
-- Pass a same-origin relative `returnTo` path for the destination after sign-in
-  or sign-out. The helper validates and safely encodes it.
-- Mark protected pages with `export const dynamic = "force-dynamic"` because
-  they depend on per-request identity headers.
+Login Google di aplikasi ini hanya dipakai untuk identitas dasar pengguna
+(nama, email, dan foto profil), bukan untuk membaca inbox Gmail. Aplikasi juga
+tidak menyimpan access token atau password Google. Akun Google baru dibuat
+sebagai peserta tanpa password lokal; jika alamat email sudah ada, akun Google
+akan ditautkan ke akun tersebut.
 
-Dispatch owns `/signin-with-chatgpt`, `/signout-with-chatgpt`, `/callback`, the
-OAuth cookies, and identity header injection. Do not implement app routes for
-those reserved paths. Routes that do not import and call the helper remain
-anonymous-compatible.
+## Invoice setelah persetujuan
 
-SIWC establishes identity only; it does not prove workspace membership. Use the
-Sites hosting platform's access policy controls for workspace-wide restrictions,
-or enforce explicit server-side membership or allowlist checks.
+Setelah admin menyetujui pendaftaran, peserta dapat membuka ringkasan biaya,
+menyetujui kebijakan pembayaran, lalu membuat invoice. Nominal invoice dihitung
+oleh backend dan satu pendaftaran hanya dapat memiliki satu invoice.
 
-Use SIWC for account pages, user-specific dashboards, saved records, and write
-actions tied to the current ChatGPT user. Leave public content anonymous.
+Konfigurasi biaya administrasi dan batas pembayaran tersedia di `.env`:
 
-## Useful Commands
+```dotenv
+BILLING_ADMINISTRATION_FEE=150000
+BILLING_INVOICE_DUE_HOURS=24
+```
 
-- `npm run dev`: start local development
-- `npm run build`: verify the vinext build output
-- `npm test`: build the starter and verify its rendered loading skeleton
-- `npm run db:generate`: generate Drizzle migrations after schema changes
+Pembayaran menggunakan Midtrans Snap Redirect. Untuk pengujian lokal, gunakan
+Access Keys dari environment Sandbox:
 
-## Learn More
+```dotenv
+MIDTRANS_IS_PRODUCTION=false
+MIDTRANS_SERVER_KEY=SB-Mid-server-...
+MIDTRANS_CLIENT_KEY=SB-Mid-client-...
+MIDTRANS_NOTIFICATION_URL=
+```
 
-- [vinext Documentation](https://github.com/cloudflare/vinext)
-- [Drizzle D1 Guide](https://orm.drizzle.team/docs/get-started/d1-new)
+`MIDTRANS_SERVER_KEY` hanya boleh disimpan di backend dan tidak boleh dikirim
+ke browser atau disimpan di repository. Midtrans tidak dapat mengirim webhook
+langsung ke `localhost`. Gunakan URL HTTPS dari tunnel lokal sebagai
+`MIDTRANS_NOTIFICATION_URL`, dengan path:
+
+```text
+/payments/midtrans/webhook
+```
+
+Redirect browser dari Midtrans tidak pernah menandai pembayaran sebagai lunas.
+Invoice hanya menjadi lunas setelah webhook memiliki signature yang valid,
+nominalnya sesuai, dan referensi transaksinya ditemukan. Webhook pembayaran
+yang valid juga membuat enrollment peserta secara otomatis.
+
+## Komponen Blade
+
+Komponen reusable berada di `resources/views/components/ui`:
+
+- alert
+- modal
+- confirmation
+- text input
+- file input
+- table
+- pagination
+- toast stack
+
+Pengujian dapat dijalankan dengan `php artisan test`. Lingkungan pengujian
+menggunakan SQLite in-memory agar tidak mengubah data MySQL lokal.
