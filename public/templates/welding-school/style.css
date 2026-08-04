@@ -1908,6 +1908,881 @@
   font-size: 28px;
 }
 
+/* =========================================================
+   PUBLIC WELDER DIRECTORY + RECRUITER ONBOARDING
+   Proposal prototype based on the approved directory flow.
+   ========================================================= */
+
+.academy-ecosystem__cards--single {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.academy-ecosystem__cards--single article {
+  max-width: 640px;
+}
+
+.welder-directory-page {
+  --directory-orange: #f05a0b;
+  --directory-navy: #0b1925;
+  background: #f8fafb;
+  color: #15202b;
+  min-height: 760px;
+  padding: 28px 0 70px;
+}
+
+.welder-directory-page .page-shell {
+  width: min(1540px, calc(100% - 40px));
+}
+
+.welder-directory-breadcrumb {
+  color: #667583;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  margin-bottom: 12px;
+}
+
+.welder-directory-breadcrumb span {
+  color: var(--directory-orange);
+  margin: 0 8px;
+}
+
+.welder-directory-heading {
+  align-items: flex-end;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.welder-directory-heading h1 {
+  color: var(--directory-navy);
+  font-size: clamp(32px, 3vw, 48px);
+  letter-spacing: -0.045em;
+  line-height: 1.05;
+  margin: 0 0 8px;
+}
+
+.welder-directory-heading p {
+  color: #62717f;
+  margin: 0;
+  max-width: 720px;
+}
+
+.welder-directory-heading > span {
+  background: #fff0e8;
+  border: 1px solid #ffd2bb;
+  border-radius: 999px;
+  color: #bd4304;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  padding: 8px 12px;
+}
+
+.welder-directory-layout {
+  align-items: start;
+  display: grid;
+  gap: 22px;
+  grid-template-columns: minmax(0, 1fr) 390px;
+}
+
+.welder-directory-main {
+  min-width: 0;
+}
+
+.welder-search-panel {
+  background: white;
+  border: 1px solid #dfe5ea;
+  border-radius: 12px;
+  box-shadow: 0 8px 26px rgba(11, 25, 37, 0.05);
+  padding: 16px;
+}
+
+.welder-search-input {
+  align-items: center;
+  display: grid;
+  gap: 8px;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+}
+
+.welder-search-input > span {
+  color: #52616e;
+  font-size: 20px;
+}
+
+.welder-search-input input {
+  border: 0;
+  font: inherit;
+  min-width: 0;
+  outline: none;
+  padding: 12px 6px;
+}
+
+.welder-search-input button,
+.welder-detail-actions button:first-child,
+.recruiter-auth-primary {
+  background: var(--directory-orange, #f05a0b);
+  border: 0;
+  border-radius: 7px;
+  color: white;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 850;
+  padding: 12px 22px;
+}
+
+.welder-filter-grid {
+  border-top: 1px solid #edf0f2;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(5, minmax(120px, 1fr)) auto;
+  margin-top: 10px;
+  padding-top: 12px;
+}
+
+.welder-filter-grid label {
+  border: 1px solid #dfe5ea;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 8px 10px;
+}
+
+.welder-filter-grid label > span {
+  color: #24313d;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.welder-filter-grid select,
+.welder-results-summary select {
+  background: white;
+  border: 0;
+  color: #687681;
+  font: inherit;
+  font-size: 12px;
+  min-width: 0;
+  outline: none;
+  padding: 4px 0 0;
+}
+
+.welder-reset-button {
+  align-self: stretch;
+  background: white;
+  border: 1px solid #cfd7de;
+  border-radius: 8px;
+  color: #33414d;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 0 14px;
+}
+
+.welder-results-summary {
+  align-items: center;
+  display: flex;
+  font-size: 13px;
+  justify-content: space-between;
+  padding: 18px 2px 12px;
+}
+
+.welder-results-summary b {
+  color: var(--directory-navy);
+  font-size: 15px;
+}
+
+.welder-results-summary label {
+  align-items: center;
+  background: white;
+  border: 1px solid #dfe5ea;
+  border-radius: 7px;
+  display: flex;
+  gap: 6px;
+  padding: 7px 10px;
+}
+
+.welder-table-wrap {
+  background: white;
+  border: 1px solid #dfe5ea;
+  border-radius: 10px;
+  box-shadow: 0 8px 28px rgba(11, 25, 37, 0.04);
+  overflow-x: auto;
+}
+
+.welder-table {
+  border-collapse: collapse;
+  min-width: 1100px;
+  width: 100%;
+}
+
+.welder-table th {
+  background: #f5f7f8;
+  color: #34424f;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.025em;
+  padding: 12px 10px;
+  text-align: left;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.welder-table td {
+  border-top: 1px solid #e6eaed;
+  color: #32404c;
+  font-size: 12px;
+  line-height: 1.45;
+  padding: 12px 10px;
+  vertical-align: middle;
+}
+
+.welder-table td + td,
+.welder-table th + th {
+  border-left: 1px solid #edf0f2;
+}
+
+.welder-table tbody tr {
+  transition: background 160ms ease;
+}
+
+.welder-table tbody tr:hover,
+.welder-table tbody tr.is-selected {
+  background: #fff5ee;
+}
+
+.welder-table tbody tr.is-selected td {
+  border-bottom: 1px solid #f7c7a9;
+  border-top-color: #f7c7a9;
+}
+
+.welder-person {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+  display: flex;
+  gap: 9px;
+  min-width: 190px;
+  padding: 0;
+  text-align: left;
+}
+
+.welder-person > span:last-child {
+  display: flex;
+  flex-direction: column;
+}
+
+.welder-person strong {
+  color: var(--directory-navy);
+  font-size: 13px;
+}
+
+.welder-person small,
+.welder-person i {
+  font-size: 12px;
+  font-style: normal;
+}
+
+.welder-person small {
+  color: #77838d;
+}
+
+.welder-person i {
+  color: #1377c5;
+  font-weight: 750;
+}
+
+.welder-avatar {
+  align-items: center;
+  background:
+    radial-gradient(circle at 50% 32%, #ffe7d1 0 20%, transparent 21%),
+    linear-gradient(145deg, #223847, #09151e);
+  border: 2px solid white;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px #ccd5db;
+  color: white;
+  display: inline-flex;
+  flex: 0 0 42px;
+  font-size: 12px;
+  font-weight: 900;
+  height: 42px;
+  justify-content: center;
+  width: 42px;
+}
+
+.welder-avatar--large {
+  flex-basis: 76px;
+  font-size: 18px;
+  height: 76px;
+  width: 76px;
+}
+
+.welder-process-tag,
+.welder-status,
+.welder-certificate {
+  border-radius: 5px;
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 850;
+  padding: 5px 7px;
+  white-space: nowrap;
+}
+
+.welder-process-tag,
+.welder-status.is-standby {
+  background: #e8f2ff;
+  color: #1765b1;
+}
+
+.welder-status.is-working,
+.welder-certificate.is-active {
+  background: #e5f6eb;
+  color: #16753e;
+}
+
+.welder-status.is-process {
+  background: #fff0df;
+  color: #bd5a03;
+}
+
+.welder-certificate.is-expired {
+  background: #ffebe7;
+  color: #c43825;
+}
+
+.welder-cell-note {
+  color: #667582;
+  display: block;
+  font-size: 12px;
+  margin-top: 4px;
+  max-width: 130px;
+}
+
+.welder-detail-button {
+  background: white;
+  border: 1px solid #cbd4db;
+  border-radius: 6px;
+  color: #25323e;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 850;
+  padding: 8px 14px;
+}
+
+.welder-detail-button.is-active {
+  background: var(--directory-orange);
+  border-color: var(--directory-orange);
+  color: white;
+}
+
+.welder-empty {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 40px;
+}
+
+.welder-pagination {
+  align-items: center;
+  display: flex;
+  gap: 7px;
+  justify-content: center;
+  padding-top: 18px;
+}
+
+.welder-pagination button {
+  background: white;
+  border: 1px solid #dfe5ea;
+  border-radius: 6px;
+  color: #34424f;
+  height: 34px;
+  min-width: 34px;
+}
+
+.welder-pagination button.is-active {
+  background: var(--directory-orange);
+  border-color: var(--directory-orange);
+  color: white;
+}
+
+.welder-detail-panel {
+  background: white;
+  border: 1px solid #dfe5ea;
+  border-radius: 12px;
+  box-shadow: 0 12px 38px rgba(11, 25, 37, 0.09);
+  max-height: calc(100vh - 110px);
+  overflow: auto;
+  padding: 20px;
+  position: sticky;
+  top: 90px;
+}
+
+.welder-detail-panel__heading {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.welder-detail-panel__heading > span {
+  color: var(--directory-navy);
+  font-size: 17px;
+  font-weight: 900;
+}
+
+.welder-detail-panel__heading small {
+  color: #89949d;
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.welder-detail-identity {
+  align-items: center;
+  display: flex;
+  gap: 15px;
+}
+
+.welder-detail-identity h2 {
+  display: inline;
+  font-size: 18px;
+  margin: 0 7px 0 0;
+}
+
+.welder-detail-identity p,
+.welder-detail-identity small {
+  color: #667582;
+  display: block;
+  font-size: 12px;
+  margin: 5px 0 0;
+}
+
+.welder-detail-actions {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 0.8fr);
+  margin: 18px 0;
+}
+
+.welder-detail-actions button {
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 850;
+  min-height: 42px;
+}
+
+.welder-detail-actions button:last-child {
+  background: white;
+  border: 1px solid #aeb9c1;
+  border-radius: 7px;
+  color: #25323e;
+}
+
+.welder-detail-section {
+  border-top: 1px solid #e7ebee;
+  padding: 16px 0 4px;
+}
+
+.welder-detail-section h3 {
+  color: var(--directory-navy);
+  font-size: 13px;
+  margin: 0 0 10px;
+}
+
+.welder-detail-section dl,
+.welder-detail-section dd {
+  margin: 0;
+}
+
+.welder-detail-section dl > div {
+  display: grid;
+  font-size: 12px;
+  gap: 10px;
+  grid-template-columns: 42% minmax(0, 1fr);
+  line-height: 1.55;
+  margin-bottom: 5px;
+}
+
+.welder-detail-section dt {
+  color: #687682;
+}
+
+.welder-detail-section dd {
+  color: #26333e;
+  font-weight: 650;
+}
+
+.welder-detail-section dd.is-valid {
+  color: #138047;
+}
+
+.welder-detail-section dd.is-warning {
+  color: #c23f28;
+}
+
+.welder-detail-summary {
+  background: #f5f7f8;
+  border-radius: 7px;
+  color: #586671;
+  font-size: 12px;
+  line-height: 1.6;
+  margin: 10px 0 0;
+  padding: 10px;
+}
+
+.recruiter-auth-page {
+  --directory-orange: #f05a0b;
+  background:
+    linear-gradient(90deg, rgba(8, 25, 38, 0.98) 0 49%, rgba(245, 248, 250, 0.98) 49%),
+    url("assets/images/welding-hero.png") center / cover;
+  min-height: calc(100vh - 80px);
+  padding: 64px 0 80px;
+}
+
+.recruiter-auth-layout {
+  align-items: center;
+  display: grid;
+  gap: clamp(50px, 9vw, 130px);
+  grid-template-columns: minmax(0, 0.9fr) minmax(430px, 0.78fr);
+}
+
+.recruiter-auth-intro {
+  color: white;
+  padding-right: 30px;
+}
+
+.recruiter-auth-intro > span,
+.recruiter-auth-card__head > span,
+.recruiter-auth-success > small {
+  color: #67d5a3;
+  display: block;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.13em;
+  margin-bottom: 16px;
+}
+
+.recruiter-auth-intro h1 {
+  font-size: clamp(36px, 4.2vw, 62px);
+  letter-spacing: -0.045em;
+  line-height: 1.05;
+  margin: 0 0 24px;
+}
+
+.recruiter-auth-intro p {
+  color: #b7c4ce;
+  font-size: 17px;
+  line-height: 1.7;
+  margin: 0;
+}
+
+.recruiter-auth-intro ul {
+  display: grid;
+  gap: 12px;
+  list-style: none;
+  margin: 28px 0;
+  padding: 0;
+}
+
+.recruiter-auth-intro li::before {
+  color: #67d5a3;
+  content: "\2713";
+  font-weight: 900;
+  margin-right: 10px;
+}
+
+.recruiter-auth-intro button {
+  background: transparent;
+  border: 0;
+  color: white;
+  cursor: pointer;
+  font-weight: 800;
+  padding: 0;
+}
+
+.recruiter-auth-card {
+  background: white;
+  border: 1px solid #dfe5ea;
+  border-radius: 16px;
+  box-shadow: 0 28px 70px rgba(4, 15, 24, 0.22);
+  padding: clamp(24px, 4vw, 42px);
+}
+
+.recruiter-auth-card__head > span,
+.recruiter-auth-success > small {
+  color: #137951;
+  margin-bottom: 10px;
+}
+
+.recruiter-auth-card h2 {
+  color: #0b1925;
+  font-size: 30px;
+  letter-spacing: -0.035em;
+  margin: 0 0 8px;
+}
+
+.recruiter-auth-card__head p,
+.recruiter-auth-success > p {
+  color: #687681;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.recruiter-candidate-summary {
+  align-items: center;
+  background: #f4f7f8;
+  border: 1px solid #e1e7eb;
+  border-radius: 10px;
+  display: grid;
+  gap: 12px;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  margin: 22px 0;
+  padding: 12px;
+}
+
+.recruiter-candidate-summary small,
+.recruiter-candidate-summary strong,
+.recruiter-candidate-summary p {
+  display: block;
+}
+
+.recruiter-candidate-summary small {
+  color: #7a8791;
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.recruiter-candidate-summary strong {
+  color: #11212d;
+  margin: 3px 0;
+}
+
+.recruiter-candidate-summary p {
+  color: #667582;
+  font-size: 12px;
+  margin: 0;
+}
+
+.recruiter-candidate-summary button {
+  background: transparent;
+  border: 0;
+  color: #d84d08;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.recruiter-auth-tabs {
+  border-bottom: 1px solid #dfe5ea;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin-bottom: 22px;
+}
+
+.recruiter-auth-tabs button {
+  background: transparent;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  color: #77838d;
+  cursor: pointer;
+  font-weight: 850;
+  padding: 12px;
+}
+
+.recruiter-auth-tabs button.is-active {
+  border-bottom-color: var(--directory-orange);
+  color: #172631;
+}
+
+.recruiter-auth-form,
+.recruiter-auth-form label {
+  display: grid;
+  gap: 8px;
+}
+
+.recruiter-auth-form {
+  gap: 16px;
+}
+
+.recruiter-auth-form label {
+  color: #2e3c47;
+  font-size: 13px;
+  font-weight: 750;
+}
+
+.recruiter-auth-form input:not([type="checkbox"]) {
+  border: 1px solid #cfd8de;
+  border-radius: 8px;
+  font: inherit;
+  min-height: 46px;
+  padding: 0 13px;
+}
+
+.recruiter-auth-form input:focus {
+  border-color: #f05a0b;
+  box-shadow: 0 0 0 3px rgba(240, 90, 11, 0.12);
+  outline: none;
+}
+
+.recruiter-auth-form__row {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 1fr 1fr;
+}
+
+.recruiter-auth-check {
+  align-items: start;
+  display: flex !important;
+  font-weight: 500 !important;
+  line-height: 1.5;
+}
+
+.recruiter-auth-check input {
+  margin-top: 3px;
+}
+
+.recruiter-auth-helper {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+}
+
+.recruiter-auth-helper button {
+  background: transparent;
+  border: 0;
+  color: #d84d08;
+  cursor: pointer;
+}
+
+.recruiter-auth-primary {
+  min-height: 48px;
+}
+
+.recruiter-auth-secondary {
+  background: white;
+  border: 1px solid #cbd4db;
+  border-radius: 7px;
+  color: #25323e;
+  cursor: pointer;
+  font-weight: 800;
+  min-height: 46px;
+}
+
+.recruiter-auth-note {
+  color: #87929b;
+  font-size: 12px;
+  margin: -4px 0 0;
+  text-align: center;
+}
+
+.recruiter-auth-success {
+  display: grid;
+  gap: 14px;
+}
+
+.recruiter-auth-success__icon {
+  align-items: center;
+  background: #def6e8;
+  border-radius: 50%;
+  color: #157749;
+  display: flex;
+  font-size: 28px;
+  font-weight: 900;
+  height: 64px;
+  justify-content: center;
+  width: 64px;
+}
+
+@media (max-width: 1280px) {
+  .welder-directory-layout {
+    grid-template-columns: minmax(0, 1fr) 340px;
+  }
+
+  .welder-filter-grid {
+    grid-template-columns: repeat(3, minmax(140px, 1fr));
+  }
+}
+
+@media (max-width: 980px) {
+  .welder-directory-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .welder-detail-panel {
+    max-height: none;
+    position: static;
+  }
+
+  .recruiter-auth-page {
+    background: #f4f7f8;
+  }
+
+  .recruiter-auth-layout {
+    gap: 34px;
+    grid-template-columns: 1fr;
+  }
+
+  .recruiter-auth-intro {
+    background: #081926;
+    border-radius: 16px;
+    padding: 34px;
+  }
+}
+
+@media (max-width: 680px) {
+  .welder-directory-page .page-shell {
+    width: min(100% - 24px, 1540px);
+  }
+
+  .welder-directory-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .welder-filter-grid,
+  .recruiter-auth-form__row {
+    grid-template-columns: 1fr;
+  }
+
+  .welder-results-summary {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .welder-detail-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .recruiter-auth-page {
+    padding: 28px 0 50px;
+  }
+
+  .recruiter-auth-layout {
+    width: min(100% - 24px, 1180px);
+  }
+
+  .recruiter-auth-intro {
+    padding: 26px 22px;
+  }
+
+  .recruiter-auth-intro h1 {
+    font-size: 36px;
+  }
+
+  .recruiter-candidate-summary {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .recruiter-candidate-summary button {
+    grid-column: 2;
+    justify-self: start;
+  }
+}
+
 /* Alpha Alumni and Talent Connect interactive prototype */
 
 .portal-demo {

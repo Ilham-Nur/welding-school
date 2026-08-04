@@ -11,11 +11,11 @@
         <meta property="og:type" content="website">
         <meta property="og:title" content="@yield('title', $brand['name'])">
         <meta property="og:description" content="@yield('description', $brand['service'].' '.$brand['name'])">
-        <meta property="og:image" content="{{ url('alpha-academy-ecosystem-og.png') }}">
+        <meta property="og:image" content="{{ url('alpha-academy-directory-og.png') }}">
         <meta name="twitter:card" content="summary_large_image">
         <meta name="twitter:title" content="@yield('title', $brand['name'])">
         <meta name="twitter:description" content="@yield('description', $brand['service'].' '.$brand['name'])">
-        <meta name="twitter:image" content="{{ url('alpha-academy-ecosystem-og.png') }}">
+        <meta name="twitter:image" content="{{ url('alpha-academy-directory-og.png') }}">
         <title>@yield('title', $brand['name'])</title>
         <link rel="icon" href="{{ asset('favicon.ico') }}" sizes="any">
         <link rel="stylesheet" href="{{ asset('templates/welding-school/style.css') }}?v={{ filemtime(public_path('templates/welding-school/style.css')) }}">
@@ -39,14 +39,13 @@
                 <a href="{{ route('home') }}#about" data-action="go-public-page" data-target="about" data-public-route="about">Tentang</a>
                 <a href="{{ route('home') }}#programs" data-action="go-programs" data-public-route="programs">Program</a>
                 <a href="{{ route('home') }}#news" data-action="go-public-page" data-target="news" data-public-route="news">Berita</a>
-                <a href="{{ route('home') }}#alumni" data-action="go-public-page" data-target="alumni" data-public-route="alumni">Alumni</a>
-                <a href="{{ route('home') }}#recruiters" data-action="go-public-page" data-target="recruiters" data-public-route="recruiters">Recruiter</a>
+                <a href="{{ route('home') }}#welders" data-action="go-public-page" data-target="welders" data-public-route="welders">Daftar Welder</a>
                 <a href="{{ route('home') }}#certificate" data-action="go-public-page" data-target="certificate" data-public-route="certificate">Verifikasi</a>
-                <a class="public-nav__account" href="{{ route('home') }}#{{ auth()->check() ? 'member-programs' : 'account' }}" data-action="go-account">{{ auth()->check() ? 'Buka Dashboard' : 'Portal Akademi' }}</a>
+                <a class="public-nav__account" href="{{ route('home') }}#{{ auth()->check() ? 'member-programs' : 'account' }}" data-action="go-account">{{ auth()->check() ? 'Buka Dashboard' : 'Login' }}</a>
             </nav>
 
             <a style="text-decoration: none;" class="login-button" href="{{ route('home') }}#{{ auth()->check() ? 'member-programs' : 'account' }}" data-action="go-account">
-                {{ auth()->check() ? 'Dashboard' : 'Portal Akademi' }}
+                {{ auth()->check() ? 'Dashboard' : 'Login' }}
             </a>
 
             <button
@@ -71,7 +70,7 @@
                             <small>{{ $brand['service'] }}</small>
                         </span>
                     </a>
-                    <p>Ekosistem pelatihan, sertifikasi, alumni, dan rekrutmen welder profesional dari PT. Alpha Teknik Pratama.</p>
+                    <p>Pelatihan, sertifikasi, dan direktori talenta welder profesional dari PT. Alpha Teknik Pratama.</p>
                 </div>
                 <div>
                     <strong>Jelajahi</strong>
@@ -81,8 +80,8 @@
                 </div>
                 <div>
                     <strong>Terhubung</strong>
-                    <a href="{{ route('home') }}#alumni" data-action="go-public-page" data-target="alumni">Platform Alumni</a>
-                    <a href="{{ route('home') }}#recruiters" data-action="go-public-page" data-target="recruiters">Untuk Recruiter</a>
+                    <a href="{{ route('home') }}#welders" data-action="go-public-page" data-target="welders">Daftar Welder &amp; Alumni</a>
+                    <a href="{{ route('home') }}#recruiter-account" data-action="go-public-page" data-target="recruiter-account">Login Recruiter</a>
                     <a href="{{ route('home') }}#certificate" data-action="go-public-page" data-target="certificate">Verifikasi Sertifikat</a>
                 </div>
                 <div>

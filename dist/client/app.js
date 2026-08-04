@@ -410,8 +410,8 @@
     { id: "programs", label: "Program Publik" },
     { id: "news", label: "Berita & Event" },
     { id: "article", label: "Artikel" },
-    { id: "alumni", label: "Platform Alumni" },
-    { id: "recruiters", label: "Platform Recruiter" },
+    { id: "welders", label: "Daftar Welder & Alumni" },
+    { id: "recruiter-account", label: "Akun Recruiter" },
     { id: "certificate", label: "Verifikasi Sertifikat" },
     { id: "account", label: "Akun" },
     { id: "member-programs", label: "Dashboard Peserta" },
@@ -451,10 +451,18 @@
     search: "",
     level: "Semua Level",
     selectedArticle: academyNews[0],
-    alumniPortalView: "directory",
-    recruiterPortalView: "talent",
-    selectedTalent: alumniProfiles[0],
-    recruitmentSent: false,
+    selectedWelder: alumniProfiles[0],
+    recruiterCandidate: alumniProfiles[0],
+    recruiterAuthMode: "register",
+    recruiterRegistrationComplete: false,
+    welderSearch: "",
+    welderFilters: {
+      domicile: "",
+      process: "",
+      position: "",
+      employment: "",
+      certificate: "",
+    },
     verification: {
       pending: Boolean(backend.verification?.pending),
       email: backend.verification?.email || "",
@@ -938,8 +946,8 @@
       "detail",
       "news",
       "article",
-      "alumni",
-      "recruiters",
+      "welders",
+      "recruiter-account",
       "certificate",
       "account",
     ];
@@ -1168,22 +1176,16 @@
       <section class="academy-ecosystem">
         <div class="page-shell">
           <div class="academy-ecosystem__intro">
-            <span class="eyebrow eyebrow--light">SATU EKOSISTEM, BANYAK PELUANG</span>
-            <h2>Pelatihan selesai. Perjalanan karier terus berlanjut.</h2>
-            <p>Kami menghubungkan lulusan yang siap berkembang dengan perusahaan yang mencari talenta welding terverifikasi.</p>
+            <span class="eyebrow eyebrow--light">DIREKTORI TALENTA TERVERIFIKASI</span>
+            <h2>Temukan welder berdasarkan kompetensi yang dibutuhkan.</h2>
+            <p>Perusahaan dapat melihat profil alumni, proses las, posisi, pengalaman, dan status sertifikat sebelum mengajukan permintaan kandidat.</p>
           </div>
-          <div class="academy-ecosystem__cards">
+          <div class="academy-ecosystem__cards academy-ecosystem__cards--single">
             <article>
-              <span class="academy-portal-no">01 / ALUMNI</span>
-              <h3>Terus terkoneksi setelah lulus.</h3>
-              <p>Perbarui profil, temukan lowongan, ikuti mentoring, dan bangun jejaring profesional.</p>
-              <button data-action="go-public-page" data-target="alumni" type="button">Lihat Platform Alumni <span>&rarr;</span></button>
-            </article>
-            <article>
-              <span class="academy-portal-no">02 / RECRUITER</span>
-              <h3>Temukan talenta welding yang tepat.</h3>
-              <p>Jelajahi kandidat berdasarkan proses las, posisi, pengalaman, dan status sertifikasi.</p>
-              <button data-action="go-public-page" data-target="recruiters" type="button">Lihat Portal Recruiter <span>&rarr;</span></button>
+              <span class="academy-portal-no">DIREKTORI WELDER &amp; ALUMNI</span>
+              <h3>Lihat kandidat yang siap mendukung kebutuhan proyek Anda.</h3>
+              <p>Telusuri data kandidat terlebih dahulu. Akun recruiter baru diperlukan saat perusahaan ingin mengajukan permintaan kandidat.</p>
+              <button data-action="go-public-page" data-target="welders" type="button">Buka Daftar Welder <span>&rarr;</span></button>
             </article>
           </div>
         </div>
@@ -1620,6 +1622,249 @@
         <button class="button button--primary button--large" data-action="recruiter-demo" type="button">Hubungi Tim Kemitraan <span>&rarr;</span></button>
       </section>
     `;
+  }
+
+  const welderDirectoryMeta = {
+    "andi-ramadhan": {
+      domicile: "Cilegon, Banten",
+      position: "Welder 3G",
+      graduationYear: "2024",
+      certificate: "Aktif",
+      certificateNumber: "AA-SMAW-2024-00128",
+      certificateUntil: "30 November 2027",
+      readyDate: "14 hari setelah konfirmasi",
+      birth: "Cilegon, 18 April 1999",
+      phone: "0812-3456-7812",
+      email: "a.ramadhan@example.id",
+    },
+    "dimas-saputra": {
+      domicile: "Serang, Banten",
+      position: "Welder 3G",
+      graduationYear: "2025",
+      certificate: "Aktif",
+      certificateNumber: "AA-FCAW-2025-00074",
+      certificateUntil: "12 Februari 2028",
+      readyDate: "Perlu konfirmasi",
+      birth: "Serang, 7 Oktober 2000",
+      phone: "0813-2208-4510",
+      email: "d.saputra@example.id",
+    },
+    "rizky-firmansyah": {
+      domicile: "Bekasi, Jawa Barat",
+      position: "Welder 6G",
+      graduationYear: "2023",
+      certificate: "Aktif",
+      certificateNumber: "AA-GTAW-2023-00216",
+      certificateUntil: "18 Juli 2027",
+      readyDate: "3 September 2026",
+      birth: "Bekasi, 22 Juni 1997",
+      phone: "0821-6678-9042",
+      email: "r.firmansyah@example.id",
+    },
+    "siti-nurhaliza": {
+      domicile: "Tangerang, Banten",
+      position: "Inspector Junior",
+      graduationYear: "2025",
+      certificate: "Aktif",
+      certificateNumber: "AA-WID-2025-00042",
+      certificateUntil: "25 Januari 2028",
+      readyDate: "30 hari setelah konfirmasi",
+      birth: "Tangerang, 9 Mei 2001",
+      phone: "0857-3412-2088",
+      email: "s.nurhaliza@example.id",
+    },
+    "bagas-pratama": {
+      domicile: "Cilegon, Banten",
+      position: "Welder 2G",
+      graduationYear: "2026",
+      certificate: "Aktif",
+      certificateNumber: "AA-GMAW-2026-00191",
+      certificateUntil: "7 Juli 2029",
+      readyDate: "Siap segera",
+      birth: "Cilegon, 11 Januari 2003",
+      phone: "0819-5012-3477",
+      email: "b.pratama@example.id",
+    },
+    "naufal-hidayat": {
+      domicile: "Jakarta Utara, DKI Jakarta",
+      position: "Welder 4G",
+      graduationYear: "2024",
+      certificate: "Perlu Diperbarui",
+      certificateNumber: "AA-WQT-2024-00089",
+      certificateUntil: "20 Mei 2026",
+      readyDate: "7 hari setelah konfirmasi",
+      birth: "Jakarta, 3 Maret 1996",
+      phone: "0812-9088-1634",
+      email: "n.hidayat@example.id",
+    },
+  };
+
+  function directoryMeta(profile) {
+    return welderDirectoryMeta[profile.id] || welderDirectoryMeta["andi-ramadhan"];
+  }
+
+  function directoryProfiles() {
+    const query = state.welderSearch.trim().toLowerCase();
+    return alumniProfiles.filter((profile) => {
+      const meta = directoryMeta(profile);
+      const searchable = [
+        profile.name,
+        profile.role,
+        profile.location,
+        profile.skills.join(" "),
+        profile.certifications.join(" "),
+        meta.certificateNumber,
+      ]
+        .join(" ")
+        .toLowerCase();
+      return (
+        (!query || searchable.includes(query)) &&
+        (!state.welderFilters.domicile || meta.domicile.includes(state.welderFilters.domicile)) &&
+        (!state.welderFilters.process || profile.skills[0] === state.welderFilters.process) &&
+        (!state.welderFilters.position || meta.position === state.welderFilters.position) &&
+        (!state.welderFilters.employment || profile.employmentStatus === state.welderFilters.employment) &&
+        (!state.welderFilters.certificate || meta.certificate === state.welderFilters.certificate)
+      );
+    });
+  }
+
+  function welderStatusClass(status) {
+    if (["Mencari pekerjaan", "Kontrak proyek"].includes(status)) return "is-standby";
+    if (status === "Freelance") return "is-process";
+    return "is-working";
+  }
+
+  function renderWelderRows(items) {
+    return items
+      .map((profile) => {
+        const meta = directoryMeta(profile);
+        const selected = state.selectedWelder.id === profile.id;
+        return `
+          <tr class="${selected ? "is-selected" : ""}">
+            <td>
+              <button class="welder-person" data-action="select-welder" data-id="${profile.id}" type="button">
+                <span class="welder-avatar">${escapeHtml(profile.initials)}</span>
+                <span><strong>${escapeHtml(profile.name)}</strong><small>ID: WELD-${meta.graduationYear}-${profile.id.slice(0, 3).toUpperCase()}</small><i>Lihat profil</i></span>
+              </button>
+            </td>
+            <td>${meta.domicile.split(", ").map(escapeHtml).join("<br>")}</td>
+            <td><span class="welder-process-tag">${escapeHtml(profile.skills[0])}</span></td>
+            <td>${escapeHtml(meta.position)}</td>
+            <td>${escapeHtml(meta.graduationYear)}</td>
+            <td>${escapeHtml(profile.experience)}</td>
+            <td><span class="welder-status ${welderStatusClass(profile.employmentStatus)}">${escapeHtml(profile.employmentStatus)}</span><small class="welder-cell-note">${escapeHtml(profile.company)}</small></td>
+            <td><span class="welder-certificate ${meta.certificate === "Aktif" ? "is-active" : "is-expired"}">${escapeHtml(meta.certificate)}</span><small class="welder-cell-note">s/d ${escapeHtml(meta.certificateUntil)}</small></td>
+            <td>${escapeHtml(meta.readyDate)}</td>
+            <td><button class="welder-detail-button ${selected ? "is-active" : ""}" data-action="select-welder" data-id="${profile.id}" type="button">Detail</button></td>
+          </tr>`;
+      })
+      .join("");
+  }
+
+  function renderWelderDetail(profile) {
+    const meta = directoryMeta(profile);
+    return `
+      <aside class="welder-detail-panel" aria-label="Detail welder terpilih">
+        <div class="welder-detail-panel__heading">
+          <span>Detail Welder</span>
+          <small>DATA SIMULASI</small>
+        </div>
+        <div class="welder-detail-identity">
+          <span class="welder-avatar welder-avatar--large">${escapeHtml(profile.initials)}</span>
+          <div><h2>${escapeHtml(profile.name)}</h2><span class="welder-status ${welderStatusClass(profile.employmentStatus)}">${escapeHtml(profile.employmentStatus)}</span><p>ID: WELD-${meta.graduationYear}-${profile.id.slice(0, 3).toUpperCase()}</p><small>${escapeHtml(meta.domicile)} &middot; ${escapeHtml(profile.availability)}</small></div>
+        </div>
+        <div class="welder-detail-actions">
+          <button data-action="request-candidate" type="button">Ajukan Permintaan Kandidat</button>
+          <button data-action="download-cv-demo" type="button">Unduh CV</button>
+        </div>
+        <section class="welder-detail-section">
+          <h3>Informasi Pribadi</h3>
+          <dl><div><dt>Tempat, Tanggal Lahir</dt><dd>${escapeHtml(meta.birth)}</dd></div><div><dt>Nomor Telepon</dt><dd>${escapeHtml(meta.phone)}</dd></div><div><dt>Email</dt><dd>${escapeHtml(meta.email)}</dd></div><div><dt>Domisili</dt><dd>${escapeHtml(meta.domicile)}</dd></div></dl>
+        </section>
+        <section class="welder-detail-section">
+          <h3>Keahlian &amp; Sertifikasi</h3>
+          <dl><div><dt>Proses</dt><dd>${escapeHtml(profile.skills[0])}</dd></div><div><dt>Posisi</dt><dd>${escapeHtml(meta.position)}</dd></div><div><dt>Sertifikasi</dt><dd>${escapeHtml(profile.certifications.join(", "))}</dd></div><div><dt>Nomor Sertifikat</dt><dd>${escapeHtml(meta.certificateNumber)}</dd></div><div><dt>Berlaku Hingga</dt><dd class="${meta.certificate === "Aktif" ? "is-valid" : "is-warning"}">${escapeHtml(meta.certificateUntil)} (${escapeHtml(meta.certificate)})</dd></div></dl>
+        </section>
+        <section class="welder-detail-section">
+          <h3>Riwayat Pendidikan &amp; Pelatihan</h3>
+          <dl><div><dt>Program</dt><dd>${escapeHtml(profile.program)}</dd></div><div><dt>Kelulusan</dt><dd>${escapeHtml(profile.graduation)}</dd></div><div><dt>Nilai Akhir</dt><dd>${escapeHtml(profile.score)}</dd></div><div><dt>Metode</dt><dd>Teori, praktik intensif, dan asesmen</dd></div></dl>
+        </section>
+        <section class="welder-detail-section">
+          <h3>Pengalaman Kerja</h3>
+          <dl><div><dt>Total Pengalaman</dt><dd>${escapeHtml(profile.experience)}</dd></div><div><dt>Perusahaan Terakhir</dt><dd>${escapeHtml(profile.company)}</dd></div><div><dt>Mulai Bekerja</dt><dd>${escapeHtml(profile.currentSince)}</dd></div></dl>
+          <p class="welder-detail-summary">${escapeHtml(profile.summary)}</p>
+        </section>
+        <section class="welder-detail-section welder-detail-section--availability">
+          <h3>Informasi Ketersediaan</h3>
+          <dl><div><dt>Status</dt><dd>${escapeHtml(profile.availability)}</dd></div><div><dt>Siap Kerja</dt><dd>${escapeHtml(meta.readyDate)}</dd></div></dl>
+        </section>
+      </aside>`;
+  }
+
+  function renderWelders() {
+    const items = directoryProfiles();
+    if (!items.some((profile) => profile.id === state.selectedWelder.id) && items[0]) {
+      state.selectedWelder = items[0];
+    }
+    return `
+      <section class="welder-directory-page">
+        <div class="page-shell welder-directory-breadcrumb">BERANDA <span>&rsaquo;</span> DAFTAR WELDER &amp; ALUMNI</div>
+        <div class="page-shell welder-directory-heading"><div><h1>Daftar Welder &amp; Alumni</h1><p>Temukan welder profesional alumni pelatihan dengan data kompetensi dan sertifikasi yang terverifikasi.</p></div><span>PROTOTYPE FRONTEND</span></div>
+        <div class="page-shell welder-directory-layout">
+          <main class="welder-directory-main">
+            <form class="welder-search-panel" data-form="welder-search">
+              <label class="welder-search-input"><span aria-hidden="true">&#9906;</span><input name="query" type="search" value="${escapeHtml(state.welderSearch)}" placeholder="Cari nama welder, keahlian, atau sertifikat..."><button type="submit">Cari</button></label>
+              <div class="welder-filter-grid">
+                <label><span>Domisili</span><select name="domicile" data-welder-filter><option value="">Semua Domisili</option><option value="Banten" ${state.welderFilters.domicile === "Banten" ? "selected" : ""}>Banten</option><option value="Jawa Barat" ${state.welderFilters.domicile === "Jawa Barat" ? "selected" : ""}>Jawa Barat</option><option value="DKI Jakarta" ${state.welderFilters.domicile === "DKI Jakarta" ? "selected" : ""}>DKI Jakarta</option></select></label>
+                <label><span>Proses</span><select name="process" data-welder-filter><option value="">Semua Proses</option>${["SMAW", "FCAW", "GTAW", "GMAW", "Visual Inspection"].map((value) => `<option ${state.welderFilters.process === value ? "selected" : ""}>${value}</option>`).join("")}</select></label>
+                <label><span>Posisi</span><select name="position" data-welder-filter><option value="">Semua Posisi</option>${["Welder 2G", "Welder 3G", "Welder 4G", "Welder 6G", "Inspector Junior"].map((value) => `<option ${state.welderFilters.position === value ? "selected" : ""}>${value}</option>`).join("")}</select></label>
+                <label><span>Status Bekerja</span><select name="employment" data-welder-filter><option value="">Semua Status</option>${["Sedang bekerja", "Mencari pekerjaan", "Kontrak proyek", "Freelance"].map((value) => `<option ${state.welderFilters.employment === value ? "selected" : ""}>${value}</option>`).join("")}</select></label>
+                <label><span>Status Sertifikat</span><select name="certificate" data-welder-filter><option value="">Semua Sertifikat</option><option value="Aktif" ${state.welderFilters.certificate === "Aktif" ? "selected" : ""}>Aktif</option><option value="Perlu Diperbarui" ${state.welderFilters.certificate === "Perlu Diperbarui" ? "selected" : ""}>Perlu Diperbarui</option></select></label>
+                <button class="welder-reset-button" data-action="reset-welder-filters" type="button">Reset Filter</button>
+              </div>
+            </form>
+            <div class="welder-results-summary"><span><b>${items.length ? "1.126" : "0"}</b> Welder &amp; Alumni ditemukan</span><label>Urutkan: <select aria-label="Urutkan hasil"><option>Tahun Kelulusan (Terbaru)</option><option>Pengalaman Terbanyak</option><option>Siap Kerja Tercepat</option></select></label></div>
+            <div class="welder-table-wrap">
+              <table class="welder-table"><thead><tr><th>Welder</th><th>Domisili</th><th>Proses</th><th>Posisi</th><th>Tahun Lulus</th><th>Pengalaman</th><th>Status Bekerja</th><th>Status Sertifikat</th><th>Siap Kerja</th><th>Aksi</th></tr></thead><tbody>${items.length ? renderWelderRows(items) : `<tr><td colspan="10"><div class="welder-empty"><strong>Kandidat tidak ditemukan</strong><span>Coba ubah kata kunci atau reset filter pencarian.</span></div></td></tr>`}</tbody></table>
+            </div>
+            <div class="welder-pagination"><button disabled>&lsaquo;</button><button class="is-active">1</button><button>2</button><button>3</button><span>&hellip;</span><button>23</button><button>&rsaquo;</button></div>
+          </main>
+          ${renderWelderDetail(state.selectedWelder)}
+        </div>
+      </section>`;
+  }
+
+  function recruiterCandidateSummary() {
+    const profile = state.recruiterCandidate;
+    const meta = directoryMeta(profile);
+    return `<div class="recruiter-candidate-summary"><span class="welder-avatar">${escapeHtml(profile.initials)}</span><div><small>KANDIDAT YANG DIMINATI</small><strong>${escapeHtml(profile.name)}</strong><p>${escapeHtml(profile.role)} &middot; ${escapeHtml(meta.domicile)}</p></div><button data-action="go-public-page" data-target="welders" type="button">Ganti</button></div>`;
+  }
+
+  function renderRecruiterAccount() {
+    const isRegister = state.recruiterAuthMode === "register";
+    if (state.recruiterRegistrationComplete) {
+      return `
+        <section class="recruiter-auth-page"><div class="recruiter-auth-layout page-shell"><div class="recruiter-auth-intro"><span>ALPHA TALENT ACCESS</span><h1>Akses kandidat dimulai dari akun perusahaan yang terverifikasi.</h1><p>Setiap permintaan kandidat akan ditinjau agar data alumni hanya digunakan untuk kebutuhan rekrutmen yang jelas.</p></div><div class="recruiter-auth-card recruiter-auth-success"><span class="recruiter-auth-success__icon">&check;</span><small>REGISTRASI PROTOTYPE BERHASIL</small><h2>Permintaan akun sudah dicatat.</h2><p>Pada versi final, tim Alpha Academy akan memverifikasi perusahaan dan mengirimkan aktivasi melalui email corporate.</p>${recruiterCandidateSummary()}<button class="recruiter-auth-primary" data-action="recruiter-auth-mode" data-mode="login" type="button">Lanjut ke Login Recruiter</button><button class="recruiter-auth-secondary" data-action="go-public-page" data-target="welders" type="button">Kembali ke Daftar Welder</button></div></div></section>`;
+    }
+    return `
+      <section class="recruiter-auth-page">
+        <div class="recruiter-auth-layout page-shell">
+          <div class="recruiter-auth-intro"><span>ALPHA TALENT ACCESS</span><h1>${isRegister ? "Buat akun recruiter untuk mengajukan kandidat." : "Masuk ke akun recruiter perusahaan Anda."}</h1><p>Data welder dapat dilihat secara publik. Akun perusahaan diperlukan saat Anda ingin meminta kandidat, mengunduh CV lengkap, atau memulai proses rekrutmen.</p><ul><li>Profil alumni dan kompetensi terkurasi</li><li>Status sertifikat mudah diperiksa</li><li>Permintaan kandidat tercatat dengan aman</li></ul><button data-action="go-public-page" data-target="welders" type="button">&larr; Kembali ke daftar welder</button></div>
+          <div class="recruiter-auth-card">
+            <div class="recruiter-auth-card__head"><span>AKUN RECRUITER</span><h2>${isRegister ? "Daftarkan perusahaan" : "Selamat datang kembali"}</h2><p>${isRegister ? "Gunakan data perusahaan yang dapat diverifikasi." : "Masukkan email corporate dan kata sandi Anda."}</p></div>
+            ${recruiterCandidateSummary()}
+            <div class="recruiter-auth-tabs"><button class="${isRegister ? "is-active" : ""}" data-action="recruiter-auth-mode" data-mode="register" type="button">Buat Akun</button><button class="${!isRegister ? "is-active" : ""}" data-action="recruiter-auth-mode" data-mode="login" type="button">Login Recruiter</button></div>
+            <form class="recruiter-auth-form" data-form="recruiter-account-demo">
+              ${isRegister ? `<label>Nama Perusahaan<input name="company" type="text" placeholder="Contoh: PT Nusantara Fabrikasi" required></label><div class="recruiter-auth-form__row"><label>Nama PIC / Recruiter<input name="pic" type="text" placeholder="Nama lengkap" required></label><label>Nomor Telepon<input name="phone" type="tel" placeholder="08xx xxxx xxxx" required></label></div>` : ""}
+              <label>Email Corporate<input name="email" type="email" placeholder="nama@perusahaan.co.id" required></label>
+              <label>Kata Sandi<input name="password" type="password" placeholder="Minimal 8 karakter" minlength="8" required></label>
+              ${isRegister ? `<label>Konfirmasi Kata Sandi<input name="password_confirmation" type="password" placeholder="Ulangi kata sandi" minlength="8" required></label><label class="recruiter-auth-check"><input name="agreement" type="checkbox" required><span>Saya menyatakan data perusahaan benar dan menyetujui penggunaan platform untuk kebutuhan rekrutmen profesional.</span></label>` : `<div class="recruiter-auth-helper"><label class="recruiter-auth-check"><input name="remember" type="checkbox"><span>Ingat saya</span></label><button type="button">Lupa kata sandi?</button></div>`}
+              <button class="recruiter-auth-primary" type="submit">${isRegister ? "Buat Akun & Ajukan Akses" : "Login Recruiter"} <span>&rarr;</span></button>
+              <p class="recruiter-auth-note">Prototype frontend &middot; data belum disimpan ke backend.</p>
+            </form>
+          </div>
+        </div>
+      </section>`;
   }
 
   function renderCertificate() {
@@ -2972,8 +3217,8 @@
       programs: renderPrograms,
       news: renderNews,
       article: renderArticle,
-      alumni: renderAlumni,
-      recruiters: renderRecruiters,
+      welders: renderWelders,
+      "recruiter-account": renderRecruiterAccount,
       certificate: renderCertificate,
       "member-programs": renderMemberPrograms,
       detail: renderDetail,
@@ -2997,8 +3242,10 @@
             ? "programs"
             : id === "article"
               ? "news"
-              : ["about", "news", "alumni", "recruiters", "certificate"].includes(id)
-                ? id
+              : id === "recruiter-account"
+                ? "welders"
+                : ["about", "news", "welders", "certificate"].includes(id)
+                  ? id
                 : "";
       link.classList.toggle("is-active", link.dataset.publicRoute === activeRoute);
     });
@@ -3064,6 +3311,32 @@
       const result = form.parentElement?.querySelector("#certificate-result");
       if (result) result.hidden = false;
       showToast("Sertifikat ditemukan dan berstatus valid.", "success");
+      return;
+    }
+
+    if (form.dataset.form === "welder-search") {
+      const data = new FormData(form);
+      state.welderSearch = String(data.get("query") || "");
+      Object.keys(state.welderFilters).forEach((key) => {
+        state.welderFilters[key] = String(data.get(key) || "");
+      });
+      render();
+      return;
+    }
+
+    if (form.dataset.form === "recruiter-account-demo") {
+      if (state.recruiterAuthMode === "register") {
+        const data = new FormData(form);
+        if (data.get("password") !== data.get("password_confirmation")) {
+          showToast("Konfirmasi kata sandi belum sama.", "warning");
+          return;
+        }
+        state.recruiterRegistrationComplete = true;
+        render();
+        showToast("Simulasi registrasi recruiter berhasil.", "success");
+      } else {
+        showToast("Simulasi login berhasil. Dashboard recruiter akan dibuat pada tahap berikutnya.", "success");
+      }
       return;
     }
 
@@ -3302,6 +3575,35 @@
     if (action === "go-public-page") {
       event.preventDefault();
       navigate(button.dataset.target || "home");
+    }
+    if (action === "select-welder") {
+      state.selectedWelder =
+        alumniProfiles.find((profile) => profile.id === button.dataset.id) ||
+        alumniProfiles[0];
+      render();
+      window.scrollTo({ top: 120, behavior: "smooth" });
+    }
+    if (action === "reset-welder-filters") {
+      state.welderSearch = "";
+      Object.keys(state.welderFilters).forEach((key) => {
+        state.welderFilters[key] = "";
+      });
+      render();
+    }
+    if (action === "request-candidate") {
+      state.recruiterCandidate = state.selectedWelder;
+      state.recruiterAuthMode = "register";
+      state.recruiterRegistrationComplete = false;
+      navigate("recruiter-account");
+      showToast("Buat akun recruiter untuk melanjutkan permintaan kandidat.", "info");
+    }
+    if (action === "recruiter-auth-mode") {
+      state.recruiterAuthMode = button.dataset.mode || "register";
+      state.recruiterRegistrationComplete = false;
+      render();
+    }
+    if (action === "download-cv-demo") {
+      showToast("CV lengkap tersedia setelah perusahaan memiliki akun recruiter terverifikasi.", "info");
     }
     if (action === "open-article") {
       state.selectedArticle =
@@ -3781,6 +4083,15 @@
   });
 
   document.addEventListener("change", (event) => {
+    if (event.target.matches("[data-welder-filter]")) {
+      const key = event.target.name;
+      if (key in state.welderFilters) {
+        state.welderFilters[key] = event.target.value;
+        render();
+      }
+      return;
+    }
+
     if (event.target.id === "level-filter") {
       state.level = event.target.value;
       render();
@@ -3812,8 +4123,8 @@
     "detail",
     "news",
     "article",
-    "alumni",
-    "recruiters",
+    "welders",
+    "recruiter-account",
     "certificate",
     "account",
   ];
