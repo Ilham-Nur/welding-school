@@ -175,7 +175,7 @@
       start: "10 Agustus 2026",
       end: "21 Agustus 2026",
       schedule: "Senin–Jumat, 08.00–16.00 WIB",
-      location: "Workshop Cilegon · Area 1",
+      location: "Workshop Batam Centre · Area 1",
       seatsLeft: 5,
       recommended: true,
     },
@@ -185,7 +185,7 @@
       start: "7 September 2026",
       end: "18 September 2026",
       schedule: "Senin–Jumat, 08.00–16.00 WIB",
-      location: "Workshop Cilegon · Area 2",
+      location: "Workshop Batam Centre · Area 2",
       seatsLeft: 9,
     },
     {
@@ -194,7 +194,7 @@
       start: "5 September 2026",
       end: "4 Oktober 2026",
       schedule: "Sabtu–Minggu, 08.00–16.00 WIB",
-      location: "Workshop Cilegon · Area 1",
+      location: "Workshop Batam Centre · Area 1",
       seatsLeft: 3,
     },
   ];
@@ -1208,7 +1208,7 @@
           <h1>Menyiapkan kompetensi.<br><em>Membuka lebih banyak peluang.</em></h1>
           <p>Alpha Academy Welding School merupakan unit pengembangan kompetensi PT. Alpha Teknik Pratama yang berfokus pada pelatihan welding berbasis praktik, keselamatan, dan kebutuhan industri.</p>
           <div class="academy-page-hero__facts">
-            <span>Sejak 2016</span><span>Cilegon, Banten</span><span>Berbasis kebutuhan industri</span>
+            <span>Sejak 2016</span><span>Batam, Kepulauan Riau</span><span>Berbasis kebutuhan industri</span>
           </div>
         </div>
       </section>
@@ -2042,7 +2042,7 @@
           <div class="booking-card__divider"></div>
           <div class="booking-fact"><span>Jadwal terdekat</span><strong>10 Agustus 2026</strong></div>
           <div class="booking-fact"><span>Kuota tersedia</span><strong class="text-green">5 kursi</strong></div>
-          <div class="booking-fact"><span>Lokasi</span><strong>Workshop Cilegon</strong></div>
+          <div class="booking-fact"><span>Lokasi</span><strong>Workshop Batam Centre</strong></div>
           <button class="button button--primary button--large" data-action="select-detail-program" type="button">Pilih Program &amp; Jadwal <span>→</span></button>
           <button class="text-button" data-action="back-program-list" type="button">← Kembali ke daftar program</button>
         </aside>
@@ -2500,7 +2500,7 @@
         <div class="application-overview">
           <div><span>Program</span><strong>${state.selectedProgram.title}</strong><small>${state.selectedProgram.subtitle}</small></div>
           <div><span>Batch</span><strong>${state.selectedBatch.label}</strong><small>${state.selectedBatch.start}</small></div>
-          <div><span>Lokasi</span><strong>Workshop Cilegon</strong><small>${state.selectedBatch.location}</small></div>
+          <div><span>Lokasi</span><strong>Workshop Batam Centre</strong><small>${state.selectedBatch.location}</small></div>
           <div><span>Nomor Pendaftaran</span><strong>${escapeHtml(state.application?.registration_number || "Diproses")}</strong><small>${state.application?.submitted_at ? new Date(state.application.submitted_at).toLocaleDateString("id-ID") : "Baru dikirim"}</small></div>
         </div>
         <ol class="application-progress-dashboard" aria-label="Status pendaftaran">
@@ -2779,7 +2779,7 @@
             <section class="dashboard-selection-strip" aria-label="Program dan batch yang dipilih">
               <div><span>Program</span><strong>${state.selectedProgram.title}</strong><small>${state.selectedProgram.subtitle}</small></div>
               <div><span>Batch</span><strong>${state.selectedBatch.label}</strong><small>${state.selectedBatch.start}</small></div>
-              <div><span>Lokasi</span><strong>Workshop Cilegon</strong><small>${state.selectedBatch.location}</small></div>
+              <div><span>Lokasi</span><strong>Workshop Batam Centre</strong><small>${state.selectedBatch.location}</small></div>
             </section>
             ${content}
           </div>
@@ -3075,7 +3075,7 @@
           </div>
           <div class="invoice-address">
             <div><span>DITAGIHKAN KEPADA</span><strong>${state.registration.fullName}</strong><p>${state.registration.email}<br>${state.registration.phone}</p></div>
-            <div><span>PENYELENGGARA</span><strong>${escapeHtml(branding.name)}</strong><p>Jl. Industri No. 88<br>Cilegon, Banten 42435</p></div>
+            <div><span>PENYELENGGARA</span><strong>${escapeHtml(branding.name)}</strong><p>Komplek PT. Komoko Batam Centre<br>Blok A No. 7, Batam</p></div>
           </div>
           <table class="invoice-table">
             <thead><tr><th>Deskripsi</th><th>Jumlah</th></tr></thead>

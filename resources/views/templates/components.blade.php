@@ -322,8 +322,8 @@
             <label class="ui-field">
                 <span class="ui-field__label">Lokasi workshop <em>Wajib</em></span>
                 <select name="location" required>
-                    <option>Workshop Cilegon · Area 1</option>
-                    <option>Workshop Cilegon · Area 2</option>
+                    <option>Workshop Batam Centre · Area 1</option>
+                    <option>Workshop Batam Centre · Area 2</option>
                 </select>
             </label>
         </form>

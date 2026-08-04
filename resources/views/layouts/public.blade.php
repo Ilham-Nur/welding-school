@@ -86,7 +86,7 @@
                 </div>
                 <div>
                     <strong>Hubungi Kami</strong>
-                    <span>Cilegon, Banten</span>
+                    <span>Komplek PT. Komoko Batam Centre Blok A No. 7, Batam</span>
                     <span>info@alphaacademy.id</span>
                     <span>+62 254 123 456</span>
                 </div>
