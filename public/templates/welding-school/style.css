@@ -2308,6 +2308,83 @@
   color: white;
 }
 
+.welder-recruiter-entry {
+  align-items: center;
+  background:
+    linear-gradient(120deg, rgba(9, 36, 61, 0.98), rgba(6, 26, 44, 0.96)),
+    url("assets/images/welding-hero.png") 78% center / cover;
+  border: 1px solid #194669;
+  border-radius: 14px;
+  box-shadow: 0 16px 36px rgba(6, 26, 44, 0.14);
+  color: white;
+  display: flex;
+  gap: 28px;
+  justify-content: space-between;
+  margin-top: 26px;
+  overflow: hidden;
+  padding: 26px 30px;
+}
+
+.welder-recruiter-entry > div:first-child {
+  max-width: 650px;
+}
+
+.welder-recruiter-entry span {
+  color: #67d5a3;
+  display: block;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  margin-bottom: 7px;
+}
+
+.welder-recruiter-entry h2 {
+  color: white;
+  font-size: 24px;
+  letter-spacing: -0.025em;
+  margin: 0 0 5px;
+}
+
+.welder-recruiter-entry p {
+  color: #b9c8d3;
+  line-height: 1.55;
+  margin: 0;
+}
+
+.welder-recruiter-entry__actions {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 10px;
+}
+
+.welder-recruiter-entry__actions button {
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 850;
+  min-height: 46px;
+  padding: 0 20px;
+}
+
+.welder-recruiter-entry__actions button:first-child {
+  background: var(--brand-green);
+  border: 1px solid var(--brand-green);
+  color: white;
+}
+
+.welder-recruiter-entry__actions button:last-child {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.64);
+  color: white;
+}
+
+.welder-recruiter-entry__actions button:hover,
+.welder-recruiter-entry__actions button:focus-visible {
+  filter: brightness(1.08);
+  outline: 3px solid rgba(103, 213, 163, 0.24);
+  outline-offset: 2px;
+}
+
 .welder-detail-panel {
   background: white;
   border: 0;
@@ -2780,6 +2857,11 @@ body.welder-detail-open {
     background: #f4f7f8;
   }
 
+  .welder-recruiter-entry {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
   .recruiter-auth-layout {
     gap: 34px;
     grid-template-columns: 1fr;
@@ -2826,6 +2908,15 @@ body.welder-detail-open {
 
   .welder-detail-actions {
     grid-template-columns: 1fr;
+  }
+
+  .welder-recruiter-entry {
+    padding: 24px 20px;
+  }
+
+  .welder-recruiter-entry__actions {
+    flex-direction: column;
+    width: 100%;
   }
 
   .recruiter-auth-page {

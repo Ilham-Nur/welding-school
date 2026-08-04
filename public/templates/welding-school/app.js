@@ -1814,8 +1814,7 @@
     }
     return `
       <section class="welder-directory-page">
-        <div class="page-shell welder-directory-breadcrumb">BERANDA <span>&rsaquo;</span> DAFTAR WELDER &amp; ALUMNI</div>
-        <div class="page-shell welder-directory-heading"><div><h1>Daftar Welder &amp; Alumni</h1><p>Temukan welder profesional alumni pelatihan dengan data kompetensi dan sertifikasi yang terverifikasi.</p></div><span>PROTOTYPE FRONTEND</span></div>
+        <div class="page-shell welder-directory-heading"><div><h1>Daftar Welder &amp; Alumni</h1><p>Temukan welder profesional alumni pelatihan dengan data kompetensi dan sertifikasi yang terverifikasi.</p></div></div>
         <div class="page-shell welder-directory-layout">
           <main class="welder-directory-main">
             <form class="welder-search-panel" data-form="welder-search">
@@ -1834,6 +1833,10 @@
               <table class="welder-table"><thead><tr><th>Welder</th><th>Domisili</th><th>Proses</th><th>Posisi</th><th>Tahun Lulus</th><th>Pengalaman</th><th>Status Bekerja</th><th>Status Sertifikat</th><th>Siap Kerja</th><th>Aksi</th></tr></thead><tbody>${items.length ? renderWelderRows(items) : `<tr><td colspan="10"><div class="welder-empty"><strong>Kandidat tidak ditemukan</strong><span>Coba ubah kata kunci atau reset filter pencarian.</span></div></td></tr>`}</tbody></table>
             </div>
             <div class="welder-pagination"><button disabled>&lsaquo;</button><button class="is-active">1</button><button>2</button><button>3</button><span>&hellip;</span><button>23</button><button>&rsaquo;</button></div>
+            <section class="welder-recruiter-entry">
+              <div><span>AKSES KHUSUS PERUSAHAAN</span><h2>Ingin mengajukan kandidat?</h2><p>Buat akun recruiter baru atau masuk menggunakan akun perusahaan yang sudah terdaftar.</p></div>
+              <div class="welder-recruiter-entry__actions"><button data-action="open-recruiter-account" data-mode="register" type="button">Buat Akun Recruiter</button><button data-action="open-recruiter-account" data-mode="login" type="button">Login Recruiter</button></div>
+            </section>
           </main>
           ${state.welderDetailOpen ? renderWelderDetail(state.selectedWelder) : ""}
         </div>
@@ -3618,6 +3621,12 @@
       state.recruiterAuthMode = button.dataset.mode || "register";
       state.recruiterRegistrationComplete = false;
       render();
+    }
+    if (action === "open-recruiter-account") {
+      state.recruiterCandidate = state.selectedWelder;
+      state.recruiterAuthMode = button.dataset.mode || "register";
+      state.recruiterRegistrationComplete = false;
+      navigate("recruiter-account");
     }
     if (action === "download-cv-demo") {
       showToast("CV lengkap tersedia setelah perusahaan memiliki akun recruiter terverifikasi.", "info");
