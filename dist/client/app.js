@@ -1047,7 +1047,6 @@
       <section class="company-hero">
         <div class="page-shell company-hero__inner">
           <div class="company-hero__copy">
-            <span class="academy-kicker"><i></i> WELDING SCHOOL BY ${escapeHtml(branding.company)}</span>
             <h1>Where skill meets steel.<br><em>Karier dimulai di sini.</em></h1>
             <p>${escapeHtml(branding.name)} adalah ekosistem pelatihan welding yang menghubungkan pembelajaran berbasis praktik, sertifikasi, alumni, dan kebutuhan talenta industri.</p>
             <div class="company-hero__actions">
@@ -1206,7 +1205,6 @@
     return `
       <section class="academy-page-hero academy-page-hero--about">
         <div class="page-shell academy-page-hero__inner">
-          <span class="academy-kicker"><i></i> TENTANG KAMI</span>
           <h1>Menyiapkan kompetensi.<br><em>Membuka lebih banyak peluang.</em></h1>
           <p>Alpha Academy Welding School merupakan unit pengembangan kompetensi PT. Alpha Teknik Pratama yang berfokus pada pelatihan welding berbasis praktik, keselamatan, dan kebutuhan industri.</p>
           <div class="academy-page-hero__facts">
@@ -1283,7 +1281,7 @@
     return `
       <section class="academy-news-hero">
         <div class="page-shell academy-news-hero__heading">
-          <div><span class="academy-kicker academy-kicker--dark"><i></i> NEWSROOM</span><h1>Kabar terbaru dari<br><em>Alpha Academy.</em></h1></div>
+          <div><h1>Kabar terbaru dari<br><em>Alpha Academy.</em></h1></div>
           <p>Ikuti kegiatan pelatihan, cerita alumni, kolaborasi industri, dan agenda terbaru dari workshop kami.</p>
         </div>
         <div class="page-shell academy-featured-story">
@@ -1443,7 +1441,7 @@
     return `
       <div class="portal-view-heading"><span>DIREKTORI ALUMNI</span><h3>Lihat perjalanan karier alumni Alpha Academy</h3><p>Status pekerjaan, keahlian, dan sertifikasi ditampilkan dalam satu profil profesional.</p></div>
       <div class="portal-directory-toolbar"><label><span aria-hidden="true">&#9906;</span><input type="search" placeholder="Cari nama, keahlian, atau perusahaan..." aria-label="Cari alumni"></label><select aria-label="Filter status kerja"><option>Semua status kerja</option><option>Sedang bekerja</option><option>Mencari pekerjaan</option><option>Freelance</option></select><select aria-label="Filter keahlian"><option>Semua keahlian</option><option>SMAW</option><option>FCAW</option><option>GTAW</option><option>GMAW</option></select></div>
-      <div class="portal-directory-summary"><span>Menampilkan <strong>${alumniProfiles.length} profil contoh</strong></span><span class="portal-demo-badge">DATA SIMULASI</span></div>
+      <div class="portal-directory-summary"><span>Menampilkan <strong>${alumniProfiles.length} profil contoh</strong></span></div>
       <div class="portal-talent-grid">${alumniProfiles.map((item) => talentCard(item, "alumni")).join("")}</div>
     `;
   }
@@ -1518,7 +1516,7 @@
 
     const talentItems = state.recruiterPortalView === "shortlist" ? alumniProfiles.filter((_, index) => [0, 2, 4].includes(index)) : alumniProfiles;
     return `
-      <div class="portal-view-heading portal-view-heading--with-action"><div><span>${state.recruiterPortalView === "shortlist" ? "SHORTLIST KANDIDAT" : "ALPHA TALENT DIRECTORY"}</span><h3>${state.recruiterPortalView === "shortlist" ? "Kandidat yang sudah disimpan" : "Temukan kompetensi yang tepat"}</h3><p>Jelajahi profil alumni berdasarkan keahlian, posisi, pengalaman, lokasi, dan kesiapan kerja.</p></div><span class="portal-demo-badge">DATA SIMULASI</span></div>
+      <div class="portal-view-heading portal-view-heading--with-action"><div><span>${state.recruiterPortalView === "shortlist" ? "SHORTLIST KANDIDAT" : "ALPHA TALENT DIRECTORY"}</span><h3>${state.recruiterPortalView === "shortlist" ? "Kandidat yang sudah disimpan" : "Temukan kompetensi yang tepat"}</h3><p>Jelajahi profil alumni berdasarkan keahlian, posisi, pengalaman, lokasi, dan kesiapan kerja.</p></div></div>
       <div class="portal-directory-toolbar portal-directory-toolbar--recruiter"><label><span aria-hidden="true">&#9906;</span><input type="search" value="SMAW 3G" aria-label="Cari kandidat"></label><select aria-label="Filter lokasi"><option>Lokasi: Semua</option><option>Banten</option><option>Jawa Barat</option><option>Jakarta</option></select><select aria-label="Filter status"><option>Siap bekerja</option><option>Sedang bekerja</option><option>Freelance</option></select><button type="button">Filter lanjutan &#9776;</button></div>
       <div class="portal-directory-summary"><span>Ditemukan <strong>${talentItems.length} kandidat contoh</strong></span><span>Urutkan: <b>Paling sesuai</b></span></div>
       <div class="portal-talent-grid">${talentItems.map((item) => talentCard(item, "recruiter")).join("")}</div>
@@ -1530,7 +1528,6 @@
       <section class="academy-portal-hero academy-portal-hero--alumni">
         <div class="page-shell academy-portal-hero__grid">
           <div>
-            <span class="academy-kicker"><i></i> ALPHA ALUMNI NETWORK</span>
             <h1>Lulus dari kelas.<br><em>Tetap tumbuh bersama.</em></h1>
             <p>Platform khusus alumni untuk membangun profil kompetensi, menemukan peluang kerja, mengikuti mentoring, dan tetap terhubung dengan jejaring Alpha Academy.</p>
             <div class="academy-portal-hero__actions"><button class="button button--primary button--large" data-action="alumni-login" type="button">Masuk sebagai Alumni</button><button class="button company-button--light button--large" data-action="proposal-interest" type="button">Aktifkan Akun</button></div>
@@ -1546,7 +1543,7 @@
       </section>
 
       <section class="portal-demo" id="alumni-demo">
-        <div class="page-shell portal-demo__heading"><div><span class="eyebrow">DEMO PLATFORM ALUMNI</span><h2>Lihat seluruh pengalaman alumni.</h2><p>Jelajahi direktori, detail karier, peluang kerja, dan jejaring dalam simulasi frontend berikut.</p></div><span class="portal-demo-badge">PROTOTYPE &middot; TANPA BACKEND</span></div>
+        <div class="page-shell portal-demo__heading"><div><h2>Lihat seluruh pengalaman alumni.</h2><p>Jelajahi direktori, detail karier, peluang kerja, dan jejaring dalam tampilan berikut.</p></div></div>
         <div class="page-shell portal-app-shell">
           <header class="portal-app-topbar"><a href="#alumni" data-action="go-public-page" data-target="alumni"><span class="portal-app-logo">A</span><strong>ALPHA <i>ALUMNI</i></strong></a><div><button type="button" aria-label="Notifikasi">&#9675;<b>3</b></button><span>Andi Ramadhan<small>SMAW Welder 3G</small></span><i class="portal-avatar">AR</i></div></header>
           <div class="portal-app-body"><aside>${alumniPortalNav()}<div class="portal-app-sidebar-card"><span>PROFIL ANDA</span><strong>85% lengkap</strong><i><b style="width:85%"></b></i><button data-action="switch-alumni-view" data-view="profile" type="button">Lengkapi profil &rarr;</button></div></aside><main>${renderAlumniPortalContent()}</main></div>
@@ -1581,7 +1578,6 @@
       <section class="academy-portal-hero academy-portal-hero--recruiter">
         <div class="page-shell academy-portal-hero__grid">
           <div>
-            <span class="academy-kicker"><i></i> ALPHA TALENT CONNECT</span>
             <h1>Temukan welder.<br><em>Siap untuk kebutuhan Anda.</em></h1>
             <p>Akses kandidat alumni dengan data program, kompetensi, pengalaman, dan sertifikat yang terverifikasi oleh Alpha Academy.</p>
             <div class="academy-portal-hero__actions"><button class="button button--primary button--large" data-action="recruiter-demo" type="button">Minta Akses Recruiter</button><button class="button company-button--light button--large" data-action="proposal-interest" type="button">Jadwalkan Demo</button></div>
@@ -1600,7 +1596,7 @@
       </section>
 
       <section class="portal-demo portal-demo--recruiter" id="recruiter-demo">
-        <div class="page-shell portal-demo__heading"><div><span class="eyebrow">DEMO RECRUITER WORKSPACE</span><h2>Dari pencarian hingga undangan rekrutmen.</h2><p>Coba seluruh alur recruiter melalui tampilan frontend interaktif berikut.</p></div><span class="portal-demo-badge">PROTOTYPE &middot; TANPA BACKEND</span></div>
+        <div class="page-shell portal-demo__heading"><div><h2>Dari pencarian hingga undangan rekrutmen.</h2><p>Coba seluruh alur recruiter melalui tampilan interaktif berikut.</p></div></div>
         <div class="page-shell portal-app-shell portal-app-shell--recruiter">
           <header class="portal-app-topbar"><a href="#recruiters" data-action="go-public-page" data-target="recruiters"><span class="portal-app-logo">A</span><strong>ALPHA <i>TALENT CONNECT</i></strong></a><div><button type="button" aria-label="Notifikasi recruiter">&#9675;<b>2</b></button><span>PT Nusantara Steel<small>Recruiter Account</small></span><i class="portal-company-avatar">NS</i></div></header>
           <div class="portal-app-body"><aside>${recruiterPortalNav()}<div class="portal-app-sidebar-card"><span>PAKET RECRUITER</span><strong>Partner Access</strong><small>126 profil dapat diakses</small><button data-action="proposal-interest" type="button">Kelola akses &rarr;</button></div></aside><main>${renderRecruiterPortalContent()}</main></div>
@@ -1772,7 +1768,7 @@
       <aside class="welder-detail-panel" role="dialog" aria-modal="true" aria-labelledby="welder-detail-title">
         <div class="welder-detail-panel__heading">
           <span id="welder-detail-title">Detail Welder</span>
-          <div><small>DATA SIMULASI</small><button class="welder-detail-close" data-action="close-welder-detail" type="button" aria-label="Tutup detail welder">&times;</button></div>
+          <div><button class="welder-detail-close" data-action="close-welder-detail" type="button" aria-label="Tutup detail welder">&times;</button></div>
         </div>
         <div class="welder-detail-identity">
           <span class="welder-avatar welder-avatar--large">${escapeHtml(profile.initials)}</span>
@@ -1853,7 +1849,7 @@
     const isRegister = state.recruiterAuthMode === "register";
     if (state.recruiterRegistrationComplete) {
       return `
-        <section class="recruiter-auth-page"><div class="recruiter-auth-layout page-shell"><div class="recruiter-auth-intro"><span>ALPHA TALENT ACCESS</span><h1>Akses kandidat dimulai dari akun perusahaan yang terverifikasi.</h1><p>Setiap permintaan kandidat akan ditinjau agar data alumni hanya digunakan untuk kebutuhan rekrutmen yang jelas.</p></div><div class="recruiter-auth-card recruiter-auth-success"><span class="recruiter-auth-success__icon">&check;</span><small>REGISTRASI PROTOTYPE BERHASIL</small><h2>Permintaan akun sudah dicatat.</h2><p>Pada versi final, tim Alpha Academy akan memverifikasi perusahaan dan mengirimkan aktivasi melalui email corporate.</p>${recruiterCandidateSummary()}<button class="recruiter-auth-primary" data-action="recruiter-auth-mode" data-mode="login" type="button">Lanjut ke Login Recruiter</button><button class="recruiter-auth-secondary" data-action="go-public-page" data-target="welders" type="button">Kembali ke Daftar Welder</button></div></div></section>`;
+        <section class="recruiter-auth-page"><div class="recruiter-auth-layout page-shell"><div class="recruiter-auth-intro"><span>ALPHA TALENT ACCESS</span><h1>Akses kandidat dimulai dari akun perusahaan yang terverifikasi.</h1><p>Setiap permintaan kandidat akan ditinjau agar data alumni hanya digunakan untuk kebutuhan rekrutmen yang jelas.</p></div><div class="recruiter-auth-card recruiter-auth-success"><span class="recruiter-auth-success__icon">&check;</span><h2>Permintaan akun sudah dicatat.</h2><p>Pada versi final, tim Alpha Academy akan memverifikasi perusahaan dan mengirimkan aktivasi melalui email corporate.</p>${recruiterCandidateSummary()}<button class="recruiter-auth-primary" data-action="recruiter-auth-mode" data-mode="login" type="button">Lanjut ke Login Recruiter</button><button class="recruiter-auth-secondary" data-action="go-public-page" data-target="welders" type="button">Kembali ke Daftar Welder</button></div></div></section>`;
     }
     return `
       <section class="recruiter-auth-page">
@@ -1869,7 +1865,7 @@
               <label>Kata Sandi<input name="password" type="password" placeholder="Minimal 8 karakter" minlength="8" required></label>
               ${isRegister ? `<label>Konfirmasi Kata Sandi<input name="password_confirmation" type="password" placeholder="Ulangi kata sandi" minlength="8" required></label><label class="recruiter-auth-check"><input name="agreement" type="checkbox" required><span>Saya menyatakan data perusahaan benar dan menyetujui penggunaan platform untuk kebutuhan rekrutmen profesional.</span></label>` : `<div class="recruiter-auth-helper"><label class="recruiter-auth-check"><input name="remember" type="checkbox"><span>Ingat saya</span></label><button type="button">Lupa kata sandi?</button></div>`}
               <button class="recruiter-auth-primary" type="submit">${isRegister ? "Buat Akun & Ajukan Akses" : "Login Recruiter"} <span>&rarr;</span></button>
-              <p class="recruiter-auth-note">Prototype frontend &middot; data belum disimpan ke backend.</p>
+              <p class="recruiter-auth-note">Data akun belum disimpan karena fitur ini masih dalam tahap pengembangan.</p>
             </form>
           </div>
         </div>
@@ -1880,7 +1876,6 @@
     return `
       <section class="academy-verify-hero">
         <div class="page-shell">
-          <span class="academy-kicker"><i></i> CERTIFICATE VERIFICATION</span>
           <h1>Verifikasi cepat.<br><em>Kepercayaan lebih kuat.</em></h1>
           <p>Periksa keaslian sertifikat yang diterbitkan oleh Alpha Academy Welding School melalui nomor unik dokumen.</p>
         </div>

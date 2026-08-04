@@ -82,29 +82,6 @@
   color: white;
 }
 
-.academy-kicker {
-  align-items: center;
-  color: #87e0ba;
-  display: flex;
-  font-size: 12px;
-  font-weight: 850;
-  gap: 10px;
-  letter-spacing: 0.15em;
-  margin-bottom: 22px;
-  text-transform: uppercase;
-}
-
-.academy-kicker i {
-  background: var(--brand-green-bright);
-  display: block;
-  height: 2px;
-  width: 28px;
-}
-
-.academy-kicker--dark {
-  color: var(--brand-green);
-}
-
 .company-hero {
   background-position: 76% center;
   min-height: 660px;
@@ -2979,18 +2956,6 @@ body.welder-detail-open {
   max-width: 680px;
 }
 
-.portal-demo-badge {
-  background: #dff3ea;
-  border: 1px solid #b8dfcc;
-  border-radius: 999px;
-  color: var(--brand-green);
-  flex: 0 0 auto;
-  font-size: 12px;
-  font-weight: 850;
-  letter-spacing: 0.06em;
-  padding: 8px 12px;
-}
-
 .portal-app-shell {
   background: white;
   border: 1px solid #cbd7dd;
@@ -3256,7 +3221,7 @@ body.welder-detail-open {
   justify-content: space-between;
 }
 
-.portal-view-heading span:not(.portal-demo-badge),
+.portal-view-heading span,
 .portal-section-label {
   color: var(--brand-green);
   display: block;
