@@ -1922,7 +1922,7 @@
 }
 
 .welder-directory-page {
-  --directory-orange: #f05a0b;
+  --directory-accent: var(--brand-green);
   --directory-navy: #0b1925;
   background: #f8fafb;
   color: #15202b;
@@ -1943,7 +1943,7 @@
 }
 
 .welder-directory-breadcrumb span {
-  color: var(--directory-orange);
+  color: var(--directory-accent);
   margin: 0 8px;
 }
 
@@ -1969,10 +1969,10 @@
 }
 
 .welder-directory-heading > span {
-  background: #fff0e8;
-  border: 1px solid #ffd2bb;
+  background: #e9f8f2;
+  border: 1px solid #b7e5d2;
   border-radius: 999px;
-  color: #bd4304;
+  color: #117c56;
   font-size: 12px;
   font-weight: 900;
   letter-spacing: 0.08em;
@@ -2021,7 +2021,7 @@
 .welder-search-input button,
 .welder-detail-actions button:first-child,
 .recruiter-auth-primary {
-  background: var(--directory-orange, #f05a0b);
+  background: var(--directory-accent, var(--brand-green));
   border: 0;
   border-radius: 7px;
   color: white;
@@ -2148,12 +2148,12 @@
 
 .welder-table tbody tr:hover,
 .welder-table tbody tr.is-selected {
-  background: #fff5ee;
+  background: #eef8f4;
 }
 
 .welder-table tbody tr.is-selected td {
-  border-bottom: 1px solid #f7c7a9;
-  border-top-color: #f7c7a9;
+  border-bottom: 1px solid #bfe1d2;
+  border-top-color: #bfe1d2;
 }
 
 .welder-person {
@@ -2272,8 +2272,8 @@
 }
 
 .welder-detail-button.is-active {
-  background: var(--directory-orange);
-  border-color: var(--directory-orange);
+  background: var(--directory-accent);
+  border-color: var(--directory-accent);
   color: white;
 }
 
@@ -2303,8 +2303,8 @@
 }
 
 .welder-pagination button.is-active {
-  background: var(--directory-orange);
-  border-color: var(--directory-orange);
+  background: var(--directory-accent);
+  border-color: var(--directory-accent);
   color: white;
 }
 
@@ -2399,9 +2399,9 @@ body.welder-detail-open {
 
 .welder-detail-close:hover,
 .welder-detail-close:focus-visible {
-  background: #fff0e8;
-  border-color: #f3a87f;
-  color: #bd4304;
+  background: #e9f8f2;
+  border-color: #9ed9c1;
+  color: #117c56;
   outline: none;
 }
 
@@ -2499,7 +2499,7 @@ body.welder-detail-open {
 }
 
 .recruiter-auth-page {
-  --directory-orange: #f05a0b;
+  --directory-accent: var(--brand-green);
   background:
     linear-gradient(90deg, rgba(8, 25, 38, 0.98) 0 49%, rgba(245, 248, 250, 0.98) 49%),
     url("assets/images/welding-hero.png") center / cover;
@@ -2634,7 +2634,7 @@ body.welder-detail-open {
 .recruiter-candidate-summary button {
   background: transparent;
   border: 0;
-  color: #d84d08;
+  color: #137c56;
   cursor: pointer;
   font-size: 12px;
   font-weight: 850;
@@ -2658,7 +2658,7 @@ body.welder-detail-open {
 }
 
 .recruiter-auth-tabs button.is-active {
-  border-bottom-color: var(--directory-orange);
+  border-bottom-color: var(--directory-accent);
   color: #172631;
 }
 
@@ -2687,8 +2687,8 @@ body.welder-detail-open {
 }
 
 .recruiter-auth-form input:focus {
-  border-color: #f05a0b;
-  box-shadow: 0 0 0 3px rgba(240, 90, 11, 0.12);
+  border-color: var(--brand-green);
+  box-shadow: 0 0 0 3px rgba(20, 140, 97, 0.14);
   outline: none;
 }
 
@@ -2718,7 +2718,7 @@ body.welder-detail-open {
 .recruiter-auth-helper button {
   background: transparent;
   border: 0;
-  color: #d84d08;
+  color: #137c56;
   cursor: pointer;
 }
 
