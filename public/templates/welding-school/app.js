@@ -452,6 +452,7 @@
     level: "Semua Level",
     selectedArticle: academyNews[0],
     selectedWelder: alumniProfiles[0],
+    welderDetailOpen: false,
     recruiterCandidate: alumniProfiles[0],
     recruiterAuthMode: "register",
     recruiterRegistrationComplete: false,
@@ -957,6 +958,7 @@
     }
 
     state.step = index;
+    if (steps[index].id !== "welders") state.welderDetailOpen = false;
     state.dashboardSidebarOpen = false;
     window.clearInterval(invoiceTimer);
     window.history.replaceState(null, "", `#${steps[index].id}`);
@@ -1738,7 +1740,8 @@
     return items
       .map((profile) => {
         const meta = directoryMeta(profile);
-        const selected = state.selectedWelder.id === profile.id;
+        const selected =
+          state.welderDetailOpen && state.selectedWelder.id === profile.id;
         return `
           <tr class="${selected ? "is-selected" : ""}">
             <td>
@@ -1764,10 +1767,12 @@
   function renderWelderDetail(profile) {
     const meta = directoryMeta(profile);
     return `
-      <aside class="welder-detail-panel" aria-label="Detail welder terpilih">
+      <div class="welder-detail-overlay">
+      <button class="welder-detail-backdrop" data-action="close-welder-detail" type="button" aria-label="Tutup detail welder"></button>
+      <aside class="welder-detail-panel" role="dialog" aria-modal="true" aria-labelledby="welder-detail-title">
         <div class="welder-detail-panel__heading">
-          <span>Detail Welder</span>
-          <small>DATA SIMULASI</small>
+          <span id="welder-detail-title">Detail Welder</span>
+          <div><small>DATA SIMULASI</small><button class="welder-detail-close" data-action="close-welder-detail" type="button" aria-label="Tutup detail welder">&times;</button></div>
         </div>
         <div class="welder-detail-identity">
           <span class="welder-avatar welder-avatar--large">${escapeHtml(profile.initials)}</span>
@@ -1798,7 +1803,8 @@
           <h3>Informasi Ketersediaan</h3>
           <dl><div><dt>Status</dt><dd>${escapeHtml(profile.availability)}</dd></div><div><dt>Siap Kerja</dt><dd>${escapeHtml(meta.readyDate)}</dd></div></dl>
         </section>
-      </aside>`;
+      </aside>
+      </div>`;
   }
 
   function renderWelders() {
@@ -1829,7 +1835,7 @@
             </div>
             <div class="welder-pagination"><button disabled>&lsaquo;</button><button class="is-active">1</button><button>2</button><button>3</button><span>&hellip;</span><button>23</button><button>&rsaquo;</button></div>
           </main>
-          ${renderWelderDetail(state.selectedWelder)}
+          ${state.welderDetailOpen ? renderWelderDetail(state.selectedWelder) : ""}
         </div>
       </section>`;
   }
@@ -3254,6 +3260,10 @@
       ["dashboard", "member-programs", "registration", "documents"].includes(id) ||
         (state.loggedIn && ["detail", "batch"].includes(id)),
     );
+    document.body.classList.toggle(
+      "welder-detail-open",
+      id === "welders" && state.welderDetailOpen,
+    );
     app.querySelectorAll("[data-user-avatar]").forEach((image) => {
       image.addEventListener("error", () => image.remove(), { once: true });
     });
@@ -3317,6 +3327,7 @@
     if (form.dataset.form === "welder-search") {
       const data = new FormData(form);
       state.welderSearch = String(data.get("query") || "");
+      state.welderDetailOpen = false;
       Object.keys(state.welderFilters).forEach((key) => {
         state.welderFilters[key] = String(data.get(key) || "");
       });
@@ -3580,11 +3591,17 @@
       state.selectedWelder =
         alumniProfiles.find((profile) => profile.id === button.dataset.id) ||
         alumniProfiles[0];
+      state.welderDetailOpen = true;
       render();
-      window.scrollTo({ top: 120, behavior: "smooth" });
+      window.setTimeout(() => document.querySelector(".welder-detail-close")?.focus(), 0);
+    }
+    if (action === "close-welder-detail") {
+      state.welderDetailOpen = false;
+      render();
     }
     if (action === "reset-welder-filters") {
       state.welderSearch = "";
+      state.welderDetailOpen = false;
       Object.keys(state.welderFilters).forEach((key) => {
         state.welderFilters[key] = "";
       });
@@ -4065,6 +4082,11 @@
   });
 
   document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && state.welderDetailOpen) {
+      state.welderDetailOpen = false;
+      render();
+      return;
+    }
     if (event.key === "Escape") closeProfileMenus();
   });
 
@@ -4087,6 +4109,7 @@
       const key = event.target.name;
       if (key in state.welderFilters) {
         state.welderFilters[key] = event.target.value;
+        state.welderDetailOpen = false;
         render();
       }
       return;
