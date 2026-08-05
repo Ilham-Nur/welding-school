@@ -41,7 +41,7 @@ class TemplateComponentsTest extends TestCase
             );
     }
 
-    public function test_alumni_directory_supports_multiple_professions_and_positions(): void
+    public function test_alumni_directory_supports_multiple_professions_skills_and_positions(): void
     {
         $script = file_get_contents(public_path('templates/welding-school/app.js'));
 
@@ -54,6 +54,23 @@ class TemplateComponentsTest extends TestCase
             'profile.positions.includes(state.welderFilters.position)',
             $script,
         );
+        $this->assertStringContainsString(
+            'state.welderFilters.professions.includes(profile.profession)',
+            $script,
+        );
+        $this->assertStringContainsString(
+            'state.welderFilters.skills.some((skill)',
+            $script,
+        );
+        $this->assertStringContainsString(
+            'renderWelderMultiFilter("Profesi", "professions"',
+            $script,
+        );
+        $this->assertStringContainsString(
+            'renderWelderMultiFilter("Keahlian", "skills"',
+            $script,
+        );
+        $this->assertStringContainsString('data.getAll(key).map(String)', $script);
         $this->assertStringContainsString(
             '["Sedang bekerja", "Mencari pekerjaan"]',
             $script,

@@ -2017,19 +2017,116 @@
   padding-top: 12px;
 }
 
-.welder-filter-grid label {
+.welder-filter-grid > label,
+.welder-multi-filter {
   border: 1px solid #dfe5ea;
   border-radius: 8px;
+  min-width: 0;
+}
+
+.welder-filter-grid > label {
   display: flex;
   flex-direction: column;
-  min-width: 0;
   padding: 8px 10px;
 }
 
-.welder-filter-grid label > span {
+.welder-filter-grid > label > span,
+.welder-multi-filter summary > span {
   color: #24313d;
   font-size: 12px;
   font-weight: 800;
+}
+
+.welder-multi-filter {
+  background: white;
+  position: relative;
+}
+
+.welder-multi-filter summary {
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  list-style: none;
+  padding: 8px 30px 8px 10px;
+  position: relative;
+}
+
+.welder-multi-filter summary::-webkit-details-marker {
+  display: none;
+}
+
+.welder-multi-filter summary::after {
+  color: #687681;
+  content: "\2304";
+  font-size: 15px;
+  position: absolute;
+  right: 10px;
+  top: 18px;
+  transform-origin: center;
+  transition: transform 160ms ease;
+}
+
+.welder-multi-filter[open] summary::after {
+  transform: rotate(180deg);
+}
+
+.welder-multi-filter summary > strong {
+  color: #687681;
+  font-size: 12px;
+  font-weight: 500;
+  overflow: hidden;
+  padding-top: 4px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.welder-multi-filter__options {
+  background: white;
+  border: 1px solid #dfe5ea;
+  border-radius: 10px;
+  box-shadow: 0 14px 32px rgba(11, 25, 37, 0.14);
+  display: grid;
+  gap: 2px;
+  left: 0;
+  max-height: 280px;
+  min-width: 230px;
+  overflow-y: auto;
+  padding: 8px;
+  position: absolute;
+  top: calc(100% + 6px);
+  z-index: 30;
+}
+
+.welder-multi-filter__options label {
+  align-items: center;
+  border: 0;
+  border-radius: 7px;
+  color: #33414d;
+  cursor: pointer;
+  display: flex;
+  flex-direction: row;
+  font-size: 13px;
+  gap: 8px;
+  padding: 8px;
+}
+
+.welder-multi-filter__options label:hover {
+  background: #f1f8f5;
+}
+
+.welder-multi-filter__options input {
+  accent-color: var(--directory-accent);
+  height: 16px;
+  margin: 0;
+  width: 16px;
+}
+
+.welder-multi-filter__options small {
+  border-top: 1px solid #edf0f2;
+  color: #7b8790;
+  font-size: 12px;
+  margin-top: 4px;
+  padding: 8px 8px 2px;
 }
 
 .welder-filter-grid select,
@@ -2970,6 +3067,12 @@ body.welder-detail-open {
   .welder-filter-grid,
   .recruiter-auth-form__row {
     grid-template-columns: 1fr;
+  }
+
+  .welder-multi-filter__options {
+    left: 0;
+    min-width: 100%;
+    right: 0;
   }
 
   .welder-results-summary {

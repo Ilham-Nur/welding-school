@@ -516,8 +516,8 @@
     welderSearch: "",
     welderFilters: {
       domicile: "",
-      profession: "",
-      skill: "",
+      professions: [],
+      skills: [],
       position: "",
       employment: "",
     },
@@ -1802,8 +1802,8 @@
       return (
         (!query || searchable.includes(query)) &&
         (!state.welderFilters.domicile || meta.domicile.includes(state.welderFilters.domicile)) &&
-        (!state.welderFilters.profession || profile.profession === state.welderFilters.profession) &&
-        (!state.welderFilters.skill || profile.technicalSkills.includes(state.welderFilters.skill)) &&
+        (!state.welderFilters.professions.length || state.welderFilters.professions.includes(profile.profession)) &&
+        (!state.welderFilters.skills.length || state.welderFilters.skills.some((skill) => profile.technicalSkills.includes(skill))) &&
         (!state.welderFilters.position || profile.positions.includes(state.welderFilters.position)) &&
         (!state.welderFilters.employment || profile.employmentStatus === state.welderFilters.employment)
       );
@@ -1816,6 +1816,20 @@
 
   function directoryTags(values) {
     return `<span class="welder-tag-list">${values.map((value) => `<span class="welder-process-tag">${escapeHtml(value)}</span>`).join("")}</span>`;
+  }
+
+  function renderWelderMultiFilter(label, name, options, selectedValues, emptyLabel) {
+    const summary = selectedValues.length
+      ? `${selectedValues.length} dipilih`
+      : emptyLabel;
+    return `
+      <details class="welder-multi-filter">
+        <summary><span>${escapeHtml(label)}</span><strong>${escapeHtml(summary)}</strong></summary>
+        <div class="welder-multi-filter__options">
+          ${options.map((value) => `<label><input name="${escapeHtml(name)}" value="${escapeHtml(value)}" type="checkbox" data-welder-multi-filter data-empty-label="${escapeHtml(emptyLabel)}" ${selectedValues.includes(value) ? "checked" : ""}> ${escapeHtml(value)}</label>`).join("")}
+          <small>Pilih beberapa opsi, lalu tekan Cari.</small>
+        </div>
+      </details>`;
   }
 
   function welderAvatar(profile, large = false) {
@@ -1917,8 +1931,8 @@
               <label class="welder-search-input"><span aria-hidden="true">&#9906;</span><input name="query" type="search" value="${escapeHtml(state.welderSearch)}" placeholder="Cari nama alumni, profesi, keahlian, atau posisi..."><button type="submit">Cari</button></label>
               <div class="welder-filter-grid">
                 <label><span>Domisili</span><select name="domicile" data-welder-filter><option value="">Semua Domisili</option><option value="Banten" ${state.welderFilters.domicile === "Banten" ? "selected" : ""}>Banten</option><option value="Jawa Barat" ${state.welderFilters.domicile === "Jawa Barat" ? "selected" : ""}>Jawa Barat</option><option value="DKI Jakarta" ${state.welderFilters.domicile === "DKI Jakarta" ? "selected" : ""}>DKI Jakarta</option><option value="Kepulauan Riau" ${state.welderFilters.domicile === "Kepulauan Riau" ? "selected" : ""}>Kepulauan Riau</option></select></label>
-                <label><span>Profesi</span><select name="profession" data-welder-filter><option value="">Semua Profesi</option>${["Welder", "Welding Inspector", "Fitter"].map((value) => `<option ${state.welderFilters.profession === value ? "selected" : ""}>${value}</option>`).join("")}</select></label>
-                <label><span>Keahlian</span><select name="skill" data-welder-filter><option value="">Semua Keahlian</option>${["SMAW", "FCAW", "GTAW", "GMAW", "Visual Inspection", "Fit-up"].map((value) => `<option ${state.welderFilters.skill === value ? "selected" : ""}>${value}</option>`).join("")}</select></label>
+                ${renderWelderMultiFilter("Profesi", "professions", ["Welder", "Welding Inspector", "Fitter"], state.welderFilters.professions, "Semua Profesi")}
+                ${renderWelderMultiFilter("Keahlian", "skills", ["SMAW", "FCAW", "GTAW", "GMAW", "Visual Inspection", "Fit-up"], state.welderFilters.skills, "Semua Keahlian")}
                 <label><span>Posisi / Kualifikasi</span><select name="position" data-welder-filter><option value="">Semua Kualifikasi</option>${["2G", "3G", "4G", "6G", "Inspector Junior", "Pipe Fitter"].map((value) => `<option ${state.welderFilters.position === value ? "selected" : ""}>${value}</option>`).join("")}</select></label>
                 <label><span>Status Bekerja</span><select name="employment" data-welder-filter><option value="">Semua Status</option>${["Sedang bekerja", "Mencari pekerjaan"].map((value) => `<option ${state.welderFilters.employment === value ? "selected" : ""}>${value}</option>`).join("")}</select></label>
                 <button class="welder-reset-button" data-action="reset-welder-filters" type="button">Reset Filter</button>
@@ -3448,7 +3462,9 @@
       state.welderSearch = String(data.get("query") || "");
       state.welderDetailOpen = false;
       Object.keys(state.welderFilters).forEach((key) => {
-        state.welderFilters[key] = String(data.get(key) || "");
+        state.welderFilters[key] = Array.isArray(state.welderFilters[key])
+          ? data.getAll(key).map(String)
+          : String(data.get(key) || "");
       });
       render();
       return;
@@ -3722,7 +3738,7 @@
       state.welderSearch = "";
       state.welderDetailOpen = false;
       Object.keys(state.welderFilters).forEach((key) => {
-        state.welderFilters[key] = "";
+        state.welderFilters[key] = Array.isArray(state.welderFilters[key]) ? [] : "";
       });
       render();
     }
@@ -4232,6 +4248,24 @@
   });
 
   document.addEventListener("change", (event) => {
+    if (event.target.matches("[data-welder-multi-filter]")) {
+      const key = event.target.name;
+      if (key in state.welderFilters && Array.isArray(state.welderFilters[key])) {
+        const selectedValues = Array.from(
+          document.querySelectorAll(`[data-welder-multi-filter][name="${key}"]:checked`),
+          (input) => input.value,
+        );
+        state.welderFilters[key] = selectedValues;
+        const summary = event.target.closest("details")?.querySelector("summary strong");
+        if (summary) {
+          summary.textContent = selectedValues.length
+            ? `${selectedValues.length} dipilih`
+            : event.target.dataset.emptyLabel;
+        }
+      }
+      return;
+    }
+
     if (event.target.matches("[data-welder-filter]")) {
       const key = event.target.name;
       if (key in state.welderFilters) {
