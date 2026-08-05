@@ -50,6 +50,21 @@ class TemplateComponentsTest extends TestCase
         $this->assertStringContainsString('profession: "Welding Inspector"', $script);
         $this->assertStringContainsString('profession: "Fitter"', $script);
         $this->assertStringContainsString('positions: ["2G", "3G", "6G"]', $script);
+        preg_match_all(
+            '/^\s+profession: "(Welder|Welding Inspector|Fitter)",$/m',
+            $script,
+            $professionMatches,
+        );
+        $professionTotals = array_count_values($professionMatches[1]);
+        $this->assertCount(20, $professionMatches[1]);
+        $this->assertSame(10, $professionTotals['Welder']);
+        $this->assertSame(5, $professionTotals['Welding Inspector']);
+        $this->assertSame(5, $professionTotals['Fitter']);
+        $this->assertStringContainsString(
+            '<b>${items.length}</b> Alumni ditemukan',
+            $script,
+        );
+        $this->assertStringNotContainsString('1.126', $script);
         $this->assertStringContainsString(
             'profile.positions.includes(state.welderFilters.position)',
             $script,
