@@ -211,6 +211,33 @@ class TemplateComponentsTest extends TestCase
         );
     }
 
+    public function test_batch_selection_shows_an_empty_state_when_a_program_has_no_batches(): void
+    {
+        $script = file_get_contents(public_path('templates/welding-school/app.js'));
+
+        $this->assertIsString($script);
+        $this->assertStringContainsString(
+            'if (!Array.isArray(program?.databaseBatches)) return fallbackBatches;',
+            $script,
+        );
+        $this->assertStringContainsString(
+            'if (!batches.length || !selected)',
+            $script,
+        );
+        $this->assertStringContainsString(
+            'Tidak ada batch yang akan dimulai',
+            $script,
+        );
+        $this->assertStringContainsString(
+            'selectedBatch: batches[0] || unavailableBatch',
+            $script,
+        );
+        $this->assertStringContainsString(
+            'state.selectedBatch = batches[0] || unavailableBatch;',
+            $script,
+        );
+    }
+
     public function test_public_home_is_a_company_profile_with_separate_program_page(): void
     {
         $response = $this->get('/');
@@ -260,6 +287,26 @@ class TemplateComponentsTest extends TestCase
         $this->assertStringNotContainsString(
             'window.setTimeout(() => navigate("success")',
             $script,
+        );
+    }
+
+    public function test_paid_payment_page_uses_a_balanced_receipt_layout(): void
+    {
+        $script = file_get_contents(public_path('templates/welding-school/app.js'));
+        $styles = file_get_contents(public_path('templates/welding-school/style.css'));
+
+        $this->assertIsString($script);
+        $this->assertIsString($styles);
+        $this->assertStringContainsString(
+            'payment-layout payment-layout--paid',
+            $script,
+        );
+        $this->assertStringContainsString('paid-payment-overview', $script);
+        $this->assertStringContainsString('paid-payment-details', $script);
+        $this->assertStringContainsString('.payment-layout--paid', $styles);
+        $this->assertStringContainsString(
+            '.paid-payment-details > div',
+            $styles,
         );
     }
 }

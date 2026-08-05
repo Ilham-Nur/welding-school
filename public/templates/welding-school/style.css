@@ -8097,6 +8097,153 @@ a {
   width: 100%;
 }
 
+.payment-layout--paid {
+  gap: 24px;
+  grid-template-columns: minmax(0, 1fr) 350px;
+}
+
+.checkout-card--paid {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  padding: 28px;
+}
+
+.checkout-card--paid .notice {
+  margin: 0;
+}
+
+.paid-payment-overview {
+  align-items: stretch;
+  display: grid;
+  gap: 24px;
+  grid-template-columns: minmax(280px, 0.9fr) minmax(0, 1.1fr);
+}
+
+.paid-payment-program {
+  align-items: flex-start;
+  background: #f7f9fa;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  min-width: 0;
+  padding: 18px;
+}
+
+.paid-payment-program .order-program__image {
+  flex: 0 0 138px;
+  height: 96px;
+}
+
+.paid-payment-program > div {
+  min-width: 0;
+}
+
+.paid-payment-program h3 {
+  font-size: 17px;
+  margin-top: 10px;
+}
+
+.paid-payment-details {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin: 0;
+  overflow: hidden;
+}
+
+.paid-payment-details > div {
+  align-items: center;
+  display: grid;
+  gap: 16px;
+  grid-template-columns: minmax(120px, 0.8fr) minmax(0, 1.2fr);
+  min-height: 54px;
+  padding: 12px 16px;
+}
+
+.paid-payment-details > div + div {
+  border-top: 1px solid var(--border);
+}
+
+.paid-payment-details > div:last-child {
+  background: var(--green-100);
+}
+
+.paid-payment-details dt {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.paid-payment-details dd {
+  font-size: 13px;
+  font-weight: 750;
+  margin: 0;
+  overflow-wrap: anywhere;
+  text-align: right;
+}
+
+.paid-payment-details > div:last-child dd {
+  color: var(--green-700);
+  font-size: 15px;
+  font-weight: 850;
+}
+
+.payment-layout--paid .payment-summary {
+  padding: 28px;
+}
+
+.payment-layout--paid .payment-summary h2 {
+  font-size: 24px;
+  line-height: 1.2;
+  margin: 12px 0 8px;
+}
+
+.payment-layout--paid .payment-summary > p {
+  color: var(--muted);
+  margin: 0;
+}
+
+.payment-layout--paid .payment-summary__total {
+  margin-top: 24px;
+}
+
+.payment-layout--paid .payment-summary > .button + .button {
+  margin-top: 10px;
+}
+
+.payment-layout--paid .payment-summary .text-button {
+  margin-top: 18px;
+}
+
+@media (max-width: 1080px) {
+  .paid-payment-overview {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 620px) {
+  .checkout-card--paid,
+  .payment-layout--paid .payment-summary {
+    padding: 18px;
+  }
+
+  .paid-payment-program {
+    flex-direction: column;
+  }
+
+  .paid-payment-program .order-program__image {
+    flex-basis: 140px;
+    width: 100%;
+  }
+
+  .paid-payment-details > div {
+    gap: 4px;
+    grid-template-columns: 1fr;
+  }
+
+  .paid-payment-details dd {
+    text-align: left;
+  }
+}
+
 .payment-security {
   align-items: center;
   color: var(--muted);

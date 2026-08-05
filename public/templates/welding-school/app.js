@@ -199,6 +199,18 @@
     },
   ];
 
+  const unavailableBatch = {
+    id: "unavailable-batch",
+    databaseId: null,
+    code: "",
+    label: "Belum ada batch",
+    start: "Belum tersedia",
+    end: "Belum tersedia",
+    schedule: "Belum tersedia",
+    location: "Belum tersedia",
+    seatsLeft: 0,
+  };
+
   function catalogDate(value) {
     if (!value) return "Belum ditentukan";
     return new Intl.DateTimeFormat("id-ID", {
@@ -210,7 +222,7 @@
   }
 
   function programBatches(program) {
-    if (!program?.databaseBatches?.length) return fallbackBatches;
+    if (!Array.isArray(program?.databaseBatches)) return fallbackBatches;
 
     return program.databaseBatches.map((batch, index) => ({
       id: `database-batch-${batch.id}`,
@@ -441,7 +453,7 @@
     trainingSection: "overview",
     programOrigin: "public",
     selectedProgram: programs[0],
-    selectedBatch: batches[0],
+    selectedBatch: batches[0] || unavailableBatch,
     accountMode: "login",
     applicationStatus: "not-started",
     applications: [],
@@ -708,7 +720,7 @@
         batches.find(
           (batch) =>
             Number(batch.databaseId) === Number(application.training_batch_id),
-        ) || batches[0];
+        ) || batches[0] || unavailableBatch;
     }
   }
 
@@ -2082,6 +2094,25 @@
 
   function renderBatchPage() {
     const selected = state.selectedBatch;
+
+    if (!batches.length || !selected) {
+      return `
+        ${pageHeader(
+          "LANGKAH 2 DARI 4 · PILIH BATCH",
+          "Pilih jadwal yang paling sesuai",
+          `Program ${state.selectedProgram.title} · ${state.selectedProgram.duration}`,
+        )}
+        <section class="page-shell selection-layout">
+          <div class="empty-state">
+            <span>i</span>
+            <h2>Tidak ada batch yang akan dimulai</h2>
+            <p>Jadwal batch untuk program ini belum tersedia. Silakan pilih program lain atau periksa kembali nanti.</p>
+            <button class="button button--primary" data-action="back-program-list" type="button">Pilih Program Lain</button>
+          </div>
+        </section>
+      `;
+    }
+
     return `
       ${pageHeader(
         "LANGKAH 2 DARI 4 · PILIH BATCH",
@@ -3141,18 +3172,20 @@
           "Pembayaran telah dikonfirmasi",
           "Rincian pembayaran program ini tetap dapat Anda lihat kapan saja.",
         )}
-        <section class="page-shell payment-layout">
-          <article class="checkout-card">
+        <section class="page-shell payment-layout payment-layout--paid">
+          <article class="checkout-card checkout-card--paid">
             <div class="notice notice--green"><span>✓</span><div><strong>Status pembayaran: Lunas</strong><p>Kursi pelatihan telah diamankan dan akses pelatihan sudah aktif.</p></div></div>
-            <div class="order-program">
-              <span class="order-program__image" style="background-position:${state.selectedProgram.imagePosition}"></span>
-              <div><span class="badge badge--blue">${state.selectedProgram.code}</span><h3>${state.selectedProgram.title}</h3><p>${state.selectedBatch.label}</p></div>
+            <div class="paid-payment-overview">
+              <div class="order-program paid-payment-program">
+                <span class="order-program__image" style="background-position:${state.selectedProgram.imagePosition}"></span>
+                <div><span class="badge badge--blue">${state.selectedProgram.code}</span><h3>${state.selectedProgram.title}</h3><p>${state.selectedBatch.label}</p></div>
+              </div>
+              <dl class="paid-payment-details">
+                <div><dt>Nomor invoice</dt><dd>${escapeHtml(invoice.invoice_number)}</dd></div>
+                <div><dt>Tanggal pembayaran</dt><dd>${formatDateTime(invoice.paid_at)}</dd></div>
+                <div><dt>Total dibayar</dt><dd>${money(total)}</dd></div>
+              </dl>
             </div>
-            <dl class="summary-list">
-              <div><dt>Nomor invoice</dt><dd>${escapeHtml(invoice.invoice_number)}</dd></div>
-              <div><dt>Tanggal pembayaran</dt><dd>${formatDateTime(invoice.paid_at)}</dd></div>
-              <div><dt>Total dibayar</dt><dd>${money(total)}</dd></div>
-            </dl>
           </article>
           <aside class="payment-summary">
             <span class="badge badge--green">LUNAS</span>
@@ -3765,7 +3798,7 @@
 
       state.selectedProgram = selectedProgram;
       batches = programBatches(state.selectedProgram);
-      state.selectedBatch = batches[0];
+      state.selectedBatch = batches[0] || unavailableBatch;
       state.application = null;
       state.applicationStatus = "not-started";
       state.invoice = null;
@@ -3823,7 +3856,9 @@
 
     if (action === "select-batch") {
       state.selectedBatch =
-        batches.find((batch) => batch.id === button.dataset.id) || batches[0];
+        batches.find((batch) => batch.id === button.dataset.id) ||
+        batches[0] ||
+        unavailableBatch;
       render();
       showToast(`${state.selectedBatch.label} dipilih.`, "success");
     }
