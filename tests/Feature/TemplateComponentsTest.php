@@ -61,7 +61,7 @@ class TemplateComponentsTest extends TestCase
         $this->assertSame(5, $professionTotals['Welding Inspector']);
         $this->assertSame(5, $professionTotals['Fitter']);
         $this->assertStringContainsString(
-            '<b>${items.length}</b> Alumni ditemukan',
+            '<b>${filteredItems.length}</b> Alumni ditemukan',
             $script,
         );
         $this->assertStringNotContainsString('1.126', $script);
@@ -95,6 +95,27 @@ class TemplateComponentsTest extends TestCase
             '<label><span>Status Sertifikat</span>',
             $script,
         );
+    }
+
+    public function test_alumni_directory_paginates_ten_profiles_per_page(): void
+    {
+        $script = file_get_contents(public_path('templates/welding-school/app.js'));
+
+        $this->assertIsString($script);
+        $this->assertStringContainsString('const WELDER_PAGE_SIZE = 10;', $script);
+        $this->assertStringContainsString(
+            'Math.ceil(filteredItems.length / WELDER_PAGE_SIZE)',
+            $script,
+        );
+        $this->assertStringContainsString(
+            'filteredItems.slice(pageStart, pageStart + WELDER_PAGE_SIZE)',
+            $script,
+        );
+        $this->assertStringContainsString(
+            'data-action="change-welder-page"',
+            $script,
+        );
+        $this->assertStringContainsString('state.welderPage = 1;', $script);
     }
 
     public function test_component_catalog_renders_all_requested_components(): void

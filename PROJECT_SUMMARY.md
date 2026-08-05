@@ -1,10 +1,28 @@
-# Welding School Management System
+# Alpha Academy Welding School Management System
 
 ## Ringkasan Proyek
 
-Welding School Management System adalah platform pelatihan welding yang akan tersedia melalui web dan aplikasi Android. Sistem dirancang untuk menangani perjalanan peserta mulai dari melihat program, mendaftar, membayar, mengikuti pelatihan, menjalani penilaian, hingga menerima sertifikat yang dapat diverifikasi.
+Alpha Academy Welding School Management System adalah platform berbasis web yang menangani perjalanan peserta mulai dari menemukan program, mendaftar, membayar, mengikuti pelatihan, menjalani penilaian, hingga menerima sertifikat yang dapat diverifikasi.
 
-Tahap pengerjaan saat ini difokuskan pada frontend web terlebih dahulu. Backend Laravel dan aplikasi Android akan dikembangkan setelah struktur halaman, komponen, dan alur utama frontend lebih stabil.
+Fondasi pelatihan tetap menjadi inti produk. Dalam proyeksi jangka panjang, perjalanan pengguna tidak berhenti setelah lulus: peserta menjadi alumni dengan profil kompetensi dan karier, sedangkan perusahaan atau recruiter dapat menemukan kandidat yang relevan secara aman dan terarah.
+
+## Visi Akhir Produk (Proyeksi Pengembangan)
+
+Visi akhir Alpha Academy adalah membangun ekosistem berkelanjutan:
+
+`Calon peserta → Peserta → Alumni → Peluang kerja / Recruiter`
+
+Pengembangan platform alumni dan recruiter merupakan arah produk setelah layanan inti pelatihan stabil. Bagian ini adalah proyeksi pengembangan ke depan, bukan pernyataan bahwa seluruh fiturnya sudah tersedia pada sistem produksi.
+
+Ruang lingkup visi tersebut meliputi:
+
+- Profil alumni untuk profesi Welder, Welding Inspector, Fitter, dan profesi teknis lain yang relevan.
+- Dukungan lebih dari satu keahlian dan posisi atau kualifikasi pada setiap alumni, misalnya Welder dengan posisi 2G, 3G, dan 6G.
+- Informasi status bekerja, ketersediaan, pengalaman, CV, dan riwayat karier alumni.
+- Akun recruiter atau perusahaan yang melalui proses verifikasi.
+- Pencarian, filter, shortlist, dan pengajuan permintaan kandidat berdasarkan profesi, kompetensi, lokasi, dan kesiapan kerja.
+- Perlindungan data alumni melalui persetujuan akses dan pembatasan informasi kontak.
+- Pencatatan hasil rekrutmen agar Alpha Academy dapat mengevaluasi dampak pelatihan terhadap karier alumni.
 
 ## Tujuan Produk
 
@@ -15,6 +33,9 @@ Tahap pengerjaan saat ini difokuskan pada frontend web terlebih dahulu. Backend 
 - Memberikan dashboard pembelajaran kepada peserta.
 - Menyediakan verifikasi sertifikat secara publik.
 - Menyimpan riwayat pelatihan dan kompetensi peserta.
+- Menjaga hubungan dengan peserta setelah lulus melalui profil alumni dan perkembangan karier.
+- Mempermudah recruiter menemukan alumni yang sesuai berdasarkan profesi, kompetensi, kualifikasi, domisili, dan status bekerja.
+- Menggunakan data hasil kerja alumni sebagai bahan evaluasi kualitas program pelatihan.
 
 ## Platform
 
@@ -34,11 +55,19 @@ Digunakan oleh pengunjung dan calon peserta untuk:
 
 Digunakan oleh admin dan instruktur untuk mengelola kegiatan operasional.
 
+### Portal Alumni (Fase Lanjutan)
+
+Direncanakan sebagai ruang bagi alumni untuk memperbarui profesi, keahlian, posisi atau kualifikasi, pengalaman kerja, status bekerja, ketersediaan, dan persetujuan penggunaan data untuk kebutuhan rekrutmen.
+
+### Portal Recruiter (Fase Lanjutan)
+
+Direncanakan untuk perusahaan yang sudah terverifikasi agar dapat mencari alumni, menyimpan shortlist, mengajukan permintaan kandidat, dan mencatat perkembangan proses rekrutmen tanpa membuka data pribadi alumni secara bebas.
+
 ### Android
 
 Direncanakan untuk peserta setelah API dan proses bisnis utama stabil. Fitur utamanya meliputi materi, jadwal, tugas, kehadiran, logbook, nilai, notifikasi, dan sertifikat.
 
-## Role MVP
+## Peran Pengguna
 
 ### Pengunjung
 
@@ -51,6 +80,14 @@ Pengguna yang sudah membuat akun tetapi belum menyelesaikan pembayaran. Calon pe
 ### Peserta
 
 Pengguna yang sudah membayar dan resmi masuk ke batch. Peserta dapat mengakses materi, jadwal, tugas, logbook, nilai, progres, dan sertifikat.
+
+### Alumni (Fase Lanjutan)
+
+Peserta yang telah lulus dan memiliki profil kompetensi serta karier. Alumni dapat mengatur status bekerja, ketersediaan, pengalaman, CV, dan persetujuan akses recruiter.
+
+### Recruiter atau Perusahaan (Fase Lanjutan)
+
+Perwakilan perusahaan yang telah diverifikasi. Recruiter dapat mencari alumni sesuai kebutuhan, membuat shortlist, dan mengajukan permintaan kandidat melalui alur yang tercatat.
 
 ### Instruktur atau Asesor
 
@@ -228,8 +265,10 @@ Kurikulum dan aturan menggunakan versioning. Ketika batch dibuat, sistem menyimp
 
 ### Ditunda Setelah MVP
 
-- Direktori welder publik.
-- Sistem rekrutmen dan permintaan kandidat.
+- Direktori alumni produksi yang terhubung ke database.
+- Portal alumni untuk pembaruan kompetensi, CV, status bekerja, dan persetujuan data.
+- Verifikasi akun recruiter atau perusahaan.
+- Shortlist, permintaan kandidat, dan alur rekrutmen.
 - Lowongan kerja.
 - Penempatan kerja lengkap.
 - Keuangan dan akuntansi lengkap.
@@ -239,6 +278,43 @@ Kurikulum dan aturan menggunakan versioning. Ketika batch dibuat, sistem menyimp
 - Chat real-time.
 - Mode offline Android.
 - Multi-cabang.
+
+## Roadmap Pengembangan Setelah MVP
+
+### Fase 1 — Fondasi Pelatihan
+
+- Menstabilkan website publik, akun peserta, pendaftaran, pembayaran, operasional pelatihan, penilaian, dan sertifikat.
+- Menyelesaikan integrasi data agar alur peserta dari pendaftaran sampai kelulusan tercatat dengan konsisten.
+
+### Fase 2 — Pengalaman Alumni
+
+- Mengubah peserta yang lulus menjadi profil alumni.
+- Menyediakan profil untuk Welder, Welding Inspector, Fitter, dan profesi teknis lain.
+- Menyimpan beberapa keahlian serta posisi atau kualifikasi dalam satu profil.
+- Memberikan kontrol kepada alumni atas status bekerja, ketersediaan, CV, dan persetujuan akses data.
+
+### Fase 3 — Akses Recruiter
+
+- Menyediakan registrasi dan verifikasi perusahaan.
+- Menyediakan pencarian multi-profesi dan multi-keahlian, shortlist, serta permintaan kandidat.
+- Membatasi data pribadi sampai alumni memberikan persetujuan atau proses rekrutmen memenuhi aturan.
+- Mencatat tahapan rekrutmen secara transparan bagi Alpha Academy, alumni, dan recruiter.
+
+### Fase 4 — Ekosistem Karier
+
+- Menambahkan lowongan kerja dan pencocokan kandidat.
+- Memantau penempatan dan perkembangan karier alumni.
+- Menggunakan data hasil kerja untuk meningkatkan kurikulum dan menunjukkan dampak pelatihan kepada mitra industri.
+
+### Yang Sudah Diprototipekan
+
+- Daftar alumni publik dengan 20 data dummy hardcode: 10 Welder, 5 Welding Inspector, dan 5 Fitter.
+- Filter profesi dan keahlian yang dapat memilih lebih dari satu opsi.
+- Dukungan beberapa posisi atau kualifikasi pada satu alumni.
+- Pagination dengan maksimal 10 alumni per halaman.
+- Tampilan detail alumni dan pintu masuk akun recruiter.
+
+Prototype tersebut masih menggunakan data frontend dan belum menjadi portal alumni atau recruiter yang terhubung ke database produksi.
 
 ## Arah Visual Frontend
 
@@ -290,6 +366,12 @@ Vertical slice pertama:
 
 Setelah frontend alur pertama stabil, backend dan API dapat dihubungkan tanpa mengubah struktur tampilan secara besar.
 
+Pengembangan alumni dan recruiter juga akan dilakukan secara vertical slice setelah fondasi pelatihan stabil:
+
+`Profil alumni → Pencarian recruiter → Verifikasi perusahaan → Permintaan kandidat → Persetujuan alumni → Proses rekrutmen`
+
+Dengan urutan tersebut, prototype daftar alumni yang tersedia sekarang menjadi referensi pengalaman pengguna, sedangkan database, keamanan data, verifikasi perusahaan, persetujuan alumni, dan proses rekrutmen dibangun bertahap pada fase lanjutan.
+
 ## Referensi Flow
 
 Flow sistem dapat dilihat dan direvisi pada FigJam:
@@ -299,12 +381,12 @@ Flow sistem dapat dilihat dan direvisi pada FigJam:
 ## Status Proyek
 
 - Analisis sistem: selesai untuk alur utama MVP.
-- Flow pendaftaran dan pembayaran: selesai.
-- Flow pelatihan: selesai.
-- Flow sertifikasi: selesai.
-- Flow batch dan refund: selesai.
-- Flow kurikulum dan versioning: selesai.
-- Role dan permission: rancangan awal selesai.
-- Frontend: belum dimulai.
-- Backend: belum dimulai.
+- Website publik dan company profile: tersedia.
+- Frontend pendaftaran, pembayaran, dashboard peserta, admin, alumni, dan recruiter: tersedia sebagai implementasi atau prototype sesuai tahapnya.
+- Fondasi backend Laravel untuk autentikasi, profil, program, batch, pendaftaran, invoice, dan webhook pembayaran: sudah diimplementasikan dan diuji.
+- Enrollment setelah pembayaran berhasil: sudah diimplementasikan.
+- Daftar alumni: prototype frontend dengan 20 data dummy, filter multi-profesi, filter multi-keahlian, dan pagination 10 data per halaman.
+- Portal alumni produksi: belum diimplementasikan; masih menjadi proyeksi fase lanjutan.
+- Portal recruiter produksi, verifikasi perusahaan, persetujuan alumni, dan alur rekrutmen: belum diimplementasikan; masih menjadi proyeksi fase lanjutan.
+- Modul operasional pelatihan lengkap, sertifikasi penuh, refund, dan permission lanjutan: masih dikembangkan bertahap.
 - Android: belum dimulai.

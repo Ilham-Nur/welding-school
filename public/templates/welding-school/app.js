@@ -740,6 +740,8 @@
     },
   ];
 
+  const WELDER_PAGE_SIZE = 10;
+
   const recruiterPipeline = [
     { name: "Andi Ramadhan", role: "SMAW Welder 3G", stage: "Interview", date: "6 Agu 2026" },
     { name: "Rizky Firmansyah", role: "GTAW Welder 6G", stage: "Undangan dikirim", date: "4 Agu 2026" },
@@ -800,6 +802,7 @@
     recruiterAuthMode: "register",
     recruiterRegistrationComplete: false,
     welderSearch: "",
+    welderPage: 1,
     welderFilters: {
       domicile: "",
       professions: [],
@@ -2316,6 +2319,20 @@
       .join("");
   }
 
+  function renderWelderPagination(currentPage, totalPages) {
+    const pageButtons = Array.from({ length: totalPages }, (_, index) => {
+      const page = index + 1;
+      return `<button class="${page === currentPage ? "is-active" : ""}" data-action="change-welder-page" data-page="${page}" type="button" ${page === currentPage ? 'aria-current="page"' : ""}>${page}</button>`;
+    }).join("");
+
+    return `
+      <div class="welder-pagination" aria-label="Pagination daftar alumni">
+        <button data-action="change-welder-page" data-page="${currentPage - 1}" type="button" aria-label="Halaman sebelumnya" ${currentPage === 1 ? "disabled" : ""}>&lsaquo;</button>
+        ${pageButtons}
+        <button data-action="change-welder-page" data-page="${currentPage + 1}" type="button" aria-label="Halaman berikutnya" ${currentPage === totalPages ? "disabled" : ""}>&rsaquo;</button>
+      </div>`;
+  }
+
   function renderWelderDetail(profile) {
     const meta = directoryMeta(profile);
     return `
@@ -2360,8 +2377,15 @@
   }
 
   function renderWelders() {
-    const items = directoryProfiles();
-    if (!items.some((profile) => profile.id === state.selectedWelder.id) && items[0]) {
+    const filteredItems = directoryProfiles();
+    const totalPages = Math.max(1, Math.ceil(filteredItems.length / WELDER_PAGE_SIZE));
+    state.welderPage = Math.min(Math.max(state.welderPage, 1), totalPages);
+    const pageStart = (state.welderPage - 1) * WELDER_PAGE_SIZE;
+    const items = filteredItems.slice(pageStart, pageStart + WELDER_PAGE_SIZE);
+    const rangeStart = filteredItems.length ? pageStart + 1 : 0;
+    const rangeEnd = Math.min(pageStart + WELDER_PAGE_SIZE, filteredItems.length);
+
+    if (!filteredItems.some((profile) => profile.id === state.selectedWelder.id) && items[0]) {
       state.selectedWelder = items[0];
     }
     return `
@@ -2380,11 +2404,11 @@
                 <button class="welder-reset-button" data-action="reset-welder-filters" type="button">Reset Filter</button>
               </div>
             </form>
-            <div class="welder-results-summary"><span><b>${items.length}</b> Alumni ditemukan</span><label>Urutkan: <select aria-label="Urutkan hasil"><option>Tahun Kelulusan (Terbaru)</option><option>Pengalaman Terbanyak</option><option>Siap Kerja Tercepat</option></select></label></div>
+            <div class="welder-results-summary"><span><b>${filteredItems.length}</b> Alumni ditemukan <small>Menampilkan ${rangeStart}&ndash;${rangeEnd}</small></span><label>Urutkan: <select aria-label="Urutkan hasil"><option>Tahun Kelulusan (Terbaru)</option><option>Pengalaman Terbanyak</option><option>Siap Kerja Tercepat</option></select></label></div>
             <div class="welder-table-wrap">
               <table class="welder-table"><thead><tr><th>Alumni</th><th>Profesi</th><th>Domisili</th><th>Keahlian</th><th>Posisi / Kualifikasi</th><th>Tahun Lulus</th><th>Pengalaman</th><th>Status Bekerja</th><th>Siap Kerja</th><th>Aksi</th></tr></thead><tbody>${items.length ? renderWelderRows(items) : `<tr><td colspan="10"><div class="welder-empty"><strong>Kandidat tidak ditemukan</strong><span>Coba ubah kata kunci atau reset filter pencarian.</span></div></td></tr>`}</tbody></table>
             </div>
-            <div class="welder-pagination"><button disabled>&lsaquo;</button><button class="is-active">1</button><button disabled>&rsaquo;</button></div>
+            ${renderWelderPagination(state.welderPage, totalPages)}
             <section class="welder-recruiter-entry">
               <div><span>AKSES KHUSUS PERUSAHAAN</span><h2>Ingin mengajukan kandidat?</h2><p>Buat akun recruiter baru atau masuk menggunakan akun perusahaan yang sudah terdaftar.</p></div>
               <div class="welder-recruiter-entry__actions"><button data-action="open-recruiter-account" data-mode="register" type="button">Buat Akun Recruiter</button><button data-action="open-recruiter-account" data-mode="login" type="button">Login Recruiter</button></div>
@@ -3902,6 +3926,7 @@
     if (form.dataset.form === "welder-search") {
       const data = new FormData(form);
       state.welderSearch = String(data.get("query") || "");
+      state.welderPage = 1;
       state.welderDetailOpen = false;
       Object.keys(state.welderFilters).forEach((key) => {
         state.welderFilters[key] = Array.isArray(state.welderFilters[key])
@@ -4176,8 +4201,21 @@
       state.welderDetailOpen = false;
       render();
     }
+    if (action === "change-welder-page") {
+      const nextPage = Number(button.dataset.page);
+      if (Number.isInteger(nextPage) && nextPage > 0) {
+        state.welderPage = nextPage;
+        state.welderDetailOpen = false;
+        render();
+        window.setTimeout(
+          () => document.querySelector(".welder-results-summary")?.scrollIntoView({ behavior: "smooth", block: "start" }),
+          0,
+        );
+      }
+    }
     if (action === "reset-welder-filters") {
       state.welderSearch = "";
+      state.welderPage = 1;
       state.welderDetailOpen = false;
       Object.keys(state.welderFilters).forEach((key) => {
         state.welderFilters[key] = Array.isArray(state.welderFilters[key]) ? [] : "";
@@ -4712,6 +4750,7 @@
       const key = event.target.name;
       if (key in state.welderFilters) {
         state.welderFilters[key] = event.target.value;
+        state.welderPage = 1;
         state.welderDetailOpen = false;
         render();
       }
