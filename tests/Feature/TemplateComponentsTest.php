@@ -41,6 +41,30 @@ class TemplateComponentsTest extends TestCase
             );
     }
 
+    public function test_alumni_directory_supports_multiple_professions_and_positions(): void
+    {
+        $script = file_get_contents(public_path('templates/welding-school/app.js'));
+
+        $this->assertIsString($script);
+        $this->assertStringContainsString('<h1>Daftar Alumni</h1>', $script);
+        $this->assertStringContainsString('profession: "Welding Inspector"', $script);
+        $this->assertStringContainsString('profession: "Fitter"', $script);
+        $this->assertStringContainsString('positions: ["2G", "3G", "6G"]', $script);
+        $this->assertStringContainsString(
+            'profile.positions.includes(state.welderFilters.position)',
+            $script,
+        );
+        $this->assertStringContainsString(
+            '["Sedang bekerja", "Mencari pekerjaan"]',
+            $script,
+        );
+        $this->assertStringNotContainsString('<th>Status Sertifikat</th>', $script);
+        $this->assertStringNotContainsString(
+            '<label><span>Status Sertifikat</span>',
+            $script,
+        );
+    }
+
     public function test_component_catalog_renders_all_requested_components(): void
     {
         $this->seed(TrainingProgramSeeder::class);

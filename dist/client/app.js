@@ -199,6 +199,18 @@
     },
   ];
 
+  const unavailableBatch = {
+    id: "unavailable-batch",
+    databaseId: null,
+    code: "",
+    label: "Belum ada batch",
+    start: "Belum tersedia",
+    end: "Belum tersedia",
+    schedule: "Belum tersedia",
+    location: "Belum tersedia",
+    seatsLeft: 0,
+  };
+
   function catalogDate(value) {
     if (!value) return "Belum ditentukan";
     return new Intl.DateTimeFormat("id-ID", {
@@ -210,7 +222,7 @@
   }
 
   function programBatches(program) {
-    if (!program?.databaseBatches?.length) return fallbackBatches;
+    if (!Array.isArray(program?.databaseBatches)) return fallbackBatches;
 
     return program.databaseBatches.map((batch, index) => ({
       id: `database-batch-${batch.id}`,
@@ -291,6 +303,9 @@
       initials: "AR",
       name: "Andi Ramadhan",
       role: "SMAW Welder 3G",
+      profession: "Welder",
+      technicalSkills: ["SMAW"],
+      positions: ["2G", "3G"],
       company: "PT Nusantara Fabrikasi",
       location: "Cilegon, Banten",
       experience: "2 tahun",
@@ -310,6 +325,9 @@
       initials: "DS",
       name: "Dimas Saputra",
       role: "FCAW Welder 3G",
+      profession: "Welder",
+      technicalSkills: ["FCAW"],
+      positions: ["3G"],
       company: "PT Krakatau Engineering",
       location: "Serang, Banten",
       experience: "1 tahun 8 bulan",
@@ -329,10 +347,13 @@
       initials: "RF",
       name: "Rizky Firmansyah",
       role: "GTAW Welder 6G",
+      profession: "Welder",
+      technicalSkills: ["GTAW", "SMAW"],
+      positions: ["2G", "3G", "6G"],
       company: "PT Petro Jaya Services",
       location: "Bekasi, Jawa Barat",
       experience: "3 tahun",
-      employmentStatus: "Kontrak proyek",
+      employmentStatus: "Sedang bekerja",
       availability: "Siap dalam 30 hari",
       skills: ["GTAW", "6G Pipe", "Stainless Steel", "Root Pass", "Purging"],
       certifications: ["GTAW 6G", "SMAW 6G", "Confined Space"],
@@ -348,6 +369,9 @@
       initials: "SN",
       name: "Siti Nurhaliza",
       role: "Welding Inspector Junior",
+      profession: "Welding Inspector",
+      technicalSkills: ["Visual Inspection", "WPS", "Weld Map"],
+      positions: ["Inspector Junior"],
       company: "PT Banten Quality Inspection",
       location: "Tangerang, Banten",
       experience: "1 tahun",
@@ -367,6 +391,9 @@
       initials: "BP",
       name: "Bagas Pratama",
       role: "GMAW Welder 2G",
+      profession: "Welder",
+      technicalSkills: ["GMAW"],
+      positions: ["2G"],
       company: "Belum bekerja",
       location: "Cilegon, Banten",
       experience: "Fresh graduate",
@@ -386,10 +413,13 @@
       initials: "NH",
       name: "Naufal Hidayat",
       role: "SMAW & FCAW Welder",
-      company: "Freelance Project",
+      profession: "Welder",
+      technicalSkills: ["SMAW", "FCAW"],
+      positions: ["3G", "4G", "6G"],
+      company: "Proyek Fabrikasi Lepas",
       location: "Jakarta Utara",
       experience: "4 tahun",
-      employmentStatus: "Freelance",
+      employmentStatus: "Sedang bekerja",
       availability: "Terbuka untuk proyek",
       skills: ["SMAW", "FCAW", "3G/4G", "Structural", "Repair Welding"],
       certifications: ["SMAW 4G", "FCAW 3G", "Rigging Basic"],
@@ -399,6 +429,28 @@
       currentSince: "Agustus 2024",
       summary:
         "Welder multi-process untuk proyek struktur, repair, dan pekerjaan lapangan dengan mobilitas tinggi.",
+    },
+    {
+      id: "fajar-maulana",
+      initials: "FM",
+      name: "Fajar Maulana",
+      role: "Pipe Fitter",
+      profession: "Fitter",
+      technicalSkills: ["Fit-up", "Isometric Drawing", "Pipe Measurement"],
+      positions: ["Pipe Fitter"],
+      company: "Belum bekerja",
+      location: "Batam, Kepulauan Riau",
+      experience: "1 tahun",
+      employmentStatus: "Mencari pekerjaan",
+      availability: "Siap segera",
+      skills: ["Fit-up", "Isometric Drawing", "Pipe Measurement", "Flange Alignment", "Basic Rigging"],
+      certifications: ["Basic Pipe Fitting", "Basic Safety"],
+      program: "Basic Pipe Fitter",
+      graduation: "Batch Juni 2026",
+      score: "90 / 100",
+      currentSince: "-",
+      summary:
+        "Fitter dengan kemampuan membaca gambar isometrik, pengukuran pipa, fit-up, dan alignment untuk pekerjaan fabrikasi serta instalasi.",
     },
   ];
 
@@ -415,7 +467,7 @@
     { id: "programs", label: "Program Publik" },
     { id: "news", label: "Aktivitas" },
     { id: "article", label: "Artikel" },
-    { id: "welders", label: "Daftar Welder & Alumni" },
+    { id: "welders", label: "Daftar Alumni" },
     { id: "recruiter-account", label: "Akun Recruiter" },
     { id: "certificate", label: "Verifikasi Sertifikat" },
     { id: "account", label: "Akun" },
@@ -441,7 +493,7 @@
     trainingSection: "overview",
     programOrigin: "public",
     selectedProgram: programs[0],
-    selectedBatch: batches[0],
+    selectedBatch: batches[0] || unavailableBatch,
     accountMode: "login",
     applicationStatus: "not-started",
     applications: [],
@@ -464,10 +516,10 @@
     welderSearch: "",
     welderFilters: {
       domicile: "",
-      process: "",
+      profession: "",
+      skill: "",
       position: "",
       employment: "",
-      certificate: "",
     },
     verification: {
       pending: Boolean(backend.verification?.pending),
@@ -708,7 +760,7 @@
         batches.find(
           (batch) =>
             Number(batch.databaseId) === Number(application.training_batch_id),
-        ) || batches[0];
+        ) || batches[0] || unavailableBatch;
     }
   }
 
@@ -1183,15 +1235,15 @@
         <div class="page-shell">
           <div class="academy-ecosystem__intro">
             <span class="eyebrow eyebrow--light">DIREKTORI TALENTA TERVERIFIKASI</span>
-            <h2>Temukan welder berdasarkan kompetensi yang dibutuhkan.</h2>
-            <p>Perusahaan dapat melihat profil alumni, proses las, posisi, pengalaman, dan status sertifikat sebelum mengajukan permintaan kandidat.</p>
+            <h2>Temukan alumni berdasarkan profesi dan kompetensi yang dibutuhkan.</h2>
+            <p>Perusahaan dapat melihat profil alumni, profesi, keahlian teknis, kualifikasi, dan pengalaman sebelum mengajukan permintaan kandidat.</p>
           </div>
           <div class="academy-ecosystem__cards academy-ecosystem__cards--single">
             <article>
               <span class="academy-portal-no">DIREKTORI WELDER &amp; ALUMNI</span>
               <h3>Lihat kandidat yang siap mendukung kebutuhan proyek Anda.</h3>
               <p>Telusuri data kandidat terlebih dahulu. Akun recruiter baru diperlukan saat perusahaan ingin mengajukan permintaan kandidat.</p>
-              <button data-action="go-public-page" data-target="welders" type="button">Buka Daftar Welder <span>&rarr;</span></button>
+              <button data-action="go-public-page" data-target="welders" type="button">Buka Daftar Alumni <span>&rarr;</span></button>
             </article>
           </div>
         </div>
@@ -1427,7 +1479,7 @@
             </div>
             <aside>
               <section><span class="portal-section-label">PENDIDIKAN ALPHA</span><strong>${escapeHtml(profile.program)}</strong><p>${escapeHtml(profile.graduation)}</p><dl><div><dt>Nilai akhir</dt><dd>${escapeHtml(profile.score)}</dd></div><div><dt>Status</dt><dd class="text-green">Lulus</dd></div></dl></section>
-              <section><span class="portal-section-label">SERTIFIKASI</span>${profile.certifications.map((item) => `<div class="portal-certificate-item"><span>&check;</span><p><strong>${escapeHtml(item)}</strong><small>Terverifikasi Alpha Academy</small></p></div>`).join("")}</section>
+              <section><span class="portal-section-label">SERTIFIKASI</span>${profile.certifications.map((item) => `<div class="portal-certificate-item"><span>&check;</span><p><strong>${escapeHtml(item)}</strong></p></div>`).join("")}</section>
             </aside>
           </div>
         </article>
@@ -1458,8 +1510,8 @@
     }
 
     return `
-      <div class="portal-view-heading"><span>DIREKTORI ALUMNI</span><h3>Lihat perjalanan karier alumni Alpha Academy</h3><p>Status pekerjaan, keahlian, dan sertifikasi ditampilkan dalam satu profil profesional.</p></div>
-      <div class="portal-directory-toolbar"><label><span aria-hidden="true">&#9906;</span><input type="search" placeholder="Cari nama, keahlian, atau perusahaan..." aria-label="Cari alumni"></label><select aria-label="Filter status kerja"><option>Semua status kerja</option><option>Sedang bekerja</option><option>Mencari pekerjaan</option><option>Freelance</option></select><select aria-label="Filter keahlian"><option>Semua keahlian</option><option>SMAW</option><option>FCAW</option><option>GTAW</option><option>GMAW</option></select></div>
+      <div class="portal-view-heading"><span>DIREKTORI ALUMNI</span><h3>Lihat perjalanan karier alumni Alpha Academy</h3><p>Status pekerjaan, profesi, keahlian, dan kualifikasi ditampilkan dalam satu profil profesional.</p></div>
+      <div class="portal-directory-toolbar"><label><span aria-hidden="true">&#9906;</span><input type="search" placeholder="Cari nama, profesi, keahlian, atau perusahaan..." aria-label="Cari alumni"></label><select aria-label="Filter status kerja"><option>Semua status kerja</option><option>Sedang bekerja</option><option>Mencari pekerjaan</option></select><select aria-label="Filter profesi"><option>Semua profesi</option><option>Welder</option><option>Welding Inspector</option><option>Fitter</option></select></div>
       <div class="portal-directory-summary"><span>Menampilkan <strong>${alumniProfiles.length} profil contoh</strong></span></div>
       <div class="portal-talent-grid">${alumniProfiles.map((item) => talentCard(item, "alumni")).join("")}</div>
     `;
@@ -1494,7 +1546,7 @@
         <div class="portal-view-heading portal-view-heading--with-action"><div><span>SELAMAT DATANG, PT NUSANTARA STEEL</span><h3>Recruitment overview</h3><p>Pantau pencarian kandidat dan proses rekrutmen dalam satu ruang kerja.</p></div><button class="portal-primary-button" data-action="switch-recruiter-view" data-view="talent" type="button">+ Cari kandidat</button></div>
         <div class="recruiter-metric-grid"><article><span>PROFIL DILIHAT</span><strong>38</strong><small>+12 minggu ini</small></article><article><span>SHORTLIST</span><strong>03</strong><small>2 kandidat baru</small></article><article><span>PROSES AKTIF</span><strong>04</strong><small>1 menunggu respons</small></article><article><span>INTERVIEW</span><strong>02</strong><small>Jadwal pekan ini</small></article></div>
         <section class="recruiter-dashboard-section"><header><div><span>PROSES TERBARU</span><h4>Kandidat dalam pipeline</h4></div><button data-action="switch-recruiter-view" data-view="pipeline" type="button">Lihat semua &rarr;</button></header>${recruiterPipelineMarkup()}</section>
-        <div class="recruiter-insight-grid"><section><span>TALENT INSIGHT</span><h4>Kompetensi paling banyak tersedia</h4><div><p><b>SMAW</b><i style="width:88%"></i><strong>184</strong></p><p><b>FCAW</b><i style="width:70%"></i><strong>126</strong></p><p><b>GTAW</b><i style="width:48%"></i><strong>82</strong></p><p><b>GMAW</b><i style="width:35%"></i><strong>61</strong></p></div></section><section class="recruiter-recommendation"><span>REKOMENDASI UNTUK ANDA</span><h4>12 kandidat baru sesuai kebutuhan SMAW 3G</h4><p>Seluruh kandidat telah menyelesaikan verifikasi profil dan sertifikat.</p><button data-action="switch-recruiter-view" data-view="talent" type="button">Tinjau kandidat</button></section></div>
+        <div class="recruiter-insight-grid"><section><span>TALENT INSIGHT</span><h4>Kompetensi paling banyak tersedia</h4><div><p><b>SMAW</b><i style="width:88%"></i><strong>184</strong></p><p><b>FCAW</b><i style="width:70%"></i><strong>126</strong></p><p><b>GTAW</b><i style="width:48%"></i><strong>82</strong></p><p><b>GMAW</b><i style="width:35%"></i><strong>61</strong></p></div></section><section class="recruiter-recommendation"><span>REKOMENDASI UNTUK ANDA</span><h4>12 kandidat baru sesuai kebutuhan SMAW 3G</h4><p>Seluruh kandidat telah melalui kurasi profil dan kompetensi.</p><button data-action="switch-recruiter-view" data-view="talent" type="button">Tinjau kandidat</button></section></div>
       `;
     }
 
@@ -1503,7 +1555,7 @@
         <button class="portal-back-button" data-action="switch-recruiter-view" data-view="talent" type="button">&larr; Kembali ke hasil pencarian</button>
         <article class="recruiter-candidate-profile">
           <header><span class="portal-avatar portal-avatar--large">${escapeHtml(profile.initials)}</span><div><div class="portal-profile-labels"><span class="portal-status portal-status--available">${escapeHtml(profile.availability)}</span><span class="portal-verified">&check; Data terverifikasi</span></div><h2>${escapeHtml(profile.name)}</h2><strong>${escapeHtml(profile.role)}</strong><p>${escapeHtml(profile.location)} &middot; ${escapeHtml(profile.experience)} pengalaman</p></div><div class="recruiter-candidate-actions"><button class="portal-secondary-button" data-action="shortlist-talent" type="button">&#9734; Simpan shortlist</button><button class="portal-primary-button" data-action="recruit-candidate" type="button">Undang rekrutmen</button></div></header>
-          <div class="recruiter-candidate-profile__body"><main><section><span class="portal-section-label">RINGKASAN PROFIL</span><p>${escapeHtml(profile.summary)}</p></section><section><span class="portal-section-label">STATUS PEKERJAAN</span><div class="portal-employment-card"><span>&#9642;</span><div><strong>${escapeHtml(profile.employmentStatus)}</strong><p>${escapeHtml(profile.role)} di ${escapeHtml(profile.company)}</p><small>Sejak ${escapeHtml(profile.currentSince)}</small></div><b>${escapeHtml(profile.availability)}</b></div></section><section><span class="portal-section-label">KEAHLIAN TEKNIS</span><div class="portal-skill-row portal-skill-row--large">${profile.skills.map((skill) => `<span>${escapeHtml(skill)}</span>`).join("")}</div></section><section><span class="portal-section-label">SERTIFIKASI</span><div class="recruiter-certificate-grid">${profile.certifications.map((item) => `<article><span>&check;</span><div><strong>${escapeHtml(item)}</strong><small>Status valid &middot; Alpha Academy</small></div></article>`).join("")}</div></section></main><aside><section><span class="portal-section-label">HASIL PELATIHAN</span><strong>${escapeHtml(profile.program)}</strong><p>${escapeHtml(profile.graduation)}</p><div class="candidate-score"><span>Nilai akhir</span><b>${escapeHtml(profile.score)}</b></div></section><section><span class="portal-section-label">KECOCOKAN KANDIDAT</span><strong class="candidate-match">94%</strong><p>Sangat sesuai untuk kebutuhan SMAW Welder 3G.</p><ul><li>&check; Proses las sesuai</li><li>&check; Lokasi sesuai</li><li>&check; Pengalaman memenuhi</li></ul></section><small class="portal-privacy-note">Kontak pribadi hanya dibagikan setelah alumni menyetujui undangan.</small></aside></div>
+          <div class="recruiter-candidate-profile__body"><main><section><span class="portal-section-label">RINGKASAN PROFIL</span><p>${escapeHtml(profile.summary)}</p></section><section><span class="portal-section-label">STATUS PEKERJAAN</span><div class="portal-employment-card"><span>&#9642;</span><div><strong>${escapeHtml(profile.employmentStatus)}</strong><p>${escapeHtml(profile.role)} di ${escapeHtml(profile.company)}</p><small>Sejak ${escapeHtml(profile.currentSince)}</small></div><b>${escapeHtml(profile.availability)}</b></div></section><section><span class="portal-section-label">KEAHLIAN TEKNIS</span><div class="portal-skill-row portal-skill-row--large">${profile.skills.map((skill) => `<span>${escapeHtml(skill)}</span>`).join("")}</div></section><section><span class="portal-section-label">SERTIFIKASI</span><div class="recruiter-certificate-grid">${profile.certifications.map((item) => `<article><span>&check;</span><div><strong>${escapeHtml(item)}</strong></div></article>`).join("")}</div></section></main><aside><section><span class="portal-section-label">HASIL PELATIHAN</span><strong>${escapeHtml(profile.program)}</strong><p>${escapeHtml(profile.graduation)}</p><div class="candidate-score"><span>Nilai akhir</span><b>${escapeHtml(profile.score)}</b></div></section><section><span class="portal-section-label">KECOCOKAN KANDIDAT</span><strong class="candidate-match">94%</strong><p>Sangat sesuai untuk kebutuhan ${escapeHtml(profile.role)}.</p><ul><li>&check; Profesi sesuai</li><li>&check; Kompetensi sesuai</li><li>&check; Pengalaman memenuhi</li></ul></section><small class="portal-privacy-note">Kontak pribadi hanya dibagikan setelah alumni menyetujui undangan.</small></aside></div>
         </article>
       `;
     }
@@ -1536,7 +1588,7 @@
     const talentItems = state.recruiterPortalView === "shortlist" ? alumniProfiles.filter((_, index) => [0, 2, 4].includes(index)) : alumniProfiles;
     return `
       <div class="portal-view-heading portal-view-heading--with-action"><div><span>${state.recruiterPortalView === "shortlist" ? "SHORTLIST KANDIDAT" : "ALPHA TALENT DIRECTORY"}</span><h3>${state.recruiterPortalView === "shortlist" ? "Kandidat yang sudah disimpan" : "Temukan kompetensi yang tepat"}</h3><p>Jelajahi profil alumni berdasarkan keahlian, posisi, pengalaman, lokasi, dan kesiapan kerja.</p></div></div>
-      <div class="portal-directory-toolbar portal-directory-toolbar--recruiter"><label><span aria-hidden="true">&#9906;</span><input type="search" value="SMAW 3G" aria-label="Cari kandidat"></label><select aria-label="Filter lokasi"><option>Lokasi: Semua</option><option>Banten</option><option>Jawa Barat</option><option>Jakarta</option></select><select aria-label="Filter status"><option>Siap bekerja</option><option>Sedang bekerja</option><option>Freelance</option></select><button type="button">Filter lanjutan &#9776;</button></div>
+      <div class="portal-directory-toolbar portal-directory-toolbar--recruiter"><label><span aria-hidden="true">&#9906;</span><input type="search" value="SMAW 3G" aria-label="Cari kandidat"></label><select aria-label="Filter lokasi"><option>Lokasi: Semua</option><option>Banten</option><option>Jawa Barat</option><option>Jakarta</option></select><select aria-label="Filter status"><option>Sedang bekerja</option><option>Mencari pekerjaan</option></select><button type="button">Filter lanjutan &#9776;</button></div>
       <div class="portal-directory-summary"><span>Ditemukan <strong>${talentItems.length} kandidat contoh</strong></span><span>Urutkan: <b>Paling sesuai</b></span></div>
       <div class="portal-talent-grid">${talentItems.map((item) => talentCard(item, "recruiter")).join("")}</div>
     `;
@@ -1624,7 +1676,7 @@
 
       <section class="page-shell academy-recruiter-flow">
         <div class="company-section-heading"><div><span class="eyebrow">REKRUTMEN LEBIH TERARAH</span><h2>Dari kebutuhan posisi hingga kandidat terpilih.</h2></div><p>Dirancang sebagai titik temu yang efisien bagi tim HR, project manager, dan talent acquisition.</p></div>
-        <ol><li><span>01</span><h3>Tentukan kebutuhan</h3><p>Filter proses las, posisi, pengalaman, domisili, dan kesiapan kerja.</p></li><li><span>02</span><h3>Tinjau kompetensi</h3><p>Lihat riwayat program, status sertifikat, dan profil pengalaman kandidat.</p></li><li><span>03</span><h3>Bangun shortlist</h3><p>Simpan kandidat potensial dan kolaborasikan evaluasi bersama tim.</p></li><li><span>04</span><h3>Terhubung</h3><p>Kirim minat atau jadwalkan proses rekrutmen melalui platform.</p></li></ol>
+        <ol><li><span>01</span><h3>Tentukan kebutuhan</h3><p>Filter profesi, keahlian, kualifikasi, pengalaman, domisili, dan kesiapan kerja.</p></li><li><span>02</span><h3>Tinjau kompetensi</h3><p>Lihat riwayat program, kompetensi, dan profil pengalaman kandidat.</p></li><li><span>03</span><h3>Bangun shortlist</h3><p>Simpan kandidat potensial dan kolaborasikan evaluasi bersama tim.</p></li><li><span>04</span><h3>Terhubung</h3><p>Kirim minat atau jadwalkan proses rekrutmen melalui platform.</p></li></ol>
       </section>
 
       <section class="academy-recruiter-solutions">
@@ -1714,6 +1766,17 @@
       phone: "0812-9088-1634",
       email: "n.hidayat@example.id",
     },
+    "fajar-maulana": {
+      domicile: "Batam, Kepulauan Riau",
+      graduationYear: "2026",
+      certificate: "Aktif",
+      certificateNumber: "AA-PF-2026-00031",
+      certificateUntil: "18 Juni 2029",
+      readyDate: "Siap segera",
+      birth: "Batam, 14 Februari 2001",
+      phone: "0812-7461-2085",
+      email: "f.maulana@example.id",
+    },
   };
 
   function directoryMeta(profile) {
@@ -1727,28 +1790,32 @@
       const searchable = [
         profile.name,
         profile.role,
+        profile.profession,
         profile.location,
+        profile.technicalSkills.join(" "),
+        profile.positions.join(" "),
         profile.skills.join(" "),
         profile.certifications.join(" "),
-        meta.certificateNumber,
       ]
         .join(" ")
         .toLowerCase();
       return (
         (!query || searchable.includes(query)) &&
         (!state.welderFilters.domicile || meta.domicile.includes(state.welderFilters.domicile)) &&
-        (!state.welderFilters.process || profile.skills[0] === state.welderFilters.process) &&
-        (!state.welderFilters.position || meta.position === state.welderFilters.position) &&
-        (!state.welderFilters.employment || profile.employmentStatus === state.welderFilters.employment) &&
-        (!state.welderFilters.certificate || meta.certificate === state.welderFilters.certificate)
+        (!state.welderFilters.profession || profile.profession === state.welderFilters.profession) &&
+        (!state.welderFilters.skill || profile.technicalSkills.includes(state.welderFilters.skill)) &&
+        (!state.welderFilters.position || profile.positions.includes(state.welderFilters.position)) &&
+        (!state.welderFilters.employment || profile.employmentStatus === state.welderFilters.employment)
       );
     });
   }
 
   function welderStatusClass(status) {
-    if (["Mencari pekerjaan", "Kontrak proyek"].includes(status)) return "is-standby";
-    if (status === "Freelance") return "is-process";
-    return "is-working";
+    return status === "Mencari pekerjaan" ? "is-standby" : "is-working";
+  }
+
+  function directoryTags(values) {
+    return `<span class="welder-tag-list">${values.map((value) => `<span class="welder-process-tag">${escapeHtml(value)}</span>`).join("")}</span>`;
   }
 
   function welderAvatar(profile, large = false) {
@@ -1759,6 +1826,7 @@
       "siti-nurhaliza": "teal",
       "bagas-pratama": "slate",
       "naufal-hidayat": "cyan",
+      "fajar-maulana": "orange",
     };
     const tone = tones[profile.id] || "navy";
     return `<span class="welder-avatar welder-avatar--${tone}${large ? " welder-avatar--large" : ""}"><span>${escapeHtml(profile.initials)}</span></span>`;
@@ -1775,16 +1843,16 @@
             <td>
               <button class="welder-person" data-action="select-welder" data-id="${profile.id}" type="button">
                 ${welderAvatar(profile)}
-                <span><strong>${escapeHtml(profile.name)}</strong><small>ID: WELD-${meta.graduationYear}-${profile.id.slice(0, 3).toUpperCase()}</small><i>Lihat profil</i></span>
+                <span><strong>${escapeHtml(profile.name)}</strong><small>ID: ALUM-${meta.graduationYear}-${profile.id.slice(0, 3).toUpperCase()}</small><i>Lihat profil</i></span>
               </button>
             </td>
+            <td><strong>${escapeHtml(profile.profession)}</strong></td>
             <td>${meta.domicile.split(", ").map(escapeHtml).join("<br>")}</td>
-            <td><span class="welder-process-tag">${escapeHtml(profile.skills[0])}</span></td>
-            <td>${escapeHtml(meta.position)}</td>
+            <td>${directoryTags(profile.technicalSkills)}</td>
+            <td>${directoryTags(profile.positions)}</td>
             <td>${escapeHtml(meta.graduationYear)}</td>
             <td>${escapeHtml(profile.experience)}</td>
             <td><span class="welder-status ${welderStatusClass(profile.employmentStatus)}">${escapeHtml(profile.employmentStatus)}</span><small class="welder-cell-note">${escapeHtml(profile.company)}</small></td>
-            <td><span class="welder-certificate ${meta.certificate === "Aktif" ? "is-active" : "is-expired"}">${escapeHtml(meta.certificate)}</span><small class="welder-cell-note">s/d ${escapeHtml(meta.certificateUntil)}</small></td>
             <td>${escapeHtml(meta.readyDate)}</td>
             <td><button class="welder-detail-button ${selected ? "is-active" : ""}" data-action="select-welder" data-id="${profile.id}" type="button">Detail</button></td>
           </tr>`;
@@ -1796,15 +1864,15 @@
     const meta = directoryMeta(profile);
     return `
       <div class="welder-detail-overlay">
-      <button class="welder-detail-backdrop" data-action="close-welder-detail" type="button" aria-label="Tutup detail welder"></button>
+      <button class="welder-detail-backdrop" data-action="close-welder-detail" type="button" aria-label="Tutup detail alumni"></button>
       <aside class="welder-detail-panel" role="dialog" aria-modal="true" aria-labelledby="welder-detail-title">
         <div class="welder-detail-panel__heading">
-          <span id="welder-detail-title">Detail Welder</span>
-          <div><button class="welder-detail-close" data-action="close-welder-detail" type="button" aria-label="Tutup detail welder">&times;</button></div>
+          <span id="welder-detail-title">Detail Alumni</span>
+          <div><button class="welder-detail-close" data-action="close-welder-detail" type="button" aria-label="Tutup detail alumni">&times;</button></div>
         </div>
         <div class="welder-detail-identity">
           ${welderAvatar(profile, true)}
-          <div><h2>${escapeHtml(profile.name)}</h2><span class="welder-status ${welderStatusClass(profile.employmentStatus)}">${escapeHtml(profile.employmentStatus)}</span><p>ID: WELD-${meta.graduationYear}-${profile.id.slice(0, 3).toUpperCase()}</p><small>${escapeHtml(meta.domicile)} &middot; ${escapeHtml(profile.availability)}</small></div>
+          <div><h2>${escapeHtml(profile.name)}</h2><span class="welder-status ${welderStatusClass(profile.employmentStatus)}">${escapeHtml(profile.employmentStatus)}</span><p>ID: ALUM-${meta.graduationYear}-${profile.id.slice(0, 3).toUpperCase()}</p><small>${escapeHtml(meta.domicile)} &middot; ${escapeHtml(profile.availability)}</small></div>
         </div>
         <div class="welder-detail-actions">
           <button data-action="request-candidate" type="button">Ajukan Permintaan Kandidat</button>
@@ -1815,8 +1883,8 @@
           <dl><div><dt>Tempat, Tanggal Lahir</dt><dd>${escapeHtml(meta.birth)}</dd></div><div><dt>Nomor Telepon</dt><dd>${escapeHtml(meta.phone)}</dd></div><div><dt>Email</dt><dd>${escapeHtml(meta.email)}</dd></div><div><dt>Domisili</dt><dd>${escapeHtml(meta.domicile)}</dd></div></dl>
         </section>
         <section class="welder-detail-section">
-          <h3>Keahlian &amp; Sertifikasi</h3>
-          <dl><div><dt>Proses</dt><dd>${escapeHtml(profile.skills[0])}</dd></div><div><dt>Posisi</dt><dd>${escapeHtml(meta.position)}</dd></div><div><dt>Sertifikasi</dt><dd>${escapeHtml(profile.certifications.join(", "))}</dd></div><div><dt>Nomor Sertifikat</dt><dd>${escapeHtml(meta.certificateNumber)}</dd></div><div><dt>Berlaku Hingga</dt><dd class="${meta.certificate === "Aktif" ? "is-valid" : "is-warning"}">${escapeHtml(meta.certificateUntil)} (${escapeHtml(meta.certificate)})</dd></div></dl>
+          <h3>Kompetensi Alumni</h3>
+          <dl><div><dt>Profesi</dt><dd>${escapeHtml(profile.profession)}</dd></div><div><dt>Keahlian Teknis</dt><dd>${escapeHtml(profile.technicalSkills.join(", "))}</dd></div><div><dt>Posisi / Kualifikasi</dt><dd>${escapeHtml(profile.positions.join(", "))}</dd></div><div><dt>Sertifikasi</dt><dd>${escapeHtml(profile.certifications.join(", "))}</dd></div></dl>
         </section>
         <section class="welder-detail-section">
           <h3>Riwayat Pendidikan &amp; Pelatihan</h3>
@@ -1842,23 +1910,23 @@
     }
     return `
       <section class="welder-directory-page">
-        <div class="page-shell welder-directory-heading"><div><h1>Daftar Welder &amp; Alumni</h1><p>Temukan welder profesional alumni pelatihan dengan data kompetensi dan sertifikasi yang terverifikasi.</p></div></div>
+        <div class="page-shell welder-directory-heading"><div><h1>Daftar Alumni</h1><p>Temukan alumni Welder, Welding Inspector, dan Fitter berdasarkan profesi, keahlian, kualifikasi, serta kesiapan kerja.</p></div></div>
         <div class="page-shell welder-directory-layout">
           <main class="welder-directory-main">
             <form class="welder-search-panel" data-form="welder-search">
-              <label class="welder-search-input"><span aria-hidden="true">&#9906;</span><input name="query" type="search" value="${escapeHtml(state.welderSearch)}" placeholder="Cari nama welder, keahlian, atau sertifikat..."><button type="submit">Cari</button></label>
+              <label class="welder-search-input"><span aria-hidden="true">&#9906;</span><input name="query" type="search" value="${escapeHtml(state.welderSearch)}" placeholder="Cari nama alumni, profesi, keahlian, atau posisi..."><button type="submit">Cari</button></label>
               <div class="welder-filter-grid">
-                <label><span>Domisili</span><select name="domicile" data-welder-filter><option value="">Semua Domisili</option><option value="Banten" ${state.welderFilters.domicile === "Banten" ? "selected" : ""}>Banten</option><option value="Jawa Barat" ${state.welderFilters.domicile === "Jawa Barat" ? "selected" : ""}>Jawa Barat</option><option value="DKI Jakarta" ${state.welderFilters.domicile === "DKI Jakarta" ? "selected" : ""}>DKI Jakarta</option></select></label>
-                <label><span>Proses</span><select name="process" data-welder-filter><option value="">Semua Proses</option>${["SMAW", "FCAW", "GTAW", "GMAW", "Visual Inspection"].map((value) => `<option ${state.welderFilters.process === value ? "selected" : ""}>${value}</option>`).join("")}</select></label>
-                <label><span>Posisi</span><select name="position" data-welder-filter><option value="">Semua Posisi</option>${["Welder 2G", "Welder 3G", "Welder 4G", "Welder 6G", "Inspector Junior"].map((value) => `<option ${state.welderFilters.position === value ? "selected" : ""}>${value}</option>`).join("")}</select></label>
-                <label><span>Status Bekerja</span><select name="employment" data-welder-filter><option value="">Semua Status</option>${["Sedang bekerja", "Mencari pekerjaan", "Kontrak proyek", "Freelance"].map((value) => `<option ${state.welderFilters.employment === value ? "selected" : ""}>${value}</option>`).join("")}</select></label>
-                <label><span>Status Sertifikat</span><select name="certificate" data-welder-filter><option value="">Semua Sertifikat</option><option value="Aktif" ${state.welderFilters.certificate === "Aktif" ? "selected" : ""}>Aktif</option><option value="Perlu Diperbarui" ${state.welderFilters.certificate === "Perlu Diperbarui" ? "selected" : ""}>Perlu Diperbarui</option></select></label>
+                <label><span>Domisili</span><select name="domicile" data-welder-filter><option value="">Semua Domisili</option><option value="Banten" ${state.welderFilters.domicile === "Banten" ? "selected" : ""}>Banten</option><option value="Jawa Barat" ${state.welderFilters.domicile === "Jawa Barat" ? "selected" : ""}>Jawa Barat</option><option value="DKI Jakarta" ${state.welderFilters.domicile === "DKI Jakarta" ? "selected" : ""}>DKI Jakarta</option><option value="Kepulauan Riau" ${state.welderFilters.domicile === "Kepulauan Riau" ? "selected" : ""}>Kepulauan Riau</option></select></label>
+                <label><span>Profesi</span><select name="profession" data-welder-filter><option value="">Semua Profesi</option>${["Welder", "Welding Inspector", "Fitter"].map((value) => `<option ${state.welderFilters.profession === value ? "selected" : ""}>${value}</option>`).join("")}</select></label>
+                <label><span>Keahlian</span><select name="skill" data-welder-filter><option value="">Semua Keahlian</option>${["SMAW", "FCAW", "GTAW", "GMAW", "Visual Inspection", "Fit-up"].map((value) => `<option ${state.welderFilters.skill === value ? "selected" : ""}>${value}</option>`).join("")}</select></label>
+                <label><span>Posisi / Kualifikasi</span><select name="position" data-welder-filter><option value="">Semua Kualifikasi</option>${["2G", "3G", "4G", "6G", "Inspector Junior", "Pipe Fitter"].map((value) => `<option ${state.welderFilters.position === value ? "selected" : ""}>${value}</option>`).join("")}</select></label>
+                <label><span>Status Bekerja</span><select name="employment" data-welder-filter><option value="">Semua Status</option>${["Sedang bekerja", "Mencari pekerjaan"].map((value) => `<option ${state.welderFilters.employment === value ? "selected" : ""}>${value}</option>`).join("")}</select></label>
                 <button class="welder-reset-button" data-action="reset-welder-filters" type="button">Reset Filter</button>
               </div>
             </form>
-            <div class="welder-results-summary"><span><b>${items.length ? "1.126" : "0"}</b> Welder &amp; Alumni ditemukan</span><label>Urutkan: <select aria-label="Urutkan hasil"><option>Tahun Kelulusan (Terbaru)</option><option>Pengalaman Terbanyak</option><option>Siap Kerja Tercepat</option></select></label></div>
+            <div class="welder-results-summary"><span><b>${items.length ? "1.126" : "0"}</b> Alumni ditemukan</span><label>Urutkan: <select aria-label="Urutkan hasil"><option>Tahun Kelulusan (Terbaru)</option><option>Pengalaman Terbanyak</option><option>Siap Kerja Tercepat</option></select></label></div>
             <div class="welder-table-wrap">
-              <table class="welder-table"><thead><tr><th>Welder</th><th>Domisili</th><th>Proses</th><th>Posisi</th><th>Tahun Lulus</th><th>Pengalaman</th><th>Status Bekerja</th><th>Status Sertifikat</th><th>Siap Kerja</th><th>Aksi</th></tr></thead><tbody>${items.length ? renderWelderRows(items) : `<tr><td colspan="10"><div class="welder-empty"><strong>Kandidat tidak ditemukan</strong><span>Coba ubah kata kunci atau reset filter pencarian.</span></div></td></tr>`}</tbody></table>
+              <table class="welder-table"><thead><tr><th>Alumni</th><th>Profesi</th><th>Domisili</th><th>Keahlian</th><th>Posisi / Kualifikasi</th><th>Tahun Lulus</th><th>Pengalaman</th><th>Status Bekerja</th><th>Siap Kerja</th><th>Aksi</th></tr></thead><tbody>${items.length ? renderWelderRows(items) : `<tr><td colspan="10"><div class="welder-empty"><strong>Kandidat tidak ditemukan</strong><span>Coba ubah kata kunci atau reset filter pencarian.</span></div></td></tr>`}</tbody></table>
             </div>
             <div class="welder-pagination"><button disabled>&lsaquo;</button><button class="is-active">1</button><button>2</button><button>3</button><span>&hellip;</span><button>23</button><button>&rsaquo;</button></div>
             <section class="welder-recruiter-entry">
@@ -1881,12 +1949,12 @@
     const isRegister = state.recruiterAuthMode === "register";
     if (state.recruiterRegistrationComplete) {
       return `
-        <section class="recruiter-auth-page"><div class="recruiter-auth-layout page-shell"><div class="recruiter-auth-intro"><span>ALPHA TALENT ACCESS</span><h1>Akses kandidat dimulai dari akun perusahaan yang terverifikasi.</h1><p>Setiap permintaan kandidat akan ditinjau agar data alumni hanya digunakan untuk kebutuhan rekrutmen yang jelas.</p></div><div class="recruiter-auth-card recruiter-auth-success"><span class="recruiter-auth-success__icon">&check;</span><h2>Permintaan akun sudah dicatat.</h2><p>Pada versi final, tim Alpha Academy akan memverifikasi perusahaan dan mengirimkan aktivasi melalui email corporate.</p>${recruiterCandidateSummary()}<button class="recruiter-auth-primary" data-action="recruiter-auth-mode" data-mode="login" type="button">Lanjut ke Login Recruiter</button><button class="recruiter-auth-secondary" data-action="go-public-page" data-target="welders" type="button">Kembali ke Daftar Welder</button></div></div></section>`;
+        <section class="recruiter-auth-page"><div class="recruiter-auth-layout page-shell"><div class="recruiter-auth-intro"><span>ALPHA TALENT ACCESS</span><h1>Akses kandidat dimulai dari akun perusahaan yang terverifikasi.</h1><p>Setiap permintaan kandidat akan ditinjau agar data alumni hanya digunakan untuk kebutuhan rekrutmen yang jelas.</p></div><div class="recruiter-auth-card recruiter-auth-success"><span class="recruiter-auth-success__icon">&check;</span><h2>Permintaan akun sudah dicatat.</h2><p>Pada versi final, tim Alpha Academy akan memverifikasi perusahaan dan mengirimkan aktivasi melalui email corporate.</p>${recruiterCandidateSummary()}<button class="recruiter-auth-primary" data-action="recruiter-auth-mode" data-mode="login" type="button">Lanjut ke Login Recruiter</button><button class="recruiter-auth-secondary" data-action="go-public-page" data-target="welders" type="button">Kembali ke Daftar Alumni</button></div></div></section>`;
     }
     return `
       <section class="recruiter-auth-page">
         <div class="recruiter-auth-layout page-shell">
-          <div class="recruiter-auth-intro"><span>ALPHA TALENT ACCESS</span><h1>${isRegister ? "Buat akun recruiter untuk mengajukan kandidat." : "Masuk ke akun recruiter perusahaan Anda."}</h1><p>Data welder dapat dilihat secara publik. Akun perusahaan diperlukan saat Anda ingin meminta kandidat, mengunduh CV lengkap, atau memulai proses rekrutmen.</p><ul><li>Profil alumni dan kompetensi terkurasi</li><li>Status sertifikat mudah diperiksa</li><li>Permintaan kandidat tercatat dengan aman</li></ul><button data-action="go-public-page" data-target="welders" type="button">&larr; Kembali ke daftar welder</button></div>
+          <div class="recruiter-auth-intro"><span>ALPHA TALENT ACCESS</span><h1>${isRegister ? "Buat akun recruiter untuk mengajukan kandidat." : "Masuk ke akun recruiter perusahaan Anda."}</h1><p>Data alumni dapat dilihat secara publik. Akun perusahaan diperlukan saat Anda ingin meminta kandidat, mengunduh CV lengkap, atau memulai proses rekrutmen.</p><ul><li>Profil alumni dan kompetensi terkurasi</li><li>Profesi dan kualifikasi mudah dibandingkan</li><li>Permintaan kandidat tercatat dengan aman</li></ul><button data-action="go-public-page" data-target="welders" type="button">&larr; Kembali ke daftar alumni</button></div>
           <div class="recruiter-auth-card">
             <div class="recruiter-auth-card__head"><span>AKUN RECRUITER</span><h2>${isRegister ? "Daftarkan perusahaan" : "Selamat datang kembali"}</h2><p>${isRegister ? "Gunakan data perusahaan yang dapat diverifikasi." : "Masukkan email corporate dan kata sandi Anda."}</p></div>
             ${recruiterCandidateSummary()}
@@ -2082,6 +2150,25 @@
 
   function renderBatchPage() {
     const selected = state.selectedBatch;
+
+    if (!batches.length || !selected) {
+      return `
+        ${pageHeader(
+          "LANGKAH 2 DARI 4 · PILIH BATCH",
+          "Pilih jadwal yang paling sesuai",
+          `Program ${state.selectedProgram.title} · ${state.selectedProgram.duration}`,
+        )}
+        <section class="page-shell selection-layout">
+          <div class="empty-state">
+            <span>i</span>
+            <h2>Tidak ada batch yang akan dimulai</h2>
+            <p>Jadwal batch untuk program ini belum tersedia. Silakan pilih program lain atau periksa kembali nanti.</p>
+            <button class="button button--primary" data-action="back-program-list" type="button">Pilih Program Lain</button>
+          </div>
+        </section>
+      `;
+    }
+
     return `
       ${pageHeader(
         "LANGKAH 2 DARI 4 · PILIH BATCH",
@@ -3141,18 +3228,20 @@
           "Pembayaran telah dikonfirmasi",
           "Rincian pembayaran program ini tetap dapat Anda lihat kapan saja.",
         )}
-        <section class="page-shell payment-layout">
-          <article class="checkout-card">
+        <section class="page-shell payment-layout payment-layout--paid">
+          <article class="checkout-card checkout-card--paid">
             <div class="notice notice--green"><span>✓</span><div><strong>Status pembayaran: Lunas</strong><p>Kursi pelatihan telah diamankan dan akses pelatihan sudah aktif.</p></div></div>
-            <div class="order-program">
-              <span class="order-program__image" style="background-position:${state.selectedProgram.imagePosition}"></span>
-              <div><span class="badge badge--blue">${state.selectedProgram.code}</span><h3>${state.selectedProgram.title}</h3><p>${state.selectedBatch.label}</p></div>
+            <div class="paid-payment-overview">
+              <div class="order-program paid-payment-program">
+                <span class="order-program__image" style="background-position:${state.selectedProgram.imagePosition}"></span>
+                <div><span class="badge badge--blue">${state.selectedProgram.code}</span><h3>${state.selectedProgram.title}</h3><p>${state.selectedBatch.label}</p></div>
+              </div>
+              <dl class="paid-payment-details">
+                <div><dt>Nomor invoice</dt><dd>${escapeHtml(invoice.invoice_number)}</dd></div>
+                <div><dt>Tanggal pembayaran</dt><dd>${formatDateTime(invoice.paid_at)}</dd></div>
+                <div><dt>Total dibayar</dt><dd>${money(total)}</dd></div>
+              </dl>
             </div>
-            <dl class="summary-list">
-              <div><dt>Nomor invoice</dt><dd>${escapeHtml(invoice.invoice_number)}</dd></div>
-              <div><dt>Tanggal pembayaran</dt><dd>${formatDateTime(invoice.paid_at)}</dd></div>
-              <div><dt>Total dibayar</dt><dd>${money(total)}</dd></div>
-            </dl>
           </article>
           <aside class="payment-summary">
             <span class="badge badge--green">LUNAS</span>
@@ -3765,7 +3854,7 @@
 
       state.selectedProgram = selectedProgram;
       batches = programBatches(state.selectedProgram);
-      state.selectedBatch = batches[0];
+      state.selectedBatch = batches[0] || unavailableBatch;
       state.application = null;
       state.applicationStatus = "not-started";
       state.invoice = null;
@@ -3823,7 +3912,9 @@
 
     if (action === "select-batch") {
       state.selectedBatch =
-        batches.find((batch) => batch.id === button.dataset.id) || batches[0];
+        batches.find((batch) => batch.id === button.dataset.id) ||
+        batches[0] ||
+        unavailableBatch;
       render();
       showToast(`${state.selectedBatch.label} dipilih.`, "success");
     }

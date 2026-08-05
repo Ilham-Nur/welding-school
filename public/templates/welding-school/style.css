@@ -1886,7 +1886,7 @@
 }
 
 /* =========================================================
-   PUBLIC WELDER DIRECTORY + RECRUITER ONBOARDING
+   PUBLIC ALUMNI DIRECTORY + RECRUITER ONBOARDING
    Proposal prototype based on the approved directory flow.
    ========================================================= */
 
@@ -2254,6 +2254,11 @@
   --avatar-end: #35a9c5;
 }
 
+.welder-avatar--orange {
+  --avatar-start: #9a4a10;
+  --avatar-end: #e68a2e;
+}
+
 .welder-avatar--large {
   flex-basis: 76px;
   font-size: 18px;
@@ -2274,6 +2279,13 @@
   min-height: 24px;
   padding: 5px 9px;
   white-space: nowrap;
+}
+
+.welder-tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  min-width: 116px;
 }
 
 .welder-process-tag,

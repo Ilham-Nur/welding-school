@@ -39,7 +39,7 @@
                 <a href="{{ route('home') }}#about" data-action="go-public-page" data-target="about" data-public-route="about">Tentang</a>
                 <a href="{{ route('home') }}#programs" data-action="go-programs" data-public-route="programs">Program</a>
                 <a href="{{ route('home') }}#news" data-action="go-public-page" data-target="news" data-public-route="news">Aktivitas</a>
-                <a href="{{ route('home') }}#welders" data-action="go-public-page" data-target="welders" data-public-route="welders">Daftar Welder</a>
+                <a href="{{ route('home') }}#welders" data-action="go-public-page" data-target="welders" data-public-route="welders">Daftar Alumni</a>
                 <a href="{{ route('home') }}#certificate" data-action="go-public-page" data-target="certificate" data-public-route="certificate">Verifikasi</a>
                 <a class="public-nav__account" href="{{ route('home') }}#{{ auth()->check() ? 'member-programs' : 'account' }}" data-action="go-account">{{ auth()->check() ? 'Buka Dashboard' : 'Login' }}</a>
             </nav>
@@ -70,7 +70,7 @@
                             <small>{{ $brand['service'] }}</small>
                         </span>
                     </a>
-                    <p>Pelatihan, sertifikasi, dan direktori talenta welder profesional dari PT. Alpha Teknik Pratama.</p>
+                    <p>Pelatihan, sertifikasi, dan direktori talenta welding profesional dari PT. Alpha Teknik Pratama.</p>
                 </div>
                 <div>
                     <strong>Jelajahi</strong>
@@ -80,7 +80,7 @@
                 </div>
                 <div>
                     <strong>Terhubung</strong>
-                    <a href="{{ route('home') }}#welders" data-action="go-public-page" data-target="welders">Daftar Welder &amp; Alumni</a>
+                    <a href="{{ route('home') }}#welders" data-action="go-public-page" data-target="welders">Daftar Alumni</a>
                     <a href="{{ route('home') }}#recruiter-account" data-action="go-public-page" data-target="recruiter-account">Login Recruiter</a>
                     <a href="{{ route('home') }}#certificate" data-action="go-public-page" data-target="certificate">Verifikasi Sertifikat</a>
                 </div>
