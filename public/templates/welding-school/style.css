@@ -2058,79 +2058,100 @@
 
 .welder-results-summary {
   align-items: center;
+  background: white;
+  border: 1px solid #dfe7ec;
+  border-bottom: 0;
+  border-radius: 14px 14px 0 0;
   display: flex;
-  font-size: 13px;
+  font-size: 14px;
   justify-content: space-between;
-  padding: 18px 2px 12px;
+  margin-top: 18px;
+  min-height: 60px;
+  padding: 14px 18px;
 }
 
 .welder-results-summary b {
   color: var(--directory-navy);
-  font-size: 15px;
+  font-size: 14px;
+  font-weight: 750;
 }
 
 .welder-results-summary label {
   align-items: center;
-  background: white;
-  border: 1px solid #dfe5ea;
+  background: #f7f9fa;
+  border: 1px solid #dfe7ec;
   border-radius: 7px;
+  color: #6b7d89;
   display: flex;
   gap: 6px;
   padding: 7px 10px;
 }
 
+.welder-results-summary select {
+  color: #40525f;
+  font-size: 14px;
+  font-weight: 650;
+}
+
 .welder-table-wrap {
   background: white;
-  border: 1px solid #dfe5ea;
-  border-radius: 10px;
-  box-shadow: 0 8px 28px rgba(11, 25, 37, 0.04);
+  border: 1px solid #dfe7ec;
+  border-radius: 0 0 14px 14px;
+  box-shadow: 0 1px 3px rgba(7, 26, 40, 0.05);
   overflow-x: auto;
 }
 
 .welder-table {
   border-collapse: collapse;
-  min-width: 1100px;
+  min-width: 1220px;
   width: 100%;
 }
 
 .welder-table th {
-  background: #f5f7f8;
-  color: #34424f;
-  font-size: 12px;
-  font-weight: 900;
-  letter-spacing: 0.025em;
-  padding: 12px 10px;
+  background: #f7f9fa;
+  border-bottom: 1px solid #dfe7ec;
+  color: #94a3ad;
+  font-size: 14px;
+  font-weight: 750;
+  letter-spacing: 0.045em;
+  padding: 11px 14px;
   text-align: left;
   text-transform: uppercase;
   white-space: nowrap;
 }
 
 .welder-table td {
-  border-top: 1px solid #e6eaed;
-  color: #32404c;
-  font-size: 12px;
+  border-top: 1px solid #dfe7ec;
+  color: #40525f;
+  font-size: 14px;
   line-height: 1.45;
-  padding: 12px 10px;
+  padding: 12px 14px;
   vertical-align: middle;
 }
 
 .welder-table td + td,
 .welder-table th + th {
-  border-left: 1px solid #edf0f2;
+  border-left: 0;
 }
 
 .welder-table tbody tr {
-  transition: background 160ms ease;
+  transition: background 180ms ease;
 }
 
-.welder-table tbody tr:hover,
+.welder-table tbody tr:hover {
+  background: #fafcfd;
+}
+
 .welder-table tbody tr.is-selected {
-  background: #eef8f4;
+  background: #e9f8f2;
 }
 
 .welder-table tbody tr.is-selected td {
-  border-bottom: 1px solid #bfe1d2;
-  border-top-color: #bfe1d2;
+  border-top-color: #c8ebd2;
+}
+
+.welder-table tbody tr.is-selected td:first-child {
+  box-shadow: inset 3px 0 #148c61;
 }
 
 .welder-person {
@@ -2141,7 +2162,7 @@
   cursor: pointer;
   display: flex;
   gap: 9px;
-  min-width: 190px;
+  min-width: 220px;
   padding: 0;
   text-align: left;
 }
@@ -2153,12 +2174,14 @@
 
 .welder-person strong {
   color: var(--directory-navy);
-  font-size: 13px;
+  font-size: 14px;
+  font-weight: 650;
+  margin-bottom: 2px;
 }
 
 .welder-person small,
 .welder-person i {
-  font-size: 12px;
+  font-size: 14px;
   font-style: normal;
 }
 
@@ -2241,58 +2264,76 @@
 .welder-process-tag,
 .welder-status,
 .welder-certificate {
-  border-radius: 5px;
-  display: inline-block;
-  font-size: 12px;
-  font-weight: 850;
-  padding: 5px 7px;
+  align-items: center;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  display: inline-flex;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+  min-height: 24px;
+  padding: 5px 9px;
   white-space: nowrap;
 }
 
 .welder-process-tag,
 .welder-status.is-standby {
-  background: #e8f2ff;
-  color: #1765b1;
+  background: #eaf4fb;
+  border-color: #c7dff5;
+  color: #1975b9;
 }
 
 .welder-status.is-working,
 .welder-certificate.is-active {
-  background: #e5f6eb;
-  color: #16753e;
+  background: #e9f8f2;
+  border-color: #c8ebd2;
+  color: #117c56;
 }
 
 .welder-status.is-process {
-  background: #fff0df;
-  color: #bd5a03;
+  background: #fff5df;
+  border-color: #f1ddb2;
+  color: #b56c00;
 }
 
 .welder-certificate.is-expired {
-  background: #ffebe7;
-  color: #c43825;
+  background: #fff0ed;
+  border-color: #f1cbc6;
+  color: #d92d20;
 }
 
 .welder-cell-note {
-  color: #667582;
+  color: #94a3ad;
   display: block;
-  font-size: 12px;
+  font-size: 14px;
   margin-top: 4px;
-  max-width: 130px;
+  max-width: 160px;
 }
 
 .welder-detail-button {
-  background: white;
-  border: 1px solid #cbd4db;
+  align-items: center;
+  background: #eaf4fb;
+  border: 1px solid #c7dff5;
   border-radius: 6px;
-  color: #25323e;
+  color: #1975b9;
   cursor: pointer;
-  font-size: 12px;
-  font-weight: 850;
-  padding: 8px 14px;
+  display: inline-flex;
+  font-size: 14px;
+  font-weight: 700;
+  justify-content: center;
+  min-height: 30px;
+  padding: 5px 10px;
+  transition: background 180ms ease, border-color 180ms ease, color 180ms ease;
+}
+
+.welder-detail-button:hover {
+  background: #dceefa;
+  border-color: #a9d0ee;
 }
 
 .welder-detail-button.is-active {
-  background: var(--directory-accent);
-  border-color: var(--directory-accent);
+  background: #148c61;
+  border-color: #148c61;
   color: white;
 }
 
