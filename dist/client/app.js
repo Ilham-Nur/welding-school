@@ -3854,11 +3854,25 @@
                 : "";
       link.classList.toggle("is-active", link.dataset.publicRoute === activeRoute);
     });
-    document.body.classList.toggle(
-      "dashboard-mode",
+    const dashboardMode =
       ["dashboard", "member-programs", "registration", "documents"].includes(id) ||
-        (state.loggedIn && ["detail", "batch"].includes(id)),
-    );
+      (state.loggedIn && ["detail", "batch"].includes(id));
+    document.body.classList.toggle("dashboard-mode", dashboardMode);
+    const whatsappRoutes = [
+      "home",
+      "about",
+      "programs",
+      "detail",
+      "batch",
+      "news",
+      "article",
+      "welders",
+      "certificate",
+    ];
+    const showWhatsapp = whatsappRoutes.includes(id) && !dashboardMode;
+    const whatsappButton = document.querySelector(".whatsapp-float");
+    if (whatsappButton) whatsappButton.hidden = !showWhatsapp;
+    document.body.classList.toggle("whatsapp-visible", showWhatsapp);
     document.body.classList.toggle(
       "welder-detail-open",
       id === "welders" && state.welderDetailOpen,
