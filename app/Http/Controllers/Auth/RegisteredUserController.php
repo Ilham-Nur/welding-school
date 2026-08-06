@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Services\Auth\EmailVerificationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
@@ -67,6 +68,31 @@ class RegisteredUserController extends Controller
 
             return $user;
         });
+
+        if (! config('auth.email_verification_required', true)) {
+            Auth::login($user);
+            $request->session()->regenerate();
+            $request->session()->forget([
+                'pending_verification_user_id',
+                'pending_verification_email',
+            ]);
+            $user->forceFill(['last_login_at' => now()])->save();
+
+            return response()->json([
+                'message' => 'Akun berhasil dibuat. Anda sudah masuk.',
+                'requires_verification' => false,
+                'user' => [
+                    'name' => $user->name,
+                    'username' => $user->username,
+                    'email' => $user->email,
+                    'role' => $user->primaryRoleName(),
+                    'avatar' => $user->profileAvatarUrl(),
+                    'is_admin' => $user->isAdmin(),
+                    'profile' => $user->participantProfileData(),
+                ],
+                'redirect_to' => null,
+            ], 201);
+        }
 
         $request->session()->regenerate();
         $request->session()->put([

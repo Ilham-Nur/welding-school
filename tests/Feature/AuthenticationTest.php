@@ -96,6 +96,55 @@ class AuthenticationTest extends TestCase
         ]);
     }
 
+    public function test_participant_can_register_and_open_portal_when_verification_is_disabled(): void
+    {
+        config()->set('auth.email_verification_required', false);
+        Notification::fake();
+
+        $response = $this->postJson(route('register.store'), [
+            'username' => 'tanpa.otp',
+            'email' => 'tanpa-otp@example.com',
+            'password' => 'Welding123',
+            'password_confirmation' => 'Welding123',
+            'agreement' => true,
+        ]);
+
+        $response
+            ->assertCreated()
+            ->assertJsonPath('requires_verification', false)
+            ->assertJsonPath('user.email', 'tanpa-otp@example.com');
+
+        $user = User::query()->where('email', 'tanpa-otp@example.com')->firstOrFail();
+
+        $this->assertAuthenticatedAs($user);
+        $this->assertNull($user->email_verified_at);
+        $this->assertDatabaseMissing('email_verification_codes', ['user_id' => $user->id]);
+        Notification::assertNothingSent();
+
+        $this->getJson(route('profile.show'))->assertOk();
+    }
+
+    public function test_unverified_participant_can_login_when_verification_is_disabled(): void
+    {
+        config()->set('auth.email_verification_required', false);
+        Notification::fake();
+        $user = User::factory()->unverified()->create([
+            'email' => 'belum@example.com',
+            'password' => 'Welding123',
+            'status' => 'active',
+        ]);
+
+        $this->postJson(route('login.store'), [
+            'email' => 'belum@example.com',
+            'password' => 'Welding123',
+        ])->assertOk()
+            ->assertJsonPath('user.email', 'belum@example.com');
+
+        $this->assertAuthenticatedAs($user);
+        Notification::assertNothingSent();
+        $this->getJson(route('profile.show'))->assertOk();
+    }
+
     public function test_registration_requires_password_confirmation_and_agreement(): void
     {
         $this->postJson(route('register.store'), [

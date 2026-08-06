@@ -49,7 +49,8 @@
                 'programs' => $catalog,
             ],
             'verification' => [
-                'pending' => session()->has('pending_verification_user_id'),
+                'pending' => config('auth.email_verification_required', true)
+                    && session()->has('pending_verification_user_id'),
                 'email' => session('pending_verification_email'),
             ],
             'googleConfigured' => filled(config('services.google.client_id'))

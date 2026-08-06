@@ -60,7 +60,7 @@ Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
     ->middleware('auth')
     ->name('logout');
 
-Route::middleware(['auth', 'verified'])->group(function (): void {
+Route::middleware(['auth', 'verified.when_required'])->group(function (): void {
     Route::get('/profile', [ParticipantProfileController::class, 'show'])
         ->name('profile.show');
     Route::post('/profile', [ParticipantProfileController::class, 'update'])

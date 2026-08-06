@@ -47,7 +47,7 @@ class AuthenticatedSessionController extends Controller
 
         $user = $request->user();
 
-        if (! $user->hasVerifiedEmail()) {
+        if (config('auth.email_verification_required', true) && ! $user->hasVerifiedEmail()) {
             Auth::guard('web')->logout();
             $request->session()->regenerate();
             $request->session()->put([
@@ -66,6 +66,10 @@ class AuthenticatedSessionController extends Controller
         }
 
         $request->session()->regenerate();
+        $request->session()->forget([
+            'pending_verification_user_id',
+            'pending_verification_email',
+        ]);
         $user->forceFill(['last_login_at' => now()])->save();
 
         return response()->json([
