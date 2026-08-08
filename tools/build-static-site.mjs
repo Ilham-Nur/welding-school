@@ -14,6 +14,7 @@ await cp(resolve(root, 'public/templates/welding-school'), client, {
   recursive: true,
 });
 await cp(resolve(root, 'public/favicon.ico'), resolve(client, 'favicon.ico'));
+await cp(resolve(root, 'public/logo_alpha.png'), resolve(client, 'logo_alpha.png'));
 await cp(
   resolve(root, 'public/alpha-academy-directory-og.png'),
   resolve(client, 'alpha-academy-directory-og.png'),

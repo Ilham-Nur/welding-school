@@ -10,7 +10,7 @@
       backend.branding?.tagline || "Kompeten. Tersertifikasi. Siap Kerja.",
     logo:
       backend.branding?.logo ||
-      "assets/images/alpha-teknik-pratama-logo-hd.png",
+      "logo_alpha.png",
   };
   const administrationFee = Math.max(
     0,

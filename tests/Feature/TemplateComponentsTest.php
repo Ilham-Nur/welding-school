@@ -16,8 +16,11 @@ class TemplateComponentsTest extends TestCase
             ->assertOk()
             ->assertSee('WELDING SCHOOL')
             ->assertSee('public-nav__account')
+            ->assertSee('logo_alpha.png')
             ->assertSee('templates/welding-school/style.css')
             ->assertSee('templates/welding-school/app.js');
+
+        $this->assertFileExists(public_path('logo_alpha.png'));
     }
 
     public function test_local_cloudflare_proxy_generates_https_asset_urls(): void
