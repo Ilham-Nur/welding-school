@@ -230,6 +230,32 @@ class TemplateComponentsTest extends TestCase
         $this->assertStringContainsString('navigate("account");', $script);
     }
 
+    public function test_paid_payment_detail_uses_the_participant_dashboard_shell(): void
+    {
+        $script = file_get_contents(public_path('templates/welding-school/app.js'));
+        $styles = file_get_contents(public_path('templates/welding-school/style.css'));
+
+        $this->assertIsString($script);
+        $this->assertIsString($styles);
+        $this->assertStringContainsString(
+            'state.dashboardView === "payment-detail"',
+            $script,
+        );
+        $this->assertStringContainsString(
+            'state.dashboardView = "payment-detail";',
+            $script,
+        );
+        $this->assertStringContainsString(
+            'paidPaymentDetailContent(true)',
+            $script,
+        );
+        $this->assertStringContainsString(
+            'openPaymentAfterLoad: Boolean(',
+            $script,
+        );
+        $this->assertStringContainsString('.dashboard-payment-detail {', $styles);
+    }
+
     public function test_template_styles_keep_text_and_touch_targets_readable(): void
     {
         foreach (['style.css', 'components.css', 'admin.css'] as $stylesheet) {

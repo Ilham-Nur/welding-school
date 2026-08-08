@@ -778,6 +778,9 @@
     step: 0,
     loggedIn: Boolean(backend.auth?.authenticated),
     dashboardView: "home",
+    openPaymentAfterLoad: Boolean(
+      backend.flash?.status?.toLowerCase().includes("pembayaran"),
+    ),
     trainingSection: "overview",
     programOrigin: "public",
     selectedProgram: programs[0],
@@ -1098,6 +1101,10 @@
         result.applications ||
           (result.application ? [result.application] : []),
       );
+      if (state.openPaymentAfterLoad && state.invoice?.status === "paid") {
+        state.dashboardView = "payment-detail";
+        state.openPaymentAfterLoad = false;
+      }
       render();
       if (showMessage) {
         showToast(
@@ -2844,6 +2851,65 @@
     `;
   }
 
+  function paidPaymentDetailContent(includeToolbar = false) {
+    const invoice = state.invoice;
+
+    if (!invoice || invoice.status !== "paid") {
+      return `
+        <section class="empty-state">
+          <span>i</span>
+          <h2>Pembayaran belum dikonfirmasi</h2>
+          <p>Periksa kembali daftar pembayaran untuk melihat status terbaru.</p>
+          <button class="button button--primary" data-action="show-dashboard-payments" type="button">Kembali ke Pembayaran</button>
+        </section>
+      `;
+    }
+
+    const total = Number(invoice.total_amount || 0);
+    const toolbar = includeToolbar
+      ? `
+        <section class="participant-detail-toolbar">
+          <button class="participant-detail-back" data-action="show-dashboard-payments" type="button">
+            <span aria-hidden="true">←</span> Kembali ke daftar pembayaran
+          </button>
+          <div>
+            <span class="eyebrow">DETAIL PEMBAYARAN</span>
+            <strong>${escapeHtml(invoice.invoice_number)}</strong>
+          </div>
+        </section>
+      `
+      : "";
+
+    return `
+      ${toolbar}
+      <section class="payment-layout payment-layout--paid${includeToolbar ? " dashboard-payment-detail" : ""}">
+        <article class="checkout-card checkout-card--paid">
+          <div class="notice notice--green"><span>✓</span><div><strong>Status pembayaran: Lunas</strong><p>Kursi pelatihan telah diamankan dan akses pelatihan sudah aktif.</p></div></div>
+          <div class="paid-payment-overview">
+            <div class="order-program paid-payment-program">
+              <span class="order-program__image" style="background-position:${state.selectedProgram.imagePosition}"></span>
+              <div><span class="badge badge--blue">${escapeHtml(state.selectedProgram.code)}</span><h3>${escapeHtml(state.selectedProgram.title)}</h3><p>${escapeHtml(state.selectedBatch.label)}</p></div>
+            </div>
+            <dl class="paid-payment-details">
+              <div><dt>Nomor invoice</dt><dd>${escapeHtml(invoice.invoice_number)}</dd></div>
+              <div><dt>Tanggal pembayaran</dt><dd>${formatDateTime(invoice.paid_at)}</dd></div>
+              <div><dt>Total dibayar</dt><dd>${money(total)}</dd></div>
+            </dl>
+          </div>
+        </article>
+        <aside class="payment-summary">
+          <span class="badge badge--green">LUNAS</span>
+          <h2>${escapeHtml(state.selectedProgram.title)}</h2>
+          <p>${escapeHtml(state.selectedBatch.label)}</p>
+          <div class="payment-summary__total"><span>Total pembayaran</span><strong>${money(total)}</strong></div>
+          <button class="button button--primary button--large button--full" data-action="show-dashboard-training" type="button">Buka Pelatihan Saya <span>→</span></button>
+          <button class="button button--outline button--full" data-action="show-dashboard-programs" type="button">Lihat Program Lain</button>
+          <button class="text-button" data-action="show-dashboard-payments" type="button">← Kembali ke daftar pembayaran</button>
+        </aside>
+      </section>
+    `;
+  }
+
   function renderMemberPrograms() {
     const isApproved = state.applicationStatus === "approved";
     const isRejected = state.applicationStatus === "rejected";
@@ -2853,12 +2919,15 @@
     const showingApplicationDetail =
       state.dashboardView === "application-detail";
     const showingPayments = state.dashboardView === "payments";
+    const showingPaymentDetail = state.dashboardView === "payment-detail";
     const showingTraining = state.dashboardView === "training";
     const showingTrainingDetail = state.dashboardView === "training-detail";
     const showingHelp = state.dashboardView === "help";
     const showingProfile = state.dashboardView === "profile";
     const sidebarSection = showingApplicationDetail
       ? "applications"
+      : showingPaymentDetail
+        ? "payments"
       : showingTrainingDetail
         ? "training"
         : state.dashboardView;
@@ -3204,6 +3273,8 @@
           ? "Detail Status Pendaftaran"
         : showingPayments
           ? "Pembayaran"
+          : showingPaymentDetail
+            ? "Detail Pembayaran"
           : showingTraining
             ? "Pelatihan Saya"
             : showingTrainingDetail
@@ -3221,6 +3292,8 @@
           ? `Status lengkap pendaftaran ${state.selectedProgram.title}.`
         : showingPayments
           ? "Buka kembali invoice dan status pembayaran untuk setiap program."
+          : showingPaymentDetail
+            ? "Rincian pembayaran lunas dan akses pelatihan Anda."
           : showingTraining
             ? "Akses program yang sudah lunas dan aktif secara terpisah."
             : showingTrainingDetail
@@ -3248,6 +3321,8 @@
               "Invoice dan pembayaran",
               "Invoice yang sudah lunas tetap dapat dibuka kembali kapan saja.",
             )
+          : showingPaymentDetail
+            ? paidPaymentDetailContent(true)
           : showingTraining
             ? recordsPanel(
                 "training",
@@ -3708,31 +3783,7 @@
           "Pembayaran telah dikonfirmasi",
           "Rincian pembayaran program ini tetap dapat Anda lihat kapan saja.",
         )}
-        <section class="page-shell payment-layout payment-layout--paid">
-          <article class="checkout-card checkout-card--paid">
-            <div class="notice notice--green"><span>✓</span><div><strong>Status pembayaran: Lunas</strong><p>Kursi pelatihan telah diamankan dan akses pelatihan sudah aktif.</p></div></div>
-            <div class="paid-payment-overview">
-              <div class="order-program paid-payment-program">
-                <span class="order-program__image" style="background-position:${state.selectedProgram.imagePosition}"></span>
-                <div><span class="badge badge--blue">${state.selectedProgram.code}</span><h3>${state.selectedProgram.title}</h3><p>${state.selectedBatch.label}</p></div>
-              </div>
-              <dl class="paid-payment-details">
-                <div><dt>Nomor invoice</dt><dd>${escapeHtml(invoice.invoice_number)}</dd></div>
-                <div><dt>Tanggal pembayaran</dt><dd>${formatDateTime(invoice.paid_at)}</dd></div>
-                <div><dt>Total dibayar</dt><dd>${money(total)}</dd></div>
-              </dl>
-            </div>
-          </article>
-          <aside class="payment-summary">
-            <span class="badge badge--green">LUNAS</span>
-            <h2>${state.selectedProgram.title}</h2>
-            <p>${state.selectedBatch.label}</p>
-            <div class="payment-summary__total"><span>Total pembayaran</span><strong>${money(total)}</strong></div>
-            <button class="button button--primary button--large button--full" data-action="show-dashboard-training" type="button">Buka Pelatihan Saya <span>→</span></button>
-            <button class="button button--outline button--full" data-action="show-dashboard-programs" type="button">Lihat Program Lain</button>
-            <button class="text-button" data-action="show-dashboard-payments" type="button">← Kembali ke daftar pembayaran</button>
-          </aside>
-        </section>
+        <div class="page-shell">${paidPaymentDetailContent()}</div>
       `;
     }
 
@@ -4518,13 +4569,12 @@
     }
 
     if (action === "continue-approved") {
-      navigate(
-        state.invoice?.status === "paid"
-          ? "payment"
-          : state.invoice
-            ? "invoice"
-            : "summary",
-      );
+      if (state.invoice?.status === "paid") {
+        state.dashboardView = "payment-detail";
+        navigate("member-programs");
+      } else {
+        navigate(state.invoice ? "invoice" : "summary");
+      }
     }
 
     if (action === "show-dashboard-home") {
@@ -4592,13 +4642,12 @@
 
       selectApplication(application);
       if (action === "open-payment-record") {
-        navigate(
-          application.invoice?.status === "paid"
-            ? "payment"
-            : application.invoice
-              ? "invoice"
-              : "summary",
-        );
+        if (application.invoice?.status === "paid") {
+          state.dashboardView = "payment-detail";
+          navigate("member-programs");
+        } else {
+          navigate(application.invoice ? "invoice" : "summary");
+        }
       } else {
         state.dashboardView =
           action === "open-training-record"

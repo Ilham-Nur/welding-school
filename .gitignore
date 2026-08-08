@@ -10,6 +10,9 @@ Thumbs.db
 !.env.example
 *.log
 .phpunit.result.cache
+/.codex-tmp-ssh/
+*client_secret*.json
+*clinet_scret*.json
 
 # Folder kerja sementara
 tmp/

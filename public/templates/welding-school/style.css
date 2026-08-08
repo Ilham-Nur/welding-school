@@ -8320,6 +8320,12 @@ a {
   grid-template-columns: minmax(0, 1fr) 350px;
 }
 
+.dashboard-payment-detail {
+  margin-top: 14px;
+  padding-bottom: 0;
+  width: 100%;
+}
+
 .checkout-card--paid {
   display: flex;
   flex-direction: column;
