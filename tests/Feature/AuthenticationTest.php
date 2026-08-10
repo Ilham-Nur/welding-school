@@ -5,9 +5,12 @@ namespace Tests\Feature;
 use App\Models\EmailVerificationCode;
 use App\Models\User;
 use App\Notifications\EmailVerificationCodeNotification;
+use App\Notifications\ResetPasswordNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Password;
 use Laravel\Socialite\Facades\Socialite;
 use Laravel\Socialite\Two\User as SocialiteUser;
 use Tests\TestCase;
@@ -342,6 +345,126 @@ class AuthenticationTest extends TestCase
             EmailVerificationCodeNotification::class,
             2,
         );
+    }
+
+    public function test_participant_can_request_a_password_reset_link(): void
+    {
+        Notification::fake();
+        $user = User::factory()->create(['email' => 'reset@example.com']);
+        $token = null;
+
+        $this->postJson(route('password.email'), ['email' => 'RESET@example.com'])
+            ->assertOk()
+            ->assertJsonPath(
+                'message',
+                'Jika email terdaftar, tautan reset password telah dikirim. Periksa inbox atau folder spam.',
+            );
+
+        Notification::assertSentTo(
+            $user,
+            ResetPasswordNotification::class,
+            function (ResetPasswordNotification $notification) use (&$token): bool {
+                $token = $notification->token;
+
+                return $token !== '';
+            },
+        );
+
+        $this->assertDatabaseHas('password_reset_tokens', ['email' => $user->email]);
+        $resetPage = $this->get(route('password.reset', [
+            'token' => $token,
+            'email' => $user->email,
+        ]));
+
+        $resetPage
+            ->assertOk()
+            ->assertSee($token)
+            ->assertSee($user->email)
+            ->assertSee('noindex, nofollow, noarchive')
+            ->assertSee('<meta name="referrer" content="no-referrer">', false);
+        $this->assertStringContainsString(
+            'no-store',
+            (string) $resetPage->headers->get('Cache-Control'),
+        );
+    }
+
+    public function test_password_reset_request_does_not_reveal_unknown_email(): void
+    {
+        Notification::fake();
+
+        $this->postJson(route('password.email'), ['email' => 'unknown@example.com'])
+            ->assertOk()
+            ->assertJsonPath(
+                'message',
+                'Jika email terdaftar, tautan reset password telah dikirim. Periksa inbox atau folder spam.',
+            );
+
+        Notification::assertNothingSent();
+        $this->assertDatabaseMissing('password_reset_tokens', [
+            'email' => 'unknown@example.com',
+        ]);
+    }
+
+    public function test_participant_can_reset_password_and_old_sessions_are_revoked(): void
+    {
+        $user = User::factory()->create([
+            'email' => 'password-baru@example.com',
+            'password' => 'PasswordLama123',
+        ]);
+        $token = Password::createToken($user);
+
+        DB::table('sessions')->insert([
+            'id' => 'old-participant-session',
+            'user_id' => $user->id,
+            'ip_address' => '127.0.0.1',
+            'user_agent' => 'PHPUnit',
+            'payload' => 'old-session',
+            'last_activity' => now()->timestamp,
+        ]);
+
+        $this->postJson(route('password.update'), [
+            'token' => $token,
+            'email' => $user->email,
+            'password' => 'PasswordBaru456',
+            'password_confirmation' => 'PasswordBaru456',
+        ])
+            ->assertOk()
+            ->assertJsonPath(
+                'message',
+                'Password berhasil diperbarui. Silakan masuk menggunakan password baru.',
+            );
+
+        $this->assertTrue(Hash::check('PasswordBaru456', $user->fresh()->password));
+        $this->assertFalse(Hash::check('PasswordLama123', $user->fresh()->password));
+        $this->assertDatabaseMissing('password_reset_tokens', ['email' => $user->email]);
+        $this->assertDatabaseMissing('sessions', ['user_id' => $user->id]);
+
+        $this->postJson(route('login.store'), [
+            'login' => $user->email,
+            'password' => 'PasswordBaru456',
+        ])->assertOk();
+    }
+
+    public function test_invalid_password_reset_token_cannot_change_password(): void
+    {
+        $user = User::factory()->create([
+            'email' => 'invalid-token@example.com',
+            'password' => 'PasswordLama123',
+        ]);
+
+        $this->postJson(route('password.update'), [
+            'token' => 'invalid-token',
+            'email' => $user->email,
+            'password' => 'PasswordBaru456',
+            'password_confirmation' => 'PasswordBaru456',
+        ])
+            ->assertUnprocessable()
+            ->assertJsonPath(
+                'errors.email.0',
+                'Tautan reset password tidak valid atau sudah kedaluwarsa. Silakan minta tautan baru.',
+            );
+
+        $this->assertTrue(Hash::check('PasswordLama123', $user->fresh()->password));
     }
 
     public function test_google_login_asks_the_user_to_select_an_account(): void

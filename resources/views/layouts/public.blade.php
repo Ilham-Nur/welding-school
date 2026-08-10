@@ -21,6 +21,7 @@
         <meta name="robots" content="{{ $robots }}">
         <meta name="author" content="{{ $brand['company'] }}">
         <meta name="theme-color" content="#071e33">
+        @stack('head')
 
         <link rel="canonical" href="{{ $canonicalUrl }}">
         <link rel="alternate" hreflang="id-ID" href="{{ $canonicalUrl }}">

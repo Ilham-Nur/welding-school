@@ -1,10 +1,12 @@
 <?php
 
+use App\Http\Controllers\ActivityViewController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\EmailVerificationController;
 use App\Http\Controllers\Auth\GoogleAuthController;
+use App\Http\Controllers\Auth\NewPasswordController;
+use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
-use App\Http\Controllers\ActivityViewController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Participant\InvoiceController as ParticipantInvoiceController;
 use App\Http\Controllers\Participant\ParticipantProfileController;
@@ -15,6 +17,11 @@ use App\Http\Controllers\Webhooks\MidtransWebhookController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', HomeController::class)->name('home');
+
+Route::get('/reset-password/{token}', HomeController::class)
+    ->middleware(['guest', 'cache.headers:no_store'])
+    ->where('token', '[A-Za-z0-9]+')
+    ->name('password.reset');
 
 Route::post('/activities/{activity}/view', ActivityViewController::class)
     ->middleware('throttle:60,1')
@@ -36,6 +43,14 @@ Route::get('/register', fn () => redirect(route('home').'#account'))
     ->name('register');
 
 Route::middleware('guest')->group(function (): void {
+    Route::post('/forgot-password', [PasswordResetLinkController::class, 'store'])
+        ->middleware('throttle:3,1')
+        ->name('password.email');
+
+    Route::post('/reset-password', [NewPasswordController::class, 'store'])
+        ->middleware('throttle:5,1')
+        ->name('password.update');
+
     Route::post('/login', [AuthenticatedSessionController::class, 'store'])
         ->middleware('throttle:6,1')
         ->name('login.store');

@@ -43,6 +43,23 @@ class TemplateComponentsTest extends TestCase
             ->assertDontSee('name="keywords"', false);
     }
 
+    public function test_account_page_exposes_the_complete_password_reset_flow(): void
+    {
+        $script = file_get_contents(public_path('templates/welding-school/app.js'));
+
+        $this->assertIsString($script);
+        $this->assertStringContainsString('data-action="forgot-password"', $script);
+        $this->assertStringContainsString('data-form="forgot-password"', $script);
+        $this->assertStringContainsString('data-form="reset-password"', $script);
+        $this->assertStringContainsString('backend.routes?.forgotPassword', $script);
+        $this->assertStringContainsString('backend.routes?.resetPassword', $script);
+
+        $this->get(route('home'))
+            ->assertOk()
+            ->assertSee('forgotPassword')
+            ->assertSee('resetPassword');
+    }
+
     public function test_internal_component_catalog_is_not_indexable(): void
     {
         $this->get('/template/components')

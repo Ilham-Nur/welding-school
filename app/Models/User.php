@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Notifications\ResetPasswordNotification;
 use Database\Factories\UserFactory;
 use Illuminate\Auth\MustVerifyEmail;
 use Illuminate\Contracts\Auth\MustVerifyEmail as MustVerifyEmailContract;
@@ -43,6 +44,11 @@ class User extends Authenticatable implements MustVerifyEmailContract
     public function emailVerificationCode(): HasOne
     {
         return $this->hasOne(EmailVerificationCode::class);
+    }
+
+    public function sendPasswordResetNotification($token): void
+    {
+        $this->notify(new ResetPasswordNotification((string) $token));
     }
 
     public function profileAvatarUrl(): ?string

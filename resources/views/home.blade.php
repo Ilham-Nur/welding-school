@@ -3,6 +3,13 @@
 @section('title', 'Alpha Welding Academy Batam | Pelatihan Welder Bersertifikasi')
 @section('description', 'Pelatihan welding dan sertifikasi welder profesional di Batam dari PT. Alpha Teknik Pratama. Pilih program kompetensi untuk meningkatkan kesiapan kerja.')
 @section('canonical', route('home'))
+
+@if ($passwordReset)
+    @section('robots', 'noindex, nofollow, noarchive')
+    @push('head')
+        <meta name="referrer" content="no-referrer">
+    @endpush
+@endif
 @section('social-image-alt', 'Alpha Welding Academy Batam — Kompeten, Tersertifikasi, Siap Kerja')
 
 @push('structured-data')
@@ -104,8 +111,11 @@
                 ] : null,
             ],
             'routes' => [
+                'home' => route('home'),
                 'login' => route('login.store'),
                 'register' => route('register.store'),
+                'forgotPassword' => route('password.email'),
+                'resetPassword' => route('password.update'),
                 'logout' => route('logout'),
                 'google' => route('auth.google.redirect'),
                 'verifyEmail' => route('verification.code.verify'),
@@ -127,6 +137,7 @@
                     && session()->has('pending_verification_user_id'),
                 'email' => session('pending_verification_email'),
             ],
+            'passwordReset' => $passwordReset,
             'googleConfigured' => filled(config('services.google.client_id'))
                 && filled(config('services.google.client_secret')),
             'billing' => [

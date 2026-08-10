@@ -737,6 +737,8 @@
     { id: "recruiter-account", label: "Akun Recruiter" },
     { id: "certificate", label: "Verifikasi Sertifikat" },
     { id: "account", label: "Akun" },
+    { id: "forgot-password", label: "Lupa Password" },
+    { id: "reset-password", label: "Reset Password" },
     { id: "member-programs", label: "Dashboard Peserta" },
     { id: "detail", label: "Detail" },
     { id: "batch", label: "Batch" },
@@ -799,6 +801,11 @@
       pending: Boolean(backend.verification?.pending),
       email: backend.verification?.email || "",
       debugCode: "",
+    },
+    passwordReset: {
+      token: backend.passwordReset?.token || "",
+      email: backend.passwordReset?.email || "",
+      requestSent: false,
     },
     registration: {
       username: backend.auth?.user?.username || "",
@@ -1286,8 +1293,10 @@
       "recruiter-account",
       "certificate",
       "account",
+      "forgot-password",
     ];
     if (state.verification.pending) publicRoutes.push("verification");
+    if (state.passwordReset.token) publicRoutes.push("reset-password");
     if (!state.loggedIn && !publicRoutes.includes(steps[index].id)) {
       index = steps.findIndex((step) => step.id === "account");
     }
@@ -2807,7 +2816,7 @@
           ${googleAuthButton()}
           <label class="field field--full"><span>Email atau username</span><input name="login" type="text" value="" placeholder="nama@email.com atau username" autocomplete="username" required></label>
           <label class="field field--full"><span>Password</span><input name="password" type="password" placeholder="Masukkan password" autocomplete="current-password" required></label>
-          <div class="auth-options"><label><input name="remember" type="checkbox"> Ingat saya</label><button class="text-link" type="button">Lupa password?</button></div>
+          <div class="auth-options"><label><input name="remember" type="checkbox"> Ingat saya</label><button class="text-link" data-action="forgot-password" type="button">Lupa password?</button></div>
           <button class="button button--primary button--large button--full" type="submit" data-submit-label="Masuk ke Dashboard">Masuk ke Dashboard <span>→</span></button>
         </form>
       `;
@@ -2855,6 +2864,106 @@
             ${accountForm()}
             <div class="secure-caption"><span>◇</span> Informasi Anda disimpan dengan aman dan hanya digunakan untuk proses pelatihan.</div>
           </div>
+        </div>
+      </section>
+    `;
+  }
+
+  function renderForgotPassword() {
+    const content = state.passwordReset.requestSent
+      ? `
+        <span class="verification-icon" aria-hidden="true">&check;</span>
+        <span class="eyebrow">PERIKSA EMAIL</span>
+        <h1>Permintaan sudah diproses</h1>
+        <p>Jika <strong>${escapeHtml(state.passwordReset.email)}</strong> terdaftar, tautan reset telah dikirim. Periksa inbox atau folder spam.</p>
+        <button class="button button--primary button--large button--full" data-action="back-to-account" type="button">Kembali ke Login</button>
+      `
+      : `
+        <span class="verification-icon" aria-hidden="true">?</span>
+        <span class="eyebrow">PEMULIHAN AKUN</span>
+        <h1>Lupa password?</h1>
+        <p>Masukkan email akun Anda. Kami akan mengirim tautan aman untuk membuat password baru.</p>
+        <form class="auth-form verification-form" data-form="forgot-password">
+          <label class="field field--full">
+            <span>Alamat email</span>
+            <input name="email" type="email" value="${escapeHtml(state.passwordReset.email)}" placeholder="nama@email.com" autocomplete="email" required>
+          </label>
+          <button class="button button--primary button--large button--full" type="submit" data-submit-label="Kirim Tautan Reset">
+            Kirim Tautan Reset <span>&rarr;</span>
+          </button>
+        </form>
+        <button class="verification-back" data-action="back-to-account" type="button">&larr; Kembali ke halaman login</button>
+      `;
+
+    return `
+      <section class="auth-page verification-page">
+        <div class="auth-visual verification-visual">
+          <div class="auth-visual__overlay">
+            <span class="eyebrow eyebrow--light">KEAMANAN AKUN</span>
+            <h1>Password lama tidak akan pernah dikirim melalui email.</h1>
+            <p>Tautan reset hanya berlaku 60 menit dan tidak dapat digunakan kembali setelah password diganti.</p>
+            <div class="auth-trust">
+              <div><span>&check;</span><strong>Tautan sekali pakai</strong></div>
+              <div><span>&check;</span><strong>Berlaku 60 menit</strong></div>
+              <div><span>&check;</span><strong>Respons tidak membocorkan akun</strong></div>
+            </div>
+          </div>
+        </div>
+        <div class="auth-panel">
+          <div class="auth-panel__inner verification-panel">${content}</div>
+        </div>
+      </section>
+    `;
+  }
+
+  function renderResetPassword() {
+    const email = state.passwordReset.email;
+    const hasValidLink = Boolean(state.passwordReset.token && email);
+
+    const content = hasValidLink
+      ? `
+        <span class="verification-icon" aria-hidden="true">&#128274;</span>
+        <span class="eyebrow">PASSWORD BARU</span>
+        <h1>Buat password baru</h1>
+        <p>Password akan diperbarui untuk akun <strong>${escapeHtml(email)}</strong>.</p>
+        <form class="auth-form verification-form" data-form="reset-password">
+          <label class="field field--full">
+            <span>Password baru</span>
+            <input name="password" type="password" placeholder="Minimal 8 karakter, huruf dan angka" minlength="8" autocomplete="new-password" required>
+          </label>
+          <label class="field field--full">
+            <span>Ulangi password baru</span>
+            <input name="password_confirmation" type="password" placeholder="Ketik ulang password" minlength="8" autocomplete="new-password" required>
+          </label>
+          <button class="button button--primary button--large button--full" type="submit" data-submit-label="Simpan Password Baru">
+            Simpan Password Baru <span>&rarr;</span>
+          </button>
+        </form>
+      `
+      : `
+        <span class="verification-icon" aria-hidden="true">!</span>
+        <span class="eyebrow">TAUTAN TIDAK LENGKAP</span>
+        <h1>Minta tautan baru</h1>
+        <p>Tautan reset password tidak lengkap. Silakan kirim permintaan reset kembali.</p>
+        <button class="button button--primary button--large button--full" data-action="forgot-password" type="button">Minta Tautan Reset</button>
+      `;
+
+    return `
+      <section class="auth-page verification-page">
+        <div class="auth-visual verification-visual">
+          <div class="auth-visual__overlay">
+            <span class="eyebrow eyebrow--light">LINDUNGI AKUN ANDA</span>
+            <h1>Gunakan password yang unik dan mudah Anda ingat.</h1>
+            <p>Setelah password diganti, seluruh sesi login lama akan dikeluarkan untuk melindungi akun.</p>
+            <div class="auth-trust">
+              <div><span>&check;</span><strong>Minimal 8 karakter</strong></div>
+              <div><span>&check;</span><strong>Mengandung huruf</strong></div>
+              <div><span>&check;</span><strong>Mengandung angka</strong></div>
+            </div>
+          </div>
+        </div>
+        <div class="auth-panel">
+          <div class="auth-panel__inner verification-panel">${content}</div>
         </div>
       </section>
     `;
@@ -3955,6 +4064,8 @@
       detail: renderDetail,
       batch: renderBatch,
       account: renderAccount,
+      "forgot-password": renderForgotPassword,
+      "reset-password": renderResetPassword,
       verification: renderVerification,
       registration: renderRegistration,
       documents: renderDocuments,
@@ -4098,6 +4209,82 @@
       state.recruiterPortalView = "pipeline";
       refreshPortal("recruiter-demo");
       showToast("Undangan rekrutmen simulasi berhasil dibuat.", "success");
+      return;
+    }
+
+    if (form.dataset.form === "forgot-password") {
+      const submitButton = form.querySelector('button[type="submit"]');
+      const submitLabel =
+        submitButton?.dataset.submitLabel || "Kirim Tautan Reset";
+      const data = new FormData(form);
+      state.passwordReset.email = String(data.get("email") || "").trim();
+
+      if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.innerHTML =
+          '<span class="button-spinner"></span> Mengirim...';
+      }
+
+      try {
+        const result = await backendRequest(backend.routes?.forgotPassword, {
+          email: state.passwordReset.email,
+        });
+        state.passwordReset.requestSent = true;
+        render();
+        showToast(result.message, "success");
+      } catch (error) {
+        showToast(error.message, "danger");
+        if (submitButton) {
+          submitButton.disabled = false;
+          submitButton.innerHTML = `${submitLabel} <span>&rarr;</span>`;
+        }
+      }
+      return;
+    }
+
+    if (form.dataset.form === "reset-password") {
+      const data = new FormData(form);
+      const password = String(data.get("password") || "");
+      const confirmation = String(data.get("password_confirmation") || "");
+
+      if (password !== confirmation) {
+        showToast("Konfirmasi password belum sama.", "warning");
+        return;
+      }
+
+      const submitButton = form.querySelector('button[type="submit"]');
+      const submitLabel =
+        submitButton?.dataset.submitLabel || "Simpan Password Baru";
+
+      if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.innerHTML =
+          '<span class="button-spinner"></span> Menyimpan...';
+      }
+
+      try {
+        const result = await backendRequest(backend.routes?.resetPassword, {
+          token: state.passwordReset.token,
+          email: state.passwordReset.email,
+          password,
+          password_confirmation: confirmation,
+        });
+
+        state.passwordReset.token = "";
+        state.passwordReset.requestSent = false;
+        state.accountMode = "login";
+        const homeUrl = new URL(backend.routes?.home || "/", window.location.origin);
+        homeUrl.hash = "account";
+        window.history.replaceState(null, "", homeUrl);
+        navigate("account");
+        showToast(result.message, "success");
+      } catch (error) {
+        showToast(error.message, "danger");
+        if (submitButton) {
+          submitButton.disabled = false;
+          submitButton.innerHTML = `${submitLabel} <span>&rarr;</span>`;
+        }
+      }
       return;
     }
 
@@ -4611,6 +4798,15 @@
       render();
     }
 
+    if (action === "forgot-password") {
+      state.passwordReset.token = "";
+      state.passwordReset.requestSent = false;
+      const homeUrl = new URL(backend.routes?.home || "/", window.location.origin);
+      homeUrl.hash = "forgot-password";
+      window.history.replaceState(null, "", homeUrl);
+      navigate("forgot-password");
+    }
+
     if (action === "resend-verification") {
       button.disabled = true;
       try {
@@ -4627,6 +4823,7 @@
     }
 
     if (action === "back-to-account") {
+      state.passwordReset.requestSent = false;
       navigate("account");
     }
 
@@ -4975,9 +5172,9 @@
     }
   });
 
-  const initialStep = steps.findIndex(
-    (step) => `#${step.id}` === window.location.hash,
-  );
+  const initialStep = state.passwordReset.token
+    ? steps.findIndex((step) => step.id === "reset-password")
+    : steps.findIndex((step) => `#${step.id}` === window.location.hash);
   if (state.loggedIn && backend.auth?.user?.is_admin) {
     window.location.replace(backend.routes?.admin || "/admin");
     return;
@@ -4993,8 +5190,10 @@
     "recruiter-account",
     "certificate",
     "account",
+    "forgot-password",
   ];
   if (state.verification.pending) initialPublicRoutes.push("verification");
+  if (state.passwordReset.token) initialPublicRoutes.push("reset-password");
   state.step =
     initialStep >= 0 &&
     (state.loggedIn || initialPublicRoutes.includes(steps[initialStep].id))

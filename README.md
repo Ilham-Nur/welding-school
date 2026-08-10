@@ -34,8 +34,9 @@ Menjalankan seeder kembali tidak akan mereset password admin yang sudah aktif.
 Form pada `/#account` sudah terhubung ke autentikasi Laravel:
 
 - daftar menggunakan nama, email, dan password;
-- login menggunakan email dan password;
+- login menggunakan email atau username dan password;
 - opsi ingat saya;
+- reset password melalui tautan sekali pakai yang dikirim ke email;
 - logout yang menghapus sesi;
 - login atau daftar menggunakan akun Google.
 
@@ -59,6 +60,14 @@ aplikasi menggunakan `APP_ENV=production`.
 
 Kode hanya dapat dicoba lima kali. Pengiriman ulang memiliki jeda 60 detik dan
 selalu menggantikan kode sebelumnya.
+
+### Reset password
+
+Tautan **Lupa password?** pada halaman login mengirim tautan reset jika email
+terdaftar. Respons aplikasi selalu sama untuk email terdaftar maupun tidak agar
+keberadaan akun tidak dapat ditebak. Tautan berlaku 60 menit, hanya dapat
+digunakan satu kali, dan seluruh sesi lama dicabut setelah password diperbarui.
+Password lama maupun password baru tidak pernah dikirim melalui email.
 
 ## Mengaktifkan login Google
 

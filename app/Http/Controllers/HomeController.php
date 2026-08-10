@@ -4,11 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Activity;
 use App\Models\TrainingProgram;
+use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class HomeController extends Controller
 {
-    public function __invoke(): View
+    public function __invoke(Request $request): View
     {
         $catalog = TrainingProgram::query()
             ->where('status', 'active')
@@ -65,6 +67,14 @@ class HomeController extends Controller
             ])
             ->values();
 
-        return view('home', compact('catalog', 'activities'));
+        $resetToken = $request->route('token');
+        $passwordReset = is_string($resetToken) && $resetToken !== ''
+            ? [
+                'token' => $resetToken,
+                'email' => Str::lower(trim((string) $request->query('email'))),
+            ]
+            : null;
+
+        return view('home', compact('catalog', 'activities', 'passwordReset'));
     }
 }
