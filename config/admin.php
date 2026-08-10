@@ -4,7 +4,7 @@ return [
     'seed' => [
         'name' => env('ADMIN_NAME', 'Administrator PT. Alpha Teknik Pratama'),
         'email' => env('ADMIN_EMAIL', 'admin@welding-school.test'),
-        'password' => env('ADMIN_PASSWORD', 'superadmin12345'),
+        'password' => env('ADMIN_PASSWORD'),
     ],
 
     'permission_labels' => [

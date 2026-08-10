@@ -17,12 +17,17 @@ Tampilan statis sebelumnya disimpan sebagai template referensi di
 Halaman utama tersedia di `/`, sedangkan katalog komponen Blade tersedia di
 `/template/components`.
 
-Setelah menjalankan seeder, akun super-admin lokal dapat digunakan dengan:
+Sebelum menjalankan seeder untuk pertama kali, tentukan kredensial super-admin
+yang unik di `.env`:
 
-```text
-Email: admin@welding-school.test
-Password: superadmin12345
+```dotenv
+ADMIN_NAME="Administrator PT. Alpha Teknik Pratama"
+ADMIN_EMAIL=alamat-admin@domain-anda.com
+ADMIN_PASSWORD=password-kuat-dan-unik
 ```
+
+Seeder hanya menggunakan password tersebut ketika akun super-admin belum ada.
+Menjalankan seeder kembali tidak akan mereset password admin yang sudah aktif.
 
 ## Login dan pendaftaran
 

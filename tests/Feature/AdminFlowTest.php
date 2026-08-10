@@ -31,10 +31,26 @@ class AdminFlowTest extends TestCase
 
         $this->assertTrue($admin->hasRole('super-admin'));
         $this->assertTrue($admin->can('roles.manage'));
-        $this->assertTrue(Hash::check('superadmin12345', $admin->password));
+        $this->assertTrue(Hash::check((string) config('admin.seed.password'), $admin->password));
         $this->assertNotNull($admin->email_verified_at);
         $this->assertDatabaseHas('training_programs', ['code' => 'SMAW-3G']);
         $this->assertDatabaseHas('training_batches', ['code' => 'SMAW-2608']);
+    }
+
+    public function test_rerunning_admin_seeder_does_not_reset_existing_password(): void
+    {
+        $this->seed(DatabaseSeeder::class);
+
+        $admin = User::query()
+            ->where('email', config('admin.seed.email'))
+            ->firstOrFail();
+        $admin->update(['password' => 'ChangedAdminPassword123']);
+
+        config()->set('admin.seed.password', 'AnotherSeedPassword123');
+        $this->seed(DatabaseSeeder::class);
+
+        $this->assertTrue(Hash::check('ChangedAdminPassword123', $admin->fresh()->password));
+        $this->assertFalse(Hash::check('AnotherSeedPassword123', $admin->fresh()->password));
     }
 
     public function test_participant_cannot_open_admin_area_but_admin_can(): void
