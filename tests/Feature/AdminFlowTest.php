@@ -69,6 +69,7 @@ class AdminFlowTest extends TestCase
         $this->actingAs($admin)
             ->get(route('admin.users.index'))
             ->assertOk()
+            ->assertSee('name="robots" content="noindex, nofollow"', false)
             ->assertSee('ui-table-shell', false)
             ->assertSee('id="create-user"', false)
             ->assertSee('ui-dialog', false)

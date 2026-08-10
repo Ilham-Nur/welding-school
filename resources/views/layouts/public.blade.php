@@ -1,5 +1,14 @@
 @php
     $brand = config('branding');
+    $siteName = 'Alpha Welding Academy';
+    $defaultTitle = $siteName.' | '.$brand['tagline'];
+    $defaultDescription = 'Pelatihan welding profesional dan sertifikasi welder dari '.$brand['company'].'.';
+    $seoTitle = trim($__env->yieldContent('title', $defaultTitle));
+    $seoDescription = trim($__env->yieldContent('description', $defaultDescription));
+    $canonicalUrl = trim($__env->yieldContent('canonical', request()->url()));
+    $robots = trim($__env->yieldContent('robots', 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'));
+    $socialImage = trim($__env->yieldContent('social-image', url('alpha-academy-og.png')));
+    $socialImageAlt = trim($__env->yieldContent('social-image-alt', $siteName.' — '.$brand['tagline']));
 @endphp
 <!doctype html>
 <html lang="id">
@@ -7,19 +16,39 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta name="csrf-token" content="{{ csrf_token() }}">
-        <meta name="description" content="@yield('description', $brand['service'].' '.$brand['name'])">
+        <title>{{ $seoTitle }}</title>
+        <meta name="description" content="{{ $seoDescription }}">
+        <meta name="robots" content="{{ $robots }}">
+        <meta name="author" content="{{ $brand['company'] }}">
+        <meta name="theme-color" content="#071e33">
+
+        <link rel="canonical" href="{{ $canonicalUrl }}">
+        <link rel="alternate" hreflang="id-ID" href="{{ $canonicalUrl }}">
+        <link rel="alternate" hreflang="x-default" href="{{ $canonicalUrl }}">
+
         <meta property="og:type" content="website">
-        <meta property="og:title" content="@yield('title', $brand['name'])">
-        <meta property="og:description" content="@yield('description', $brand['service'].' '.$brand['name'])">
-        <meta property="og:image" content="{{ url('alpha-academy-directory-og.png') }}">
+        <meta property="og:site_name" content="{{ $siteName }}">
+        <meta property="og:locale" content="id_ID">
+        <meta property="og:url" content="{{ $canonicalUrl }}">
+        <meta property="og:title" content="{{ $seoTitle }}">
+        <meta property="og:description" content="{{ $seoDescription }}">
+        <meta property="og:image" content="{{ $socialImage }}">
+        <meta property="og:image:secure_url" content="{{ $socialImage }}">
+        <meta property="og:image:type" content="image/png">
+        <meta property="og:image:width" content="1730">
+        <meta property="og:image:height" content="909">
+        <meta property="og:image:alt" content="{{ $socialImageAlt }}">
+
         <meta name="twitter:card" content="summary_large_image">
-        <meta name="twitter:title" content="@yield('title', $brand['name'])">
-        <meta name="twitter:description" content="@yield('description', $brand['service'].' '.$brand['name'])">
-        <meta name="twitter:image" content="{{ url('alpha-academy-directory-og.png') }}">
-        <title>@yield('title', $brand['name'])</title>
+        <meta name="twitter:title" content="{{ $seoTitle }}">
+        <meta name="twitter:description" content="{{ $seoDescription }}">
+        <meta name="twitter:image" content="{{ $socialImage }}">
+        <meta name="twitter:image:alt" content="{{ $socialImageAlt }}">
+
         <link rel="icon" href="{{ asset('favicon.ico') }}" sizes="any">
         <link rel="stylesheet" href="{{ asset('templates/welding-school/style.css') }}?v={{ filemtime(public_path('templates/welding-school/style.css')) }}">
         <link rel="stylesheet" href="{{ asset('templates/welding-school/components.css') }}?v={{ filemtime(public_path('templates/welding-school/components.css')) }}">
+        @stack('structured-data')
         @stack('styles')
     </head>
     <body class="@yield('body-class')">

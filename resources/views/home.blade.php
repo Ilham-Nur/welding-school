@@ -1,7 +1,80 @@
 @extends('layouts.public')
 
-@section('title', config('branding.name').' Welding School · Kompeten, Tersertifikasi, Siap Kerja')
-@section('description', 'Company profile dan platform pelatihan welding profesional PT. Alpha Teknik Pratama.')
+@section('title', 'Alpha Welding Academy Batam | Pelatihan Welder Bersertifikasi')
+@section('description', 'Pelatihan welding dan sertifikasi welder profesional di Batam dari PT. Alpha Teknik Pratama. Pilih program kompetensi untuk meningkatkan kesiapan kerja.')
+@section('canonical', route('home'))
+@section('social-image-alt', 'Alpha Welding Academy Batam — Kompeten, Tersertifikasi, Siap Kerja')
+
+@push('structured-data')
+    @php
+        $homeUrl = route('home');
+        $organizationId = $homeUrl.'#organization';
+        $websiteId = $homeUrl.'#website';
+        $webpageId = $homeUrl.'#webpage';
+        $primaryImageId = $homeUrl.'#primaryimage';
+        $seoDescription = 'Pelatihan welding dan sertifikasi welder profesional di Batam dari PT. Alpha Teknik Pratama. Pilih program kompetensi untuk meningkatkan kesiapan kerja.';
+        $structuredData = [
+            '@context' => 'https://schema.org',
+            '@graph' => [
+                [
+                    '@type' => 'EducationalOrganization',
+                    '@id' => $organizationId,
+                    'name' => 'Alpha Welding Academy',
+                    'alternateName' => 'Alpha Academy Welding School',
+                    'legalName' => config('branding.company'),
+                    'url' => $homeUrl,
+                    'logo' => [
+                        '@type' => 'ImageObject',
+                        'url' => asset(config('branding.logo')),
+                        'contentUrl' => asset(config('branding.logo')),
+                        'caption' => 'Logo Alpha Welding Academy',
+                    ],
+                    'image' => ['@id' => $primaryImageId],
+                    'description' => $seoDescription,
+                    'slogan' => config('branding.tagline'),
+                    'telephone' => '+62895603502918',
+                    'email' => 'info@alphaacademy.id',
+                    'address' => [
+                        '@type' => 'PostalAddress',
+                        'streetAddress' => 'Komplek PT. Komoko Batam Centre Blok A No. 7',
+                        'addressLocality' => 'Batam',
+                        'addressCountry' => 'ID',
+                    ],
+                ],
+                [
+                    '@type' => 'WebSite',
+                    '@id' => $websiteId,
+                    'url' => $homeUrl,
+                    'name' => 'Alpha Welding Academy',
+                    'alternateName' => 'Alpha Academy Welding School',
+                    'publisher' => ['@id' => $organizationId],
+                    'inLanguage' => 'id-ID',
+                ],
+                [
+                    '@type' => 'ImageObject',
+                    '@id' => $primaryImageId,
+                    'url' => url('alpha-academy-og.png'),
+                    'contentUrl' => url('alpha-academy-og.png'),
+                    'width' => 1730,
+                    'height' => 909,
+                    'caption' => 'Alpha Welding Academy — Kompeten, Tersertifikasi, Siap Kerja',
+                ],
+                [
+                    '@type' => 'WebPage',
+                    '@id' => $webpageId,
+                    'url' => $homeUrl,
+                    'name' => 'Alpha Welding Academy Batam | Pelatihan Welder Bersertifikasi',
+                    'description' => $seoDescription,
+                    'isPartOf' => ['@id' => $websiteId],
+                    'about' => ['@id' => $organizationId],
+                    'primaryImageOfPage' => ['@id' => $primaryImageId],
+                    'inLanguage' => 'id-ID',
+                ],
+            ],
+        ];
+    @endphp
+    <script type="application/ld+json">{!! json_encode($structuredData, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) !!}</script>
+@endpush
 
 @section('content')
     <main id="app" tabindex="-1"></main>

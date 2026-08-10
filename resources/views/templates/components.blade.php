@@ -2,6 +2,7 @@
 
 @section('title', 'Katalog Komponen UI '.config('branding.name'))
 @section('description', 'Katalog komponen Blade untuk pengembangan '.config('branding.name').'.')
+@section('robots', 'noindex, nofollow')
 @section('body-class', 'component-library-page')
 
 @section('content')

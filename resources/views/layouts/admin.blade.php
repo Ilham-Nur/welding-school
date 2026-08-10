@@ -8,6 +8,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta name="csrf-token" content="{{ csrf_token() }}">
         <meta name="description" content="Dashboard administrasi {{ $brand['name'] }}">
+        <meta name="robots" content="noindex, nofollow">
         <title>@yield('title', 'Dashboard Admin') · {{ $brand['name'] }}</title>
         <link rel="icon" href="{{ asset('favicon.ico') }}" sizes="any">
         <link rel="stylesheet" href="{{ asset('templates/welding-school/style.css') }}?v={{ filemtime(public_path('templates/welding-school/style.css')) }}">

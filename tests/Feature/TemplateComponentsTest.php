@@ -23,6 +23,33 @@ class TemplateComponentsTest extends TestCase
         $this->assertFileExists(public_path('logo_alpha.png'));
     }
 
+    public function test_home_page_exposes_search_and_social_metadata(): void
+    {
+        $homeUrl = route('home');
+        $socialImageUrl = url('alpha-academy-og.png');
+
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('<title>Alpha Welding Academy Batam | Pelatihan Welder Bersertifikasi</title>', false)
+            ->assertSee('<link rel="canonical" href="'.$homeUrl.'">', false)
+            ->assertSee('name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"', false)
+            ->assertSee('property="og:site_name" content="Alpha Welding Academy"', false)
+            ->assertSee('property="og:url" content="'.$homeUrl.'"', false)
+            ->assertSee('property="og:image" content="'.$socialImageUrl.'"', false)
+            ->assertSee('name="twitter:card" content="summary_large_image"', false)
+            ->assertSee('type="application/ld+json"', false)
+            ->assertSee('"@type":"EducationalOrganization"', false)
+            ->assertSee('"@type":"WebSite"', false)
+            ->assertDontSee('name="keywords"', false);
+    }
+
+    public function test_internal_component_catalog_is_not_indexable(): void
+    {
+        $this->get('/template/components')
+            ->assertOk()
+            ->assertSee('name="robots" content="noindex, nofollow"', false);
+    }
+
     public function test_local_cloudflare_proxy_generates_https_asset_urls(): void
     {
         $this
