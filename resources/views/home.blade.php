@@ -121,6 +121,7 @@
             'catalog' => [
                 'programs' => $catalog,
             ],
+            'activities' => $activities,
             'verification' => [
                 'pending' => config('auth.email_verification_required', true)
                     && session()->has('pending_verification_user_id'),

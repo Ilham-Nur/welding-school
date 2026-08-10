@@ -57,6 +57,11 @@
                             <span aria-hidden="true"><x-ui.icon name="calendar" /></span><span class="admin-nav-label">Batch Pelatihan</span>
                         </a>
                     @endcan
+                    @can('activities.view')
+                        <a class="{{ request()->routeIs('admin.activities.*') ? 'is-active' : '' }}" href="{{ route('admin.activities.index') }}" data-label="Aktivitas" title="Aktivitas">
+                            <span aria-hidden="true"><x-ui.icon name="file" /></span><span class="admin-nav-label">Aktivitas</span>
+                        </a>
+                    @endcan
 
                     @canany(['users.view', 'roles.view'])
                         <div class="admin-sidebar__label">Akses & pengguna</div>
@@ -76,7 +81,6 @@
                 <div class="admin-sidebar__footer">
                     <span>Mode akses</span>
                     <strong>{{ str_replace('-', ' ', auth()->user()->primaryRoleName()) }}</strong>
-                    <a href="{{ route('home') }}#member-programs">Lihat tampilan peserta →</a>
                 </div>
             </aside>
 

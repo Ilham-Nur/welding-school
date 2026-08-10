@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Activity;
 use App\Models\TrainingProgram;
 use Illuminate\View\View;
 
@@ -42,6 +43,28 @@ class HomeController extends Controller
             ])
             ->values();
 
-        return view('home', compact('catalog'));
+        $activities = Activity::query()
+            ->published()
+            ->orderByDesc('published_at')
+            ->limit(100)
+            ->get()
+            ->map(fn (Activity $activity): array => [
+                'id' => $activity->slug,
+                'category' => $activity->category,
+                'date' => $activity->published_at->translatedFormat('d F Y'),
+                'published_at' => $activity->published_at->toIso8601String(),
+                'title' => $activity->title,
+                'excerpt' => $activity->excerpt,
+                'content' => $activity->content,
+                'featured' => $activity->is_featured,
+                'image' => $activity->imageUrl(),
+                'image_alt' => $activity->image_alt ?: $activity->title,
+                'image_position' => $activity->image_position,
+                'view_count' => $activity->view_count,
+                'view_url' => route('activities.view', $activity),
+            ])
+            ->values();
+
+        return view('home', compact('catalog', 'activities'));
     }
 }

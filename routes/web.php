@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\EmailVerificationController;
 use App\Http\Controllers\Auth\GoogleAuthController;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\ActivityViewController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Participant\InvoiceController as ParticipantInvoiceController;
 use App\Http\Controllers\Participant\ParticipantProfileController;
@@ -14,6 +15,10 @@ use App\Http\Controllers\Webhooks\MidtransWebhookController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', HomeController::class)->name('home');
+
+Route::post('/activities/{activity}/view', ActivityViewController::class)
+    ->middleware('throttle:60,1')
+    ->name('activities.view');
 
 Route::post('/payments/midtrans/webhook', MidtransWebhookController::class)
     ->middleware('throttle:120,1')

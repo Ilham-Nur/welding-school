@@ -27,6 +27,7 @@ erDiagram
     INVOICES ||--o{ PAYMENTS : dicoba
     TRAINING_APPLICATIONS ||--o| ENROLLMENTS : menghasilkan
     USERS ||--o{ ENROLLMENTS : mengikuti
+    USERS ||--o{ ACTIVITIES : menulis
 ```
 
 ## Tanggung jawab tabel
@@ -45,6 +46,7 @@ erDiagram
 | `payments` | Setiap percobaan transaksi pada payment gateway |
 | `payment_webhooks` | Payload callback gateway untuk validasi dan idempotensi |
 | `enrollments` | Hak akses peserta ke dashboard program/batch |
+| `activities` | Konten aktivitas publik, metadata foto, status/jadwal publikasi, unggulan, dan jumlah dilihat |
 
 ## Status yang disarankan
 
@@ -53,6 +55,21 @@ erDiagram
 - `invoices`: `unpaid`, `paid`, `expired`, `cancelled`, `refunded`
 - `payments`: `pending`, `paid`, `failed`, `expired`, `cancelled`, `refunded`
 - `enrollments`: `active`, `completed`, `cancelled`, `suspended`
+- `activities`: `draft`, `published`, `archived`
+
+## Struktur aktivitas publik
+
+| Kolom | Fungsi tampilan |
+| --- | --- |
+| `title`, `slug` | Judul kartu/detail dan identitas aktivitas |
+| `category` | Label dan filter kategori |
+| `excerpt` | Ringkasan pada kartu aktivitas |
+| `content` | Isi paragraf pada halaman detail |
+| `image_path`, `image_alt`, `image_position` | Foto utama, aksesibilitas, dan kompatibilitas posisi; komposisi baru disimpan dalam rasio 16:9 melalui Cropper.js |
+| `status`, `published_at` | Draft, terjadwal, terbit, atau arsip |
+| `is_featured` | Sorotan utama halaman aktivitas; hanya satu aktivitas aktif pada satu waktu |
+| `view_count` | Dasar urutan aktivitas terpopuler |
+| `author_id` | Admin yang membuat aktivitas |
 
 ## Aturan transaksi penting
 
@@ -62,4 +79,5 @@ erDiagram
 - Perubahan invoice menjadi `paid` dan pembuatan enrollment harus dilakukan dalam satu transaksi database.
 - `personal_data_snapshot` menyimpan salinan data saat formulir dikirim agar hasil verifikasi tetap dapat diaudit walaupun profil pengguna diperbarui.
 - File dokumen disimpan di object storage/private storage; database hanya menyimpan metadata dan lokasi file.
+- Foto aktivitas disimpan di public storage; database menyimpan lokasi dan metadata tampilannya.
 - Dashboard peserta hanya dapat dibuka bila tersedia enrollment berstatus `active`.

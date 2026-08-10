@@ -22,8 +22,9 @@ outputs/
 # Dependensi dan hasil build
 /vendor/
 /node_modules/
-/public/build/
+# /public/build/
 /public/hot
+/public/storage
 
 # File runtime Laravel
 /bootstrap/cache/*

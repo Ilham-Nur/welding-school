@@ -34,6 +34,8 @@ class RolePermissionSeeder extends Seeder
             'programs.manage',
             'batches.view',
             'batches.manage',
+            'activities.view',
+            'activities.manage',
         ]);
         $participant->syncPermissions([]);
 

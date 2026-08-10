@@ -14,11 +14,13 @@
         'rejected' => 'Ditolak',
         'pending' => 'Menunggu',
         'valid' => 'Valid',
+        'published' => 'Terbit',
+        'archived' => 'Diarsipkan',
     ];
     $tone = match ($status) {
-        'active', 'open', 'approved', 'completed', 'valid' => 'success',
+        'active', 'open', 'approved', 'completed', 'valid', 'published' => 'success',
         'submitted', 'under_review', 'pending' => 'warning',
-        'inactive', 'closed', 'rejected' => 'danger',
+        'inactive', 'closed', 'rejected', 'archived' => 'danger',
         default => 'neutral',
     };
 @endphp

@@ -19,5 +19,7 @@ return [
         'programs.manage' => 'Mengelola program pelatihan',
         'batches.view' => 'Melihat batch',
         'batches.manage' => 'Mengelola batch',
+        'activities.view' => 'Melihat aktivitas',
+        'activities.manage' => 'Mengelola dan menerbitkan aktivitas',
     ],
 ];

@@ -80,7 +80,18 @@ class AdminFlowTest extends TestCase
             ->assertSee('id="toast-stack"', false)
             ->assertSee('data-admin-sidebar-collapse', false)
             ->assertSee('data-label="User Management"', false)
+            ->assertDontSee('Lihat tampilan peserta')
             ->assertSee('templates/welding-school/components.js');
+
+        $this->get(route('admin.roles.index'))
+            ->assertOk()
+            ->assertSee('Melihat aktivitas')
+            ->assertSee('Mengelola dan menerbitkan aktivitas')
+            ->assertSee('value="activities.view"', false)
+            ->assertSee('value="activities.manage"', false);
+
+        $this->assertTrue($admin->can('activities.view'));
+        $this->assertTrue($admin->can('activities.manage'));
 
         $this->assertIsString($adminStyles);
         $this->assertStringContainsString(

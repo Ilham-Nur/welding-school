@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\ActivityController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\TrainingApplicationController;
 use App\Http\Controllers\Admin\TrainingBatchController;
@@ -65,4 +66,9 @@ Route::prefix('admin')
             ->except(['show'])
             ->middlewareFor(['index'], 'permission:batches.view')
             ->middlewareFor(['create', 'store', 'edit', 'update', 'destroy'], 'permission:batches.manage');
+
+        Route::resource('activities', ActivityController::class)
+            ->except(['show'])
+            ->middlewareFor(['index'], 'permission:activities.view')
+            ->middlewareFor(['create', 'store', 'edit', 'update', 'destroy'], 'permission:activities.manage');
     });
