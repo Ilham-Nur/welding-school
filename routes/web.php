@@ -1,6 +1,9 @@
 <?php
 
 use App\Http\Controllers\ActivityViewController;
+use App\Http\Controllers\AssetInspectionController;
+use App\Http\Controllers\AssetInspectionScanController;
+use App\Http\Controllers\AssetVerificationController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\EmailVerificationController;
 use App\Http\Controllers\Auth\GoogleAuthController;
@@ -26,6 +29,25 @@ Route::get('/reset-password/{token}', HomeController::class)
 Route::post('/activities/{activity}/view', ActivityViewController::class)
     ->middleware('throttle:60,1')
     ->name('activities.view');
+
+Route::get('/assets/verify/{asset:public_id}', AssetVerificationController::class)
+    ->middleware('throttle:60,1')
+    ->name('assets.verify');
+
+Route::get('/assets/verify/{asset:public_id}/calibration-certificate', [AssetVerificationController::class, 'certificate'])
+    ->middleware('throttle:30,1')
+    ->name('assets.calibration-certificate');
+
+Route::middleware(['auth', 'verified.when_required', 'permission:assets.inspect'])->group(function (): void {
+    Route::get('/assets/resolve', AssetInspectionScanController::class)
+        ->middleware('throttle:60,1')
+        ->name('assets.inspections.resolve');
+    Route::get('/assets/inspect/{asset:public_id}', [AssetInspectionController::class, 'create'])
+        ->name('assets.inspections.create');
+    Route::post('/assets/inspect/{asset:public_id}', [AssetInspectionController::class, 'store'])
+        ->middleware('throttle:30,1')
+        ->name('assets.inspections.store');
+});
 
 Route::post('/payments/midtrans/webhook', MidtransWebhookController::class)
     ->middleware('throttle:120,1')

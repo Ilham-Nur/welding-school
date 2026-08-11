@@ -54,6 +54,23 @@
         @case('chevron-down')
             <path d="m6 9 6 6 6-6" />
             @break
+        @case('list')
+            <path d="M8 6h13M8 12h13M8 18h13" />
+            <path d="M3 6h.01M3 12h.01M3 18h.01" />
+            @break
+        @case('scan')
+            <path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3" />
+            <path d="M7 12h10" />
+            @break
+        @case('camera')
+            <path d="M14.5 4 16 7h3a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h3l1.5-3Z" />
+            <circle cx="12" cy="13" r="3.5" />
+            @break
+        @case('image')
+            <rect x="3" y="4" width="18" height="16" rx="2" />
+            <circle cx="8.5" cy="9" r="1.5" />
+            <path d="m4 17 4.5-4.5 3.5 3 2.5-2.5 5.5 5" />
+            @break
         @case('eye')
             <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z" />
             <circle cx="12" cy="12" r="2.5" />
@@ -76,6 +93,17 @@
         @case('upload')
             <path d="M12 16V4M7 9l5-5 5 5" />
             <path d="M5 15v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4" />
+            @break
+        @case('asset')
+            <path d="M4 7.5 12 3l8 4.5-8 4.5Z" />
+            <path d="m4 7.5 8 4.5 8-4.5V16l-8 5-8-5Z" />
+            <path d="M12 12v9" />
+            @break
+        @case('printer')
+            <path d="M6 9V3h12v6" />
+            <rect x="6" y="14" width="12" height="7" rx="1" />
+            <path d="M6 17H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2" />
+            <path d="M18 12h.01" />
             @break
         @case('check-circle')
             <circle cx="12" cy="12" r="9" />

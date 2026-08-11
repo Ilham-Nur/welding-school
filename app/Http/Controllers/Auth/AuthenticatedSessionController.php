@@ -72,6 +72,11 @@ class AuthenticatedSessionController extends Controller
         ]);
         $user->forceFill(['last_login_at' => now()])->save();
 
+        $intendedUrl = $request->session()->pull('url.intended');
+        $redirectTo = is_string($intendedUrl) && Str::startsWith($intendedUrl, url('/'))
+            ? $intendedUrl
+            : ($user->isAdmin() ? route('admin.dashboard') : null);
+
         return response()->json([
             'message' => 'Login berhasil.',
             'user' => [
@@ -83,7 +88,7 @@ class AuthenticatedSessionController extends Controller
                 'is_admin' => $user->isAdmin(),
                 'profile' => $user->participantProfileData(),
             ],
-            'redirect_to' => $user->isAdmin() ? route('admin.dashboard') : null,
+            'redirect_to' => $redirectTo,
         ]);
     }
 

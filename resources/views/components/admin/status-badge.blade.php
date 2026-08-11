@@ -16,11 +16,20 @@
         'valid' => 'Valid',
         'published' => 'Terbit',
         'archived' => 'Diarsipkan',
+        'serviceable' => 'Layak pakai',
+        'calibrated' => 'Terkalibrasi',
+        'calibration_due' => 'Kalibrasi jatuh tempo',
+        'out_of_calibration' => 'Tidak terkalibrasi',
+        'maintenance' => 'Dalam perawatan',
+        'out_of_service' => 'Tidak layak pakai',
+        'under_calibration' => 'Dalam kalibrasi',
+        'retired' => 'Tidak digunakan',
     ];
     $tone = match ($status) {
-        'active', 'open', 'approved', 'completed', 'valid', 'published' => 'success',
-        'submitted', 'under_review', 'pending' => 'warning',
-        'inactive', 'closed', 'rejected', 'archived' => 'danger',
+        'active', 'open', 'approved', 'completed', 'valid', 'published', 'serviceable', 'calibrated' => 'success',
+        'submitted', 'under_review', 'pending', 'calibration_due' => 'warning',
+        'maintenance', 'under_calibration' => 'info',
+        'inactive', 'closed', 'rejected', 'archived', 'out_of_calibration', 'out_of_service' => 'danger',
         default => 'neutral',
     };
 @endphp

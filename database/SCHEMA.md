@@ -47,6 +47,7 @@ erDiagram
 | `payment_webhooks` | Payload callback gateway untuk validasi dan idempotensi |
 | `enrollments` | Hak akses peserta ke dashboard program/batch |
 | `activities` | Konten aktivitas publik, metadata foto, status/jadwal publikasi, unggulan, dan jumlah dilihat |
+| `assets` | Inventaris alat, identitas permanen, foto, kondisi, jadwal inspeksi, dan data kalibrasi |
 
 ## Status yang disarankan
 
@@ -80,4 +81,6 @@ erDiagram
 - `personal_data_snapshot` menyimpan salinan data saat formulir dikirim agar hasil verifikasi tetap dapat diaudit walaupun profil pengguna diperbarui.
 - File dokumen disimpan di object storage/private storage; database hanya menyimpan metadata dan lokasi file.
 - Foto aktivitas disimpan di public storage; database menyimpan lokasi dan metadata tampilannya.
+- Foto aset disimpan di public storage dalam komposisi 4:3; database menyimpan lokasi filenya.
+- File sertifikat kalibrasi aset disimpan di private storage; database menyimpan lokasi, nama asli, tipe, dan ukuran file.
 - Dashboard peserta hanya dapat dibuka bila tersedia enrollment berstatus `active`.

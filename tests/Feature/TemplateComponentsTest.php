@@ -189,7 +189,7 @@ class TemplateComponentsTest extends TestCase
         $response
             ->assertOk()
             ->assertSee('GTAW Welder 6G')
-            ->assertSee('Menampilkan 1–1 dari 1 program');
+            ->assertSee('Menampilkan 1 sampai 1 dari 1 program');
 
         $this->assertSame(1, $response->viewData('programs')->total());
     }

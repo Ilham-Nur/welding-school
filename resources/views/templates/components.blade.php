@@ -255,7 +255,7 @@
                     </x-ui.table>
 
                     <div id="pagination" class="ui-data-card__footer">
-                        <p>Menampilkan {{ $programs->firstItem() ?? 0 }}–{{ $programs->lastItem() ?? 0 }} dari {{ $programs->total() }} program</p>
+                        <p>Menampilkan {{ $programs->firstItem() ?? 0 }} sampai {{ $programs->lastItem() ?? 0 }} dari {{ $programs->total() }} program</p>
                         <x-ui.pagination :paginator="$programs" />
                     </div>
                 </div>

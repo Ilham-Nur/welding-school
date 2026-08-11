@@ -21,5 +21,8 @@ return [
         'batches.manage' => 'Mengelola batch',
         'activities.view' => 'Melihat aktivitas',
         'activities.manage' => 'Mengelola dan menerbitkan aktivitas',
+        'assets.view' => 'Melihat aset dan label aset',
+        'assets.manage' => 'Mengelola data aset',
+        'assets.inspect' => 'Melakukan inspeksi aset',
     ],
 ];

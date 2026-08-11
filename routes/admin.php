@@ -1,7 +1,10 @@
 <?php
 
-use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ActivityController;
+use App\Http\Controllers\Admin\AssetController;
+use App\Http\Controllers\Admin\AssetDashboardController;
+use App\Http\Controllers\Admin\AssetLabelController;
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\TrainingApplicationController;
 use App\Http\Controllers\Admin\TrainingBatchController;
@@ -71,4 +74,21 @@ Route::prefix('admin')
             ->except(['show'])
             ->middlewareFor(['index'], 'permission:activities.view')
             ->middlewareFor(['create', 'store', 'edit', 'update', 'destroy'], 'permission:activities.manage');
+
+        Route::get('/assets/labels', AssetLabelController::class)
+            ->middleware('permission:assets.view')
+            ->name('assets.labels');
+
+        Route::get('/assets/export', [AssetController::class, 'export'])
+            ->middleware('permission:assets.view')
+            ->name('assets.export');
+
+        Route::get('/assets/dashboard', AssetDashboardController::class)
+            ->middleware('permission:assets.view')
+            ->name('assets.dashboard');
+
+        Route::resource('assets', AssetController::class)
+            ->except(['show'])
+            ->middlewareFor(['index'], 'permission:assets.view')
+            ->middlewareFor(['create', 'store', 'edit', 'update', 'destroy'], 'permission:assets.manage');
     });

@@ -141,7 +141,7 @@
                     <dt>Periode pelatihan</dt>
                     <dd>
                         {{ $batch->start_date->translatedFormat('d M Y') }}
-                        – {{ $batch->end_date?->translatedFormat('d M Y') ?? 'Belum ditentukan' }}
+                        sampai {{ $batch->end_date?->translatedFormat('d M Y') ?? 'Belum ditentukan' }}
                     </dd>
                 </div>
                 <div>

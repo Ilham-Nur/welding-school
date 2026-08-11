@@ -42,7 +42,7 @@
                         <dd>
                             {{ $application->trainingBatch?->start_date?->translatedFormat('d M Y') ?? 'Belum tersedia' }}
                             @if ($application->trainingBatch?->end_date)
-                                – {{ $application->trainingBatch->end_date->translatedFormat('d M Y') }}
+                                sampai {{ $application->trainingBatch->end_date->translatedFormat('d M Y') }}
                             @endif
                         </dd>
                     </div>

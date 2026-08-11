@@ -10,7 +10,7 @@
         <meta name="referrer" content="no-referrer">
     @endpush
 @endif
-@section('social-image-alt', 'Alpha Welding Academy Batam — Kompeten, Tersertifikasi, Siap Kerja')
+@section('social-image-alt', 'Alpha Welding Academy Batam, Kompeten, Tersertifikasi, Siap Kerja')
 
 @push('structured-data')
     @php
@@ -64,7 +64,7 @@
                     'contentUrl' => url('alpha-academy-og.png'),
                     'width' => 1730,
                     'height' => 909,
-                    'caption' => 'Alpha Welding Academy — Kompeten, Tersertifikasi, Siap Kerja',
+                    'caption' => 'Alpha Welding Academy, Kompeten, Tersertifikasi, Siap Kerja',
                 ],
                 [
                     '@type' => 'WebPage',

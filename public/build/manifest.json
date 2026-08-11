@@ -1,6 +1,14 @@
 {
+  "__commonjsHelpers-Cpj98o6Y.js": {
+    "file": "assets/_commonjsHelpers-Cpj98o6Y.js",
+    "name": "_commonjsHelpers"
+  },
+  "_cropper.esm.raw-CmZ07mUc.js": {
+    "file": "assets/cropper.esm.raw-CmZ07mUc.js",
+    "name": "cropper.esm.raw"
+  },
   "resources/css/app.css": {
-    "file": "assets/app-CYVkx9ky.css",
+    "file": "assets/app-0PSaDyZt.css",
     "src": "resources/css/app.css",
     "isEntry": true,
     "name": "app",
@@ -9,15 +17,45 @@
     ]
   },
   "resources/js/activity-focus.js": {
-    "file": "assets/activity-focus-DLAJ-EL7.js",
+    "file": "assets/activity-focus-BDK_J7st.js",
     "name": "activity-focus",
     "src": "resources/js/activity-focus.js",
-    "isEntry": true
+    "isEntry": true,
+    "imports": [
+      "_cropper.esm.raw-CmZ07mUc.js"
+    ]
   },
   "resources/js/app.js": {
     "file": "assets/app-CIomGrQN.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true
+  },
+  "resources/js/asset-photo.js": {
+    "file": "assets/asset-photo-BdZzIyzU.js",
+    "name": "asset-photo",
+    "src": "resources/js/asset-photo.js",
+    "isEntry": true,
+    "imports": [
+      "_cropper.esm.raw-CmZ07mUc.js"
+    ]
+  },
+  "resources/js/asset-scanner.js": {
+    "file": "assets/asset-scanner-B2_2Y-Jh.js",
+    "name": "asset-scanner",
+    "src": "resources/js/asset-scanner.js",
+    "isEntry": true,
+    "imports": [
+      "__commonjsHelpers-Cpj98o6Y.js"
+    ]
+  },
+  "resources/js/assets.js": {
+    "file": "assets/assets-DT9bQbco.js",
+    "name": "assets",
+    "src": "resources/js/assets.js",
+    "isEntry": true,
+    "imports": [
+      "__commonjsHelpers-Cpj98o6Y.js"
+    ]
   }
 }

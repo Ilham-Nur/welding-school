@@ -174,7 +174,7 @@
       label: "Batch Agustus 2026",
       start: "10 Agustus 2026",
       end: "21 Agustus 2026",
-      schedule: "Senin–Jumat, 08.00–16.00 WIB",
+      schedule: "Senin sampai Jumat, 08.00 sampai 16.00 WIB",
       location: "Workshop Batam Centre · Area 1",
       seatsLeft: 5,
       recommended: true,
@@ -184,7 +184,7 @@
       label: "Batch September 2026",
       start: "7 September 2026",
       end: "18 September 2026",
-      schedule: "Senin–Jumat, 08.00–16.00 WIB",
+      schedule: "Senin sampai Jumat, 08.00 sampai 16.00 WIB",
       location: "Workshop Batam Centre · Area 2",
       seatsLeft: 9,
     },
@@ -193,7 +193,7 @@
       label: "Batch Weekend September",
       start: "5 September 2026",
       end: "4 Oktober 2026",
-      schedule: "Sabtu–Minggu, 08.00–16.00 WIB",
+      schedule: "Sabtu sampai Minggu, 08.00 sampai 16.00 WIB",
       location: "Workshop Batam Centre · Area 1",
       seatsLeft: 3,
     },
@@ -1443,7 +1443,7 @@
             <dl>
               <div><dt>Durasi</dt><dd>80 Jam</dd></div>
               <div><dt>Praktik</dt><dd>60 Jam</dd></div>
-              <div><dt>Posisi</dt><dd>1G–4G</dd></div>
+              <div><dt>Posisi</dt><dd>1G sampai 4G</dd></div>
             </dl>
             <button data-action="select-program" data-id="smaw" type="button">Lihat detail program <span>→</span></button>
           </aside>
@@ -2765,7 +2765,7 @@
                         ${batch.recommended ? '<span class="badge badge--green">Direkomendasikan</span>' : ""}
                       </div>
                       <dl>
-                        <div><dt>Periode</dt><dd>${batch.start} – ${batch.end}</dd></div>
+                        <div><dt>Periode</dt><dd>${batch.start} sampai ${batch.end}</dd></div>
                         <div><dt>Jadwal</dt><dd>${batch.schedule}</dd></div>
                         <div><dt>Lokasi</dt><dd>${batch.location}</dd></div>
                       </dl>
@@ -3658,7 +3658,7 @@
               ${inputField("Alamat lengkap", "address", data.address, { full: true })}
               ${inputField("Kota / Kabupaten", "city", data.city)}
               ${selectField("Pendidikan terakhir", "education", data.education, ["SMP", "SMA/SMK", "Diploma", "Sarjana"])}
-              ${selectField("Pengalaman welding", "experience", data.experience, ["Belum pernah", "Kurang dari 1 tahun", "1–3 tahun", "Lebih dari 3 tahun"])}
+              ${selectField("Pengalaman welding", "experience", data.experience, ["Belum pernah", "Kurang dari 1 tahun", "1 sampai 3 tahun", "Lebih dari 3 tahun"])}
               <label class="field"><span>Ukuran wearpack *</span><select name="wearpack"><option>M</option><option selected>L</option><option>XL</option><option>XXL</option></select></label>
             </div>
           </div>
@@ -3805,7 +3805,7 @@
             </div>
             <dl class="order-detail-grid">
               <div><dt>Batch</dt><dd>${state.selectedBatch.label}</dd></div>
-              <div><dt>Periode</dt><dd>${state.selectedBatch.start} – ${state.selectedBatch.end}</dd></div>
+              <div><dt>Periode</dt><dd>${state.selectedBatch.start} sampai ${state.selectedBatch.end}</dd></div>
               <div><dt>Jadwal</dt><dd>${state.selectedBatch.schedule}</dd></div>
               <div><dt>Lokasi</dt><dd>${state.selectedBatch.location}</dd></div>
             </dl>

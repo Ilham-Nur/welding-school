@@ -14,6 +14,9 @@
         <link rel="stylesheet" href="{{ asset('templates/welding-school/style.css') }}?v={{ filemtime(public_path('templates/welding-school/style.css')) }}">
         <link rel="stylesheet" href="{{ asset('templates/welding-school/components.css') }}?v={{ filemtime(public_path('templates/welding-school/components.css')) }}">
         <link rel="stylesheet" href="{{ asset('templates/welding-school/admin.css') }}?v={{ filemtime(public_path('templates/welding-school/admin.css')) }}">
+        @can('assets.inspect')
+            <link rel="stylesheet" href="{{ asset('templates/welding-school/assets.css') }}?v={{ filemtime(public_path('templates/welding-school/assets.css')) }}">
+        @endcan
         @stack('styles')
     </head>
     <body class="admin-page">
@@ -62,6 +65,39 @@
                             <span aria-hidden="true"><x-ui.icon name="file" /></span><span class="admin-nav-label">Aktivitas</span>
                         </a>
                     @endcan
+                    @canany(['assets.view', 'assets.inspect'])
+                        @php($assetMenuOpen = request()->routeIs('admin.assets.*', 'assets.inspections.*'))
+                        <div @class(['admin-nav-group', 'is-open' => $assetMenuOpen]) data-admin-nav-group>
+                            <button
+                                type="button"
+                                class="admin-nav-group__toggle {{ $assetMenuOpen ? 'is-active' : '' }}"
+                                data-admin-nav-toggle
+                                aria-expanded="{{ $assetMenuOpen ? 'true' : 'false' }}"
+                                aria-controls="admin-assets-submenu"
+                                data-label="Manajemen Aset"
+                                title="Manajemen Aset"
+                            >
+                                <span aria-hidden="true"><x-ui.icon name="asset" /></span>
+                                <span class="admin-nav-label">Manajemen Aset</span>
+                                <span class="admin-nav-group__chevron" aria-hidden="true"><x-ui.icon name="chevron-down" size="14" /></span>
+                            </button>
+                            <div class="admin-nav-group__items" id="admin-assets-submenu" data-admin-nav-items @if (! $assetMenuOpen) hidden @endif>
+                                @can('assets.view')
+                                    <a class="{{ request()->routeIs('admin.assets.dashboard') ? 'is-active' : '' }}" href="{{ route('admin.assets.dashboard') }}" data-label="Dashboard Aset" title="Dashboard Aset">
+                                        <span aria-hidden="true"><x-ui.icon name="home" size="16" /></span><span class="admin-nav-label">Dashboard Aset</span>
+                                    </a>
+                                    <a class="{{ request()->routeIs('admin.assets.index', 'admin.assets.create', 'admin.assets.edit', 'admin.assets.labels') ? 'is-active' : '' }}" href="{{ route('admin.assets.index') }}" data-label="Daftar Aset" title="Daftar Aset">
+                                        <span aria-hidden="true"><x-ui.icon name="list" size="16" /></span><span class="admin-nav-label">Daftar Aset</span>
+                                    </a>
+                                @endcan
+                                @can('assets.inspect')
+                                    <button class="admin-nav-submenu-button" type="button" data-open-asset-scanner data-label="Inspeksi Aset" title="Inspeksi Aset">
+                                        <span aria-hidden="true"><x-ui.icon name="scan" size="16" /></span><span class="admin-nav-label">Inspeksi Aset</span>
+                                    </button>
+                                @endcan
+                            </div>
+                        </div>
+                    @endcanany
 
                     @canany(['users.view', 'roles.view'])
                         <div class="admin-sidebar__label">Akses & pengguna</div>
@@ -158,9 +194,66 @@
         </div>
 
         <div class="admin-backdrop" data-admin-backdrop hidden></div>
+
+        @can('assets.inspect')
+            <dialog class="asset-scan-dialog" data-asset-scan-dialog aria-labelledby="asset-scan-modal-title">
+                <main
+                    class="asset-scan-shell"
+                    data-asset-scanner
+                    data-inspection-url="{{ route('assets.inspections.create', ['asset' => 'ASSET_PUBLIC_ID']) }}"
+                    data-lookup-url="{{ route('assets.inspections.resolve') }}"
+                >
+                    <header class="asset-scan-brand">
+                        <div class="asset-scan-modal-title">
+                            <span aria-hidden="true"><x-ui.icon name="scan" size="21" /></span>
+                            <div><strong id="asset-scan-modal-title">Inspeksi Aset</strong><small>Scan QR atau masukkan Asset ID</small></div>
+                        </div>
+                        <button type="button" data-close-asset-scanner aria-label="Tutup scanner"><x-ui.icon name="x-circle" size="20" /></button>
+                    </header>
+
+                    <section class="asset-scan-heading">
+                        <span aria-hidden="true"><x-ui.icon name="scan" size="28" /></span>
+                        <div><small>PEMINDAI ASET</small><h1>Scan QR pada label aset</h1><p>Arahkan kamera ke QR yang tertempel pada alat. Checklist akan terbuka otomatis setelah aset dikenali.</p></div>
+                    </section>
+
+                    <section class="asset-scan-camera">
+                        <div id="asset-qr-reader" class="asset-scan-camera__reader"></div>
+                        <div class="asset-scan-camera__placeholder" data-scanner-placeholder>
+                            <span aria-hidden="true"><x-ui.icon name="camera" size="42" /></span>
+                            <strong>Kamera belum aktif</strong>
+                            <p>Tekan tombol di bawah dan izinkan browser menggunakan kamera.</p>
+                        </div>
+                        <div class="asset-scan-target" aria-hidden="true" hidden data-scanner-target><i></i><i></i><i></i><i></i></div>
+                    </section>
+
+                    <div class="asset-scan-status" data-scanner-status aria-live="polite">Siap memindai QR aset.</div>
+
+                    <div class="asset-scan-actions">
+                        <button type="button" class="asset-scan-start" data-scanner-start><x-ui.icon name="camera" size="17" /> Aktifkan kamera</button>
+                        <button type="button" class="asset-scan-stop" data-scanner-stop hidden>Matikan kamera</button>
+                        <label class="asset-scan-file">Pilih foto QR<input type="file" accept="image/*" capture="environment" data-scanner-file></label>
+                    </div>
+
+                    <section class="asset-scan-manual">
+                        <div><h2>Masukkan Asset ID</h2><p>Gunakan pilihan ini jika kamera tidak tersedia atau label sulit dipindai.</p></div>
+                        <div class="asset-inspection-message asset-inspection-message--error" data-scanner-lookup-error hidden></div>
+                        <form data-scanner-manual>
+                            <label for="asset-code-modal">Asset ID</label>
+                            <div><input id="asset-code-modal" name="asset_code" placeholder="AWA-WLD-001" autocomplete="off" required><button type="submit">Buka checklist</button></div>
+                        </form>
+                    </section>
+
+                    <footer>Hanya pengguna dengan izin inspeksi aset yang dapat membuka dan menyimpan checklist.</footer>
+                </main>
+            </dialog>
+        @endcan
+
         <x-ui.toast-stack />
         <script src="{{ asset('templates/welding-school/components.js') }}" defer></script>
         <script src="{{ asset('templates/welding-school/admin.js') }}" defer></script>
+        @can('assets.inspect')
+            @vite('resources/js/asset-scanner.js')
+        @endcan
         @stack('scripts')
     </body>
 </html>

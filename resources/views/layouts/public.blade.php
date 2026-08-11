@@ -8,7 +8,7 @@
     $canonicalUrl = trim($__env->yieldContent('canonical', request()->url()));
     $robots = trim($__env->yieldContent('robots', 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'));
     $socialImage = trim($__env->yieldContent('social-image', url('alpha-academy-og.png')));
-    $socialImageAlt = trim($__env->yieldContent('social-image-alt', $siteName.' — '.$brand['tagline']));
+    $socialImageAlt = trim($__env->yieldContent('social-image-alt', $siteName.', '.$brand['tagline']));
 @endphp
 <!doctype html>
 <html lang="id">
