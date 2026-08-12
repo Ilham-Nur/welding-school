@@ -160,7 +160,33 @@ async function initializeQrLabels() {
     printButton?.addEventListener('click', () => window.print());
 }
 
+function initializeLabelSizePicker() {
+    const picker = document.querySelector('[data-label-size-select]');
+    const sheet = document.querySelector('[data-label-sheet]');
+    const summary = document.querySelector('[data-label-size-summary]');
+
+    if (!picker || !sheet) return;
+
+    const updateSize = () => {
+        const compact = picker.value === 'compact';
+        const sizeLabel = compact ? 'Ringkas 60 x 35 mm' : 'Standar 90 x 55 mm';
+
+        sheet.classList.toggle('asset-label-sheet--compact', compact);
+        sheet.querySelectorAll('.asset-sticker').forEach((sticker) => {
+            sticker.classList.toggle('asset-sticker--compact', compact);
+        });
+        sheet.querySelectorAll('[data-compact-hidden]').forEach((row) => {
+            row.hidden = compact;
+        });
+        if (summary) summary.textContent = sizeLabel;
+    };
+
+    picker.addEventListener('change', updateSize);
+    updateSize();
+}
+
 initializeAssetForm();
 initializeChecklistEditor();
 initializeAssetSelection();
+initializeLabelSizePicker();
 initializeQrLabels();

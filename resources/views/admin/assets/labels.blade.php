@@ -15,14 +15,23 @@
             <div>
                 <a href="{{ route('admin.assets.index') }}">← Kembali ke aset</a>
                 <strong>Pratinjau label aset</strong>
-                <span>{{ $assets->count() }} label · ukuran 90 × 55 mm</span>
+                <span>{{ $assets->count() }} label · <span data-label-size-summary>Standar 90 x 55 mm</span></span>
             </div>
-            <button type="button" data-print-labels disabled>
-                <x-ui.icon name="printer" size="17" /> Cetak label
-            </button>
+            <div class="asset-print-toolbar__actions">
+                <label class="asset-label-size-picker">
+                    <span>Ukuran label</span>
+                    <select data-label-size-select>
+                        <option value="standard">Standar 90 x 55 mm</option>
+                        <option value="compact">Ringkas 60 x 35 mm</option>
+                    </select>
+                </label>
+                <button type="button" data-print-labels disabled>
+                    <x-ui.icon name="printer" size="17" /> Cetak label
+                </button>
+            </div>
         </header>
 
-        <main class="asset-label-sheet" aria-label="Label aset siap cetak">
+        <main class="asset-label-sheet" aria-label="Label aset siap cetak" data-label-sheet>
             @foreach ($assets as $asset)
                 <article @class(['asset-sticker', 'asset-sticker--measuring' => $asset->requires_calibration])>
                     <header class="asset-sticker__header">
@@ -51,7 +60,7 @@
                                     <dt>SERIAL NO</dt>
                                     <dd>{{ $asset->serial_number }}</dd>
                                 </div>
-                                <div>
+                                <div data-compact-hidden>
                                     <dt>CAL. DATE</dt>
                                     <dd>{{ $asset->calibrated_at?->format('d-m-Y') ?? 'Belum diisi' }}</dd>
                                 </div>
@@ -59,7 +68,7 @@
                                     <dt>DUE DATE</dt>
                                     <dd>{{ $asset->calibration_due_at?->format('d-m-Y') ?? 'Belum diisi' }}</dd>
                                 </div>
-                                <div>
+                                <div data-compact-hidden>
                                     <dt>CERT. NO</dt>
                                     <dd>{{ $asset->certificate_number ?? 'Belum diisi' }}</dd>
                                 </div>

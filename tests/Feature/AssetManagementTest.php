@@ -42,6 +42,7 @@ class AssetManagementTest extends TestCase
             ->assertSee('data-asset-photo-cropper', false)
             ->assertSee('name="calibration_certificate"', false)
             ->assertSee('PDF, JPG, JPEG, atau PNG. Maksimal 10 MB.')
+            ->assertDontSee('name="label_size"', false)
             ->assertDontSee('PIC / penanggung jawab')
             ->assertDontSee('id="asset_code"', false);
 
@@ -228,6 +229,36 @@ class AssetManagementTest extends TestCase
             ->assertSee('10-06-2026')
             ->assertSee('10-06-2027')
             ->assertSee('CAL-UT-2026-002');
+    }
+
+    public function test_label_preview_offers_standard_and_compact_print_sizes(): void
+    {
+        $this->post(route('admin.assets.store'), $this->calibratedPayload([
+            'equipment_name' => 'Digital Caliper',
+        ]))->assertRedirect(route('admin.assets.index'));
+
+        $asset = Asset::query()->firstOrFail();
+
+        $this->get(route('admin.assets.labels', ['assets' => [$asset->id]]))
+            ->assertOk()
+            ->assertSee('data-label-size-select', false)
+            ->assertSee('data-label-size-summary', false)
+            ->assertSee('data-label-sheet', false)
+            ->assertSee('Standar 90 x 55 mm')
+            ->assertSee('Ringkas 60 x 35 mm')
+            ->assertSee('Digital Caliper')
+            ->assertSee('SERIAL NO')
+            ->assertSee('DUE DATE')
+            ->assertSee('data-compact-hidden', false)
+            ->assertSee('CAL. DATE')
+            ->assertSee('CERT. NO')
+            ->assertSee(route('assets.verify', ['asset' => $asset->public_id]), false);
+
+        $styles = file_get_contents(public_path('templates/welding-school/assets.css'));
+        $this->assertMatchesRegularExpression(
+            '/\.asset-label-sheet\s*\{[^}]*align-content:\s*start;/s',
+            $styles,
+        );
     }
 
     public function test_active_calibration_asset_requires_complete_and_chronological_data(): void
