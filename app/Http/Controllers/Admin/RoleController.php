@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
@@ -16,15 +17,62 @@ class RoleController extends Controller
 {
     public function index(): View
     {
+        $permissions = Permission::query()->orderBy('name')->get();
+
         return view('admin.roles.index', [
             'roles' => Role::query()
                 ->with('permissions')
                 ->withCount('users')
                 ->orderBy('name')
                 ->get(),
-            'permissions' => Permission::query()->orderBy('name')->get(),
+            'permissions' => $permissions,
+            'permissionGroups' => $this->groupPermissions($permissions),
             'permissionLabels' => config('admin.permission_labels'),
         ]);
+    }
+
+    /**
+     * @param  Collection<int, Permission>  $permissions
+     * @return Collection<int, array{key: string, label: string, description: string, permissions: Collection<int, Permission>}>
+     */
+    private function groupPermissions(Collection $permissions): Collection
+    {
+        $permissionsByName = $permissions->keyBy('name');
+        $groupedNames = collect();
+
+        $groups = collect(config('admin.permission_groups', []))
+            ->map(function (array $group, string $key) use ($permissionsByName, $groupedNames): array {
+                $groupPermissions = collect($group['permissions'] ?? [])
+                    ->map(fn (string $name) => $permissionsByName->get($name))
+                    ->filter()
+                    ->values();
+
+                $groupedNames->push(...$groupPermissions->pluck('name'));
+
+                return [
+                    'key' => $key,
+                    'label' => $group['label'] ?? $key,
+                    'description' => $group['description'] ?? '',
+                    'permissions' => $groupPermissions,
+                ];
+            })
+            ->filter(fn (array $group): bool => $group['permissions']->isNotEmpty())
+            ->values();
+
+        $ungrouped = $permissions
+            ->reject(fn (Permission $permission): bool => $groupedNames->contains($permission->name))
+            ->values();
+
+        if ($ungrouped->isNotEmpty()) {
+            $groups->push([
+                'key' => 'other',
+                'label' => 'Izin lainnya',
+                'description' => 'Izin tambahan yang belum ditempatkan pada kelompok khusus.',
+                'permissions' => $ungrouped,
+            ]);
+        }
+
+        return $groups;
     }
 
     public function store(Request $request): RedirectResponse

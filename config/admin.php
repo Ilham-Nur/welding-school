@@ -25,4 +25,59 @@ return [
         'assets.manage' => 'Mengelola data aset',
         'assets.inspect' => 'Melakukan inspeksi aset',
     ],
+
+    'permission_groups' => [
+        'system' => [
+            'label' => 'Akses internal',
+            'description' => 'Izin dasar untuk masuk ke portal dan dashboard internal.',
+            'permissions' => [
+                'admin.access',
+            ],
+        ],
+        'access' => [
+            'label' => 'Pengguna & role',
+            'description' => 'Pengelolaan akun staf, peserta, role, dan hak akses.',
+            'permissions' => [
+                'users.view',
+                'users.manage',
+                'roles.view',
+                'roles.manage',
+            ],
+        ],
+        'applications' => [
+            'label' => 'Pendaftaran peserta',
+            'description' => 'Peninjauan dan persetujuan pendaftaran pelatihan.',
+            'permissions' => [
+                'applications.view',
+                'applications.approve',
+            ],
+        ],
+        'training' => [
+            'label' => 'Program & pelatihan',
+            'description' => 'Pengelolaan program dan batch pelatihan.',
+            'permissions' => [
+                'programs.view',
+                'programs.manage',
+                'batches.view',
+                'batches.manage',
+            ],
+        ],
+        'content' => [
+            'label' => 'Aktivitas & konten',
+            'description' => 'Pengelolaan kabar dan aktivitas akademi.',
+            'permissions' => [
+                'activities.view',
+                'activities.manage',
+            ],
+        ],
+        'assets' => [
+            'label' => 'Aset & inventaris',
+            'description' => 'Data aset, label, serta proses inspeksi peralatan.',
+            'permissions' => [
+                'assets.view',
+                'assets.manage',
+                'assets.inspect',
+            ],
+        ],
+    ],
 ];

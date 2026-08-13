@@ -16,13 +16,17 @@ class Asset extends Model
 
     public const CATEGORIES = [
         'WLD' => 'Welding Equipment',
-        'MSR' => 'Measuring / Inspection Tools',
+        'MSR' => 'Measurement',
+        'TOL' => 'Tools',
+        'FAC' => 'Facility',
+        'DEV' => 'Device',
+    ];
+
+    private const LEGACY_CATEGORIES = [
         'NDT' => 'NDT Equipment',
-        'TOL' => 'Hand & Power Tools',
         'PPE' => 'Safety Equipment / APD',
         'GAS' => 'Gas Equipment',
         'MAT' => 'Training Supporting Equipment',
-        'FAC' => 'Fasilitas / Workshop Equipment',
     ];
 
     public const CONDITIONS = [
@@ -126,7 +130,9 @@ class Asset extends Model
 
     public function categoryLabel(): string
     {
-        return self::CATEGORIES[$this->category_code] ?? (string) $this->category_code;
+        return self::CATEGORIES[$this->category_code]
+            ?? self::LEGACY_CATEGORIES[$this->category_code]
+            ?? (string) $this->category_code;
     }
 
     public function photoUrl(): ?string

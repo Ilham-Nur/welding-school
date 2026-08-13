@@ -239,7 +239,7 @@
                         <div class="asset-inspection-message asset-inspection-message--error" data-scanner-lookup-error hidden></div>
                         <form data-scanner-manual>
                             <label for="asset-code-modal">Asset ID</label>
-                            <div><input id="asset-code-modal" name="asset_code" placeholder="AWA-WLD-001" autocomplete="off" required><button type="submit">Buka checklist</button></div>
+                            <div><input id="asset-code-modal" name="asset_code" placeholder="ATP-WLD-001" autocomplete="off" required><button type="submit">Buka checklist</button></div>
                         </form>
                     </section>
 

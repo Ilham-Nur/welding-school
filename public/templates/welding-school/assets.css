@@ -605,7 +605,7 @@
   border: 0.4mm solid #6b747b;
   border-radius: 2.5mm;
   box-shadow: 0 1.2mm 2.6mm rgba(7, 27, 50, 0.15);
-  height: 55mm;
+  height: 42mm;
   overflow: hidden;
   page-break-inside: avoid;
   width: 90mm;
@@ -667,13 +667,14 @@
   display: grid;
   gap: 2mm;
   grid-template-columns: minmax(0, 1fr) 25mm;
-  height: 43.1mm;
+  height: 29.7mm;
   padding: 2.2mm 3mm 2.4mm;
 }
 
 .asset-sticker__details {
-  align-self: stretch;
+  align-self: center;
   display: grid;
+  height: 25mm;
   margin: 0;
   min-width: 0;
 }
@@ -689,10 +690,6 @@
 
 .asset-sticker__details > div:last-child {
   border-bottom: 0;
-}
-
-.asset-sticker__details > [data-compact-hidden][hidden] {
-  display: none;
 }
 
 .asset-sticker__details dt,
@@ -749,12 +746,12 @@
 
 .asset-sticker--measuring .asset-sticker__details > div {
   grid-template-columns: 17mm minmax(0, 1fr);
-  min-height: 4.6mm;
+  min-height: 0;
 }
 
 .asset-sticker--measuring:not(.asset-sticker--compact) .asset-sticker__details {
-  align-content: center;
-  grid-auto-rows: 4.6mm;
+  align-content: stretch;
+  grid-template-rows: repeat(6, minmax(0, 1fr));
 }
 
 .asset-sticker--measuring .asset-sticker__details dt {
@@ -767,7 +764,7 @@
 
 .asset-sticker--compact {
   border-radius: 1.8mm;
-  height: 35mm;
+  height: 31mm;
   width: 60mm;
 }
 
@@ -798,19 +795,25 @@
 .asset-sticker--compact .asset-sticker__body {
   gap: 1.2mm;
   grid-template-columns: minmax(0, 1fr) 20mm;
-  height: 26.2mm;
-  padding: 1.2mm 1.5mm 1.4mm;
+  height: 22.2mm;
+  padding: 1.1mm 1.5mm;
 }
 
 .asset-sticker--compact .asset-sticker__details {
   align-content: center;
+  height: 20mm;
 }
 
 .asset-sticker--compact .asset-sticker__details > div,
 .asset-sticker--compact.asset-sticker--measuring .asset-sticker__details > div {
   gap: 0.7mm;
   grid-template-columns: 11.5mm minmax(0, 1fr);
-  min-height: 4.8mm;
+  min-height: 0;
+}
+
+.asset-sticker--compact.asset-sticker--measuring .asset-sticker__details {
+  align-content: stretch;
+  grid-template-rows: repeat(6, minmax(0, 1fr));
 }
 
 .asset-sticker--compact .asset-sticker__details dt,

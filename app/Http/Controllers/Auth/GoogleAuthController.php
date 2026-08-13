@@ -19,7 +19,7 @@ class GoogleAuthController extends Controller
 {
     public function redirect(): RedirectResponse
     {
-        if (!$this->isConfigured()) {
+        if (! $this->isConfigured()) {
             return $this->accountRedirect()
                 ->with('auth_error', 'Login Google belum dikonfigurasi. Tambahkan Client ID dan Client Secret Google.');
         }
@@ -31,7 +31,7 @@ class GoogleAuthController extends Controller
 
     public function callback(Request $request): RedirectResponse
     {
-        if (!$this->isConfigured()) {
+        if (! $this->isConfigured()) {
             return $this->accountRedirect()
                 ->with('auth_error', 'Login Google belum dikonfigurasi.');
         }
@@ -44,7 +44,7 @@ class GoogleAuthController extends Controller
                 throw new DomainException('Google tidak memberikan alamat email.');
             }
 
-            if (!filter_var($googleUser->user['email_verified'] ?? false, FILTER_VALIDATE_BOOL)) {
+            if (! filter_var($googleUser->user['email_verified'] ?? false, FILTER_VALIDATE_BOOL)) {
                 throw new DomainException('Alamat email Google belum terverifikasi.');
             }
 
@@ -56,7 +56,7 @@ class GoogleAuthController extends Controller
 
                 $user = $socialAccount?->user;
 
-                if (!$user) {
+                if (! $user) {
                     $user = User::query()->firstOrCreate(
                         ['email' => $email],
                         [
@@ -70,6 +70,10 @@ class GoogleAuthController extends Controller
 
                 if ($user->status !== 'active') {
                     throw new DomainException('Akun tidak aktif.');
+                }
+
+                if ($user->isInternal()) {
+                    throw new DomainException('Akun internal harus masuk melalui Portal Internal.');
                 }
 
                 $user->socialAccounts()->updateOrCreate(
@@ -98,7 +102,7 @@ class GoogleAuthController extends Controller
             Auth::login($user, true);
             $request->session()->regenerate();
 
-            return redirect($user->isAdmin() ? route('admin.dashboard') : route('home') . '#member-programs')
+            return redirect(route('home').'#member-programs')
                 ->with('auth_status', 'Login dengan Google berhasil.');
         } catch (DomainException $exception) {
             return $this->accountRedirect()->with('auth_error', $exception->getMessage());
@@ -118,6 +122,6 @@ class GoogleAuthController extends Controller
 
     private function accountRedirect(): RedirectResponse
     {
-        return redirect(route('home') . '#account');
+        return redirect(route('home').'#account');
     }
 }

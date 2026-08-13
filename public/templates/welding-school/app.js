@@ -2817,7 +2817,7 @@
           <label class="field field--full"><span>Email atau username</span><input name="login" type="text" value="" placeholder="nama@email.com atau username" autocomplete="username" required></label>
           <label class="field field--full"><span>Password</span><input name="password" type="password" placeholder="Masukkan password" autocomplete="current-password" required></label>
           <div class="auth-options"><label><input name="remember" type="checkbox"> Ingat saya</label><button class="text-link" data-action="forgot-password" type="button">Lupa password?</button></div>
-          <button class="button button--primary button--large button--full" type="submit" data-submit-label="Masuk ke Dashboard">Masuk ke Dashboard <span>→</span></button>
+          <button class="button button--primary button--large button--full" type="submit" data-submit-label="Masuk ke Dashboard Peserta">Masuk ke Dashboard Peserta <span>→</span></button>
         </form>
       `;
     }
@@ -2854,15 +2854,16 @@
         </div>
         <div class="auth-panel">
           <div class="auth-panel__inner">
-            <span class="eyebrow">PORTAL CALON PESERTA</span>
+            <span class="eyebrow">PORTAL PESERTA</span>
             <h1>${state.accountMode === "register" ? "Buat akun baru" : "Selamat datang kembali"}</h1>
-            <p>${state.accountMode === "register" ? "Daftar menggunakan email untuk melihat dan memilih program pelatihan." : "Masuk menggunakan email untuk membuka dashboard Anda."}</p>
+            <p>${state.accountMode === "register" ? "Daftar menggunakan email untuk melihat dan memilih program pelatihan." : "Masuk menggunakan akun peserta untuk membuka dashboard pelatihan Anda."}</p>
             <div class="auth-tabs" role="tablist">
               <button class="${state.accountMode === "register" ? "is-active" : ""}" data-action="account-mode" data-mode="register" type="button">Saya belum punya akun</button>
               <button class="${state.accountMode === "login" ? "is-active" : ""}" data-action="account-mode" data-mode="login" type="button">Saya sudah punya akun</button>
             </div>
             ${accountForm()}
             <div class="secure-caption"><span>◇</span> Informasi Anda disimpan dengan aman dan hanya digunakan untuk proses pelatihan.</div>
+            <div class="portal-switch-link">Bagian dari tim Alpha Academy? <a href="${escapeHtml(backend.routes?.internalLogin || "/admin/login")}">Masuk ke Portal Internal</a></div>
           </div>
         </div>
       </section>

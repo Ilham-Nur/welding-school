@@ -121,6 +121,7 @@
                 'verifyEmail' => route('verification.code.verify'),
                 'resendVerification' => route('verification.code.resend'),
                 'admin' => route('admin.dashboard'),
+                'internalLogin' => route('admin.login'),
                 'applicationCurrent' => route('applications.current'),
                 'applicationStore' => route('applications.store'),
                 'profileCurrent' => route('profile.show'),

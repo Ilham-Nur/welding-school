@@ -15,14 +15,14 @@
             <div>
                 <a href="{{ route('admin.assets.index') }}">← Kembali ke aset</a>
                 <strong>Pratinjau label aset</strong>
-                <span>{{ $assets->count() }} label · <span data-label-size-summary>Standar 90 x 55 mm</span></span>
+                <span>{{ $assets->count() }} label · <span data-label-size-summary>Standar 90 x 42 mm</span></span>
             </div>
             <div class="asset-print-toolbar__actions">
                 <label class="asset-label-size-picker">
                     <span>Ukuran label</span>
                     <select data-label-size-select>
-                        <option value="standard">Standar 90 x 55 mm</option>
-                        <option value="compact">Ringkas 60 x 35 mm</option>
+                        <option value="standard">Standar 90 x 42 mm</option>
+                        <option value="compact">Ringkas 60 x 31 mm</option>
                     </select>
                 </label>
                 <button type="button" data-print-labels disabled>
@@ -60,7 +60,7 @@
                                     <dt>SERIAL NO</dt>
                                     <dd>{{ $asset->serial_number }}</dd>
                                 </div>
-                                <div data-compact-hidden>
+                                <div>
                                     <dt>CAL. DATE</dt>
                                     <dd>{{ $asset->calibrated_at?->format('d-m-Y') ?? 'Belum diisi' }}</dd>
                                 </div>
@@ -68,9 +68,14 @@
                                     <dt>DUE DATE</dt>
                                     <dd>{{ $asset->calibration_due_at?->format('d-m-Y') ?? 'Belum diisi' }}</dd>
                                 </div>
-                                <div data-compact-hidden>
+                                <div>
                                     <dt>CERT. NO</dt>
                                     <dd>{{ $asset->certificate_number ?? 'Belum diisi' }}</dd>
+                                </div>
+                            @else
+                                <div>
+                                    <dt>LOCATION</dt>
+                                    <dd>{{ $asset->location }}</dd>
                                 </div>
                             @endif
                         </dl>

@@ -67,23 +67,12 @@
                         @endif
                     </label>
 
-                    <div class="admin-permissions">
-                        @foreach ($permissions as $permission)
-                            <label class="admin-check">
-                                <input
-                                    name="permissions[]"
-                                    type="checkbox"
-                                    value="{{ $permission->name }}"
-                                    @checked($role->name === 'super-admin' || $role->hasPermissionTo($permission))
-                                    @disabled($role->name === 'super-admin' || ! auth()->user()->can('roles.manage'))
-                                >
-                                <span>
-                                    {{ $permissionLabels[$permission->name] ?? $permission->name }}
-                                    <small>{{ $permission->name }}</small>
-                                </span>
-                            </label>
-                        @endforeach
-                    </div>
+                    @include('admin.roles._permission-groups', [
+                        'selectedPermissions' => $role->name === 'super-admin'
+                            ? $permissions->pluck('name')
+                            : $role->permissions->pluck('name'),
+                        'disabled' => $role->name === 'super-admin' || ! auth()->user()->can('roles.manage'),
+                    ])
 
                     @can('roles.manage')
                         @if ($role->name !== 'super-admin')
@@ -126,13 +115,33 @@
             </dl>
             <div class="admin-modal-permissions">
                 <strong>Izin yang dimiliki</strong>
-                <div class="admin-permission-tags">
-                    @forelse ($role->permissions as $permission)
-                        <span>{{ $permissionLabels[$permission->name] ?? $permission->name }}</span>
-                    @empty
+                @if ($role->name === 'super-admin' || $role->permissions->isNotEmpty())
+                    <div class="admin-permission-detail-groups">
+                        @foreach ($permissionGroups as $group)
+                            @php
+                                $groupPermissions = $role->name === 'super-admin'
+                                    ? $group['permissions']
+                                    : $group['permissions']->filter(
+                                        fn ($permission) => $role->permissions->contains('name', $permission->name),
+                                    );
+                            @endphp
+                            @if ($groupPermissions->isNotEmpty())
+                                <section>
+                                    <h3>{{ $group['label'] }}</h3>
+                                    <div class="admin-permission-tags">
+                                        @foreach ($groupPermissions as $permission)
+                                            <span>{{ $permissionLabels[$permission->name] ?? $permission->name }}</span>
+                                        @endforeach
+                                    </div>
+                                </section>
+                            @endif
+                        @endforeach
+                    </div>
+                @else
+                    <div class="admin-permission-tags">
                         <small>Role ini belum memiliki izin.</small>
-                    @endforelse
-                </div>
+                    </div>
+                @endif
             </div>
             <x-slot:footer>
                 <button class="button button--outline admin-button" type="button" data-modal-close>Tutup</button>
@@ -161,16 +170,11 @@
                     <input name="name" placeholder="contoh: verifier" pattern="[a-z0-9-]+" required>
                     <small>Gunakan huruf kecil dan tanda hubung, tanpa spasi.</small>
                 </label>
-                <div class="admin-permissions" style="margin-top: 16px">
-                    @foreach ($permissions as $permission)
-                        <label class="admin-check">
-                            <input name="permissions[]" type="checkbox" value="{{ $permission->name }}">
-                            <span>
-                                {{ $permissionLabels[$permission->name] ?? $permission->name }}
-                                <small>{{ $permission->name }}</small>
-                            </span>
-                        </label>
-                    @endforeach
+                <div style="margin-top: 16px">
+                    @include('admin.roles._permission-groups', [
+                        'selectedPermissions' => collect(old('permissions', [])),
+                        'disabled' => false,
+                    ])
                 </div>
                 <div class="admin-form-actions">
                     <button class="button button--outline admin-button" type="button" data-modal-close>Batal</button>

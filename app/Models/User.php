@@ -65,7 +65,12 @@ class User extends Authenticatable implements MustVerifyEmailContract
 
     public function isAdmin(): bool
     {
-        return $this->hasAnyRole(['super-admin', 'admin']);
+        return $this->isInternal();
+    }
+
+    public function isInternal(): bool
+    {
+        return $this->can('admin.access');
     }
 
     public function participantProfile(): HasOne

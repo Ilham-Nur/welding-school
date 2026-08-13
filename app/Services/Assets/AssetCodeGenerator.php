@@ -36,7 +36,7 @@ class AssetCodeGenerator
                     'updated_at' => now(),
                 ]);
 
-            return sprintf('AWA-%s-%03d', $categoryCode, $nextNumber);
+            return sprintf('ATP-%s-%03d', $categoryCode, $nextNumber);
         }, 5);
     }
 }

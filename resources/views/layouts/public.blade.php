@@ -112,6 +112,7 @@
                     <strong>Terhubung</strong>
                     <a href="{{ route('home') }}#welders" data-action="go-public-page" data-target="welders">Daftar Alumni</a>
                     <a href="{{ route('home') }}#recruiter-account" data-action="go-public-page" data-target="recruiter-account">Login Recruiter</a>
+                    <a href="{{ route('admin.login') }}">Login Internal</a>
                     <a href="{{ route('home') }}#certificate" data-action="go-public-page" data-target="certificate">Verifikasi Sertifikat</a>
                 </div>
                 <div>

@@ -11,7 +11,7 @@ function initializeAssetForm() {
     if (!form || !calibrationSelect || !statusSelect || !calibrationFields) return;
 
     const updateIdPreview = () => {
-        if (categorySelect && idPreview) idPreview.textContent = `AWA-${categorySelect.value}-###`;
+        if (categorySelect && idPreview) idPreview.textContent = `ATP-${categorySelect.value}-###`;
     };
 
     const updateCalibrationFields = () => {
@@ -169,14 +169,11 @@ function initializeLabelSizePicker() {
 
     const updateSize = () => {
         const compact = picker.value === 'compact';
-        const sizeLabel = compact ? 'Ringkas 60 x 35 mm' : 'Standar 90 x 55 mm';
+        const sizeLabel = compact ? 'Ringkas 60 x 31 mm' : 'Standar 90 x 42 mm';
 
         sheet.classList.toggle('asset-label-sheet--compact', compact);
         sheet.querySelectorAll('.asset-sticker').forEach((sticker) => {
             sticker.classList.toggle('asset-sticker--compact', compact);
-        });
-        sheet.querySelectorAll('[data-compact-hidden]').forEach((row) => {
-            row.hidden = compact;
         });
         if (summary) summary.textContent = sizeLabel;
     };

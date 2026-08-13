@@ -31,14 +31,20 @@ Menjalankan seeder kembali tidak akan mereset password admin yang sudah aktif.
 
 ## Login dan pendaftaran
 
-Form pada `/#account` sudah terhubung ke autentikasi Laravel:
+Autentikasi dipisahkan berdasarkan jenis pengguna:
+
+- Portal Peserta tersedia di `/login` dan diarahkan ke `/#account`;
+- Portal Internal untuk instruktur, admin, storeman, keuangan, dan role staf lain tersedia di `/admin/login`;
+- akun internal harus memiliki permission `admin.access`, sedangkan menu dan tindakan setelah login mengikuti permission masing-masing role.
+
+Portal Peserta sudah terhubung ke autentikasi Laravel dan mendukung:
 
 - daftar menggunakan nama, email, dan password;
 - login menggunakan email atau username dan password;
 - opsi ingat saya;
 - reset password melalui tautan sekali pakai yang dikirim ke email;
 - logout yang menghapus sesi;
-- login atau daftar menggunakan akun Google.
+- login atau daftar menggunakan akun Google khusus peserta.
 
 Password minimal 8 karakter dan harus berisi huruf serta angka. Pesan login
 yang gagal dibuat umum agar tidak membocorkan apakah sebuah email terdaftar.

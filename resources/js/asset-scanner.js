@@ -65,7 +65,7 @@ if (root && dialog instanceof HTMLDialogElement) {
 
     const findScannedAsset = (value) => {
         const text = value.trim();
-        const assetCode = text.match(/^AWA-[A-Z]{3}-\d{3,}$/i)?.[0];
+        const assetCode = text.match(/^ATP-[A-Z]{3}-\d{3,}$/i)?.[0];
         if (assetCode) return {type: 'asset_code', value: assetCode.toUpperCase()};
 
         try {

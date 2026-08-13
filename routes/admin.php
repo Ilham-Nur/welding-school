@@ -10,11 +10,20 @@ use App\Http\Controllers\Admin\TrainingApplicationController;
 use App\Http\Controllers\Admin\TrainingBatchController;
 use App\Http\Controllers\Admin\TrainingProgramController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use Illuminate\Support\Facades\Route;
+
+Route::middleware(['guest', 'cache.headers:no_store'])->group(function (): void {
+    Route::view('/admin/login', 'auth.internal-login')
+        ->name('admin.login');
+    Route::post('/admin/login', [AuthenticatedSessionController::class, 'storeInternal'])
+        ->middleware('throttle:6,1')
+        ->name('admin.login.store');
+});
 
 Route::prefix('admin')
     ->name('admin.')
-    ->middleware(['auth', 'verified', 'role:super-admin|admin', 'permission:admin.access'])
+    ->middleware(['auth', 'verified', 'permission:admin.access'])
     ->group(function (): void {
         Route::get('/', DashboardController::class)->name('dashboard');
 

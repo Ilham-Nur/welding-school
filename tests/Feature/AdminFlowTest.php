@@ -101,6 +101,16 @@ class AdminFlowTest extends TestCase
 
         $this->get(route('admin.roles.index'))
             ->assertOk()
+            ->assertSeeInOrder([
+                'Akses internal',
+                'Pengguna &amp; role',
+                'Pendaftaran peserta',
+                'Program &amp; pelatihan',
+                'Aktivitas &amp; konten',
+                'Aset &amp; inventaris',
+            ], false)
+            ->assertSee('data-permission-group="system"', false)
+            ->assertSee('data-permission-group="assets"', false)
             ->assertSee('Melihat aktivitas')
             ->assertSee('Mengelola dan menerbitkan aktivitas')
             ->assertSee('value="activities.view"', false)

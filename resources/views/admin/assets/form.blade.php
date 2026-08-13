@@ -39,7 +39,7 @@
                 <div class="admin-panel__body">
                     <div class="admin-asset-id-preview">
                         <span>ASSET ID</span>
-                        <strong data-asset-id-preview>{{ $editing ? $asset->asset_code : 'AWA-'.$selectedCategory.'-###' }}</strong>
+                        <strong data-asset-id-preview>{{ $editing ? $asset->asset_code : 'ATP-'.$selectedCategory.'-###' }}</strong>
                         <small>{{ $editing ? 'Identitas permanen aset ini.' : 'Nomor urut final dibuat otomatis saat data disimpan.' }}</small>
                     </div>
 
@@ -224,7 +224,7 @@
                                 <option value="0" @selected($requiresCalibration === '0')>Tidak, gunakan label aset umum</option>
                                 <option value="1" @selected($requiresCalibration === '1')>Ya, gunakan label kalibrasi</option>
                             </select>
-                            <small>Kategori tidak menentukan kalibrasi. Alat NDT, GAS, atau kategori lain tetap dapat diwajibkan kalibrasi.</small>
+                            <small>Kategori tidak menentukan kalibrasi. Setiap aset tetap dapat diwajibkan kalibrasi sesuai kebutuhannya.</small>
                         </label>
                     </div>
                 </div>

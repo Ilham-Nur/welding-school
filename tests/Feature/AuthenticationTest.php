@@ -6,6 +6,7 @@ use App\Models\EmailVerificationCode;
 use App\Models\User;
 use App\Notifications\EmailVerificationCodeNotification;
 use App\Notifications\ResetPasswordNotification;
+use Database\Seeders\RolePermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -13,11 +14,73 @@ use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Password;
 use Laravel\Socialite\Facades\Socialite;
 use Laravel\Socialite\Two\User as SocialiteUser;
+use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
 class AuthenticationTest extends TestCase
 {
     use RefreshDatabase;
+
+    public function test_participant_and_internal_login_portals_are_separate(): void
+    {
+        $this->seed(RolePermissionSeeder::class);
+
+        $participant = User::factory()->create([
+            'email' => 'peserta@example.com',
+            'password' => 'Welding123',
+            'status' => 'active',
+        ]);
+        $participant->assignRole('participant');
+
+        $internalRole = Role::create(['name' => 'instructor', 'guard_name' => 'web']);
+        $internalRole->givePermissionTo(['admin.access', 'applications.view']);
+        $instructor = User::factory()->create([
+            'email' => 'instruktur@example.com',
+            'password' => 'Welding123',
+            'status' => 'active',
+        ]);
+        $instructor->assignRole($internalRole);
+
+        $this->get(route('admin.login'))
+            ->assertOk()
+            ->assertSee('Login Portal Internal')
+            ->assertSee('Masuk ke Portal Peserta');
+
+        $this->postJson(route('login.store'), [
+            'login' => $instructor->email,
+            'password' => 'Welding123',
+        ])->assertUnprocessable()
+            ->assertJsonValidationErrors('login');
+        $this->assertGuest();
+
+        $this->from(route('admin.login'))
+            ->post(route('admin.login.store'), [
+                'login' => $participant->email,
+                'password' => 'Welding123',
+            ])
+            ->assertRedirect(route('admin.login'))
+            ->assertSessionHasErrors('login');
+        $this->assertGuest();
+
+        $this->post(route('admin.login.store'), [
+            'login' => $instructor->email,
+            'password' => 'Welding123',
+            'remember' => true,
+        ])->assertRedirect(route('admin.dashboard'));
+
+        $this->assertAuthenticatedAs($instructor);
+        $this->get(route('admin.dashboard'))->assertOk();
+
+        $this->post(route('logout'))
+            ->assertRedirect(route('admin.login'));
+        $this->assertGuest();
+    }
+
+    public function test_admin_guest_is_redirected_to_internal_login(): void
+    {
+        $this->get(route('admin.dashboard'))
+            ->assertRedirect(route('admin.login'));
+    }
 
     public function test_participant_can_register_with_email_and_password(): void
     {

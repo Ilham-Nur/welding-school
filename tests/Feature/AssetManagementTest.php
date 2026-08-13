@@ -32,7 +32,14 @@ class AssetManagementTest extends TestCase
     {
         $this->get(route('admin.assets.create'))
             ->assertOk()
-            ->assertSee('AWA-WLD-###')
+            ->assertSee('ATP-WLD-###')
+            ->assertSee('WLD | Welding Equipment')
+            ->assertSee('MSR | Measurement')
+            ->assertSee('TOL | Tools')
+            ->assertSee('FAC | Facility')
+            ->assertSee('DEV | Device')
+            ->assertDontSee('NDT | NDT Equipment')
+            ->assertDontSee('PPE | Safety Equipment / APD')
             ->assertSee('Generate Asset ID &amp; simpan', false)
             ->assertSee('Daftar pemeriksaan')
             ->assertSee('Setiap 2 bulan')
@@ -59,10 +66,10 @@ class AssetManagementTest extends TestCase
         ]))->assertRedirect(route('admin.assets.index'));
 
         $this->assertSame(
-            ['AWA-MSR-001', 'AWA-WLD-001', 'AWA-WLD-002'],
+            ['ATP-MSR-001', 'ATP-WLD-001', 'ATP-WLD-002'],
             Asset::query()->orderBy('asset_code')->pluck('asset_code')->all(),
         );
-        $this->assertSame(2, Asset::query()->where('asset_code', 'AWA-WLD-001')->firstOrFail()->checklistItems()->count());
+        $this->assertSame(2, Asset::query()->where('asset_code', 'ATP-WLD-001')->firstOrFail()->checklistItems()->count());
     }
 
     public function test_asset_photo_can_be_uploaded_replaced_displayed_and_deleted(): void
@@ -191,18 +198,18 @@ class AssetManagementTest extends TestCase
 
         $asset = Asset::query()->firstOrFail();
 
-        $this->assertSame('AWA-WLD-001', $asset->asset_code);
+        $this->assertSame('ATP-WLD-001', $asset->asset_code);
         $this->assertSame('WLD', $asset->category_code);
         $this->assertNotEmpty($asset->public_id);
         $this->assertSame($this->admin->id, $asset->created_by);
 
         $this->get(route('admin.assets.labels', ['assets' => [$asset->id]]))
             ->assertOk()
-            ->assertSee('AWA-WLD-001')
+            ->assertSee('ATP-WLD-001')
             ->assertSee('SMAW Welding Machine')
-            ->assertDontSee('Workshop Welding Bay 01')
+            ->assertSee('Workshop Welding Bay 01')
             ->assertDontSee('SERVICEABLE')
-            ->assertDontSee('<dt>LOCATION</dt>', false)
+            ->assertSee('<dt>LOCATION</dt>', false)
             ->assertDontSee('<dt>STATUS</dt>', false)
             ->assertSee('logo_alpha.png')
             ->assertSee('asset-sticker__header-background')
@@ -217,7 +224,7 @@ class AssetManagementTest extends TestCase
 
         $asset = Asset::query()->firstOrFail();
 
-        $this->assertSame('AWA-NDT-001', $asset->asset_code);
+        $this->assertSame('ATP-DEV-001', $asset->asset_code);
         $this->assertTrue($asset->requires_calibration);
         $this->assertSame('valid', $asset->calibrationStatus());
 
@@ -226,6 +233,7 @@ class AssetManagementTest extends TestCase
             ->assertSee('UT Flaw Detector')
             ->assertDontSee('CALIBRATED')
             ->assertDontSee('<dt>STATUS</dt>', false)
+            ->assertDontSee('<dt>LOCATION</dt>', false)
             ->assertSee('10-06-2026')
             ->assertSee('10-06-2027')
             ->assertSee('CAL-UT-2026-002');
@@ -244,12 +252,11 @@ class AssetManagementTest extends TestCase
             ->assertSee('data-label-size-select', false)
             ->assertSee('data-label-size-summary', false)
             ->assertSee('data-label-sheet', false)
-            ->assertSee('Standar 90 x 55 mm')
-            ->assertSee('Ringkas 60 x 35 mm')
+            ->assertSee('Standar 90 x 42 mm')
+            ->assertSee('Ringkas 60 x 31 mm')
             ->assertSee('Digital Caliper')
             ->assertSee('SERIAL NO')
             ->assertSee('DUE DATE')
-            ->assertSee('data-compact-hidden', false)
             ->assertSee('CAL. DATE')
             ->assertSee('CERT. NO')
             ->assertSee(route('assets.verify', ['asset' => $asset->public_id]), false);
@@ -257,6 +264,10 @@ class AssetManagementTest extends TestCase
         $styles = file_get_contents(public_path('templates/welding-school/assets.css'));
         $this->assertMatchesRegularExpression(
             '/\.asset-label-sheet\s*\{[^}]*align-content:\s*start;/s',
+            $styles,
+        );
+        $this->assertMatchesRegularExpression(
+            '/\.asset-sticker--measuring:not\(\.asset-sticker--compact\) \.asset-sticker__details\s*\{[^}]*align-content:\s*stretch;[^}]*grid-template-rows:\s*repeat\(6, minmax\(0, 1fr\)\);/s',
             $styles,
         );
     }
@@ -319,7 +330,7 @@ class AssetManagementTest extends TestCase
         $this->get(route('assets.verify', ['asset' => $asset->public_id]))
             ->assertOk()
             ->assertSee('ASET TERVERIFIKASI')
-            ->assertSee('AWA-WLD-001')
+            ->assertSee('ATP-WLD-001')
             ->assertSee('Lincoln Electric')
             ->assertSee('Invertec V270-S')
             ->assertSee('Workshop Welding Bay 01')
@@ -335,7 +346,7 @@ class AssetManagementTest extends TestCase
     {
         $asset = Asset::query()->create([
             ...$this->directAssetData(),
-            'asset_code' => 'AWA-MSR-001',
+            'asset_code' => 'ATP-MSR-001',
             'category_code' => 'MSR',
             'equipment_name' => 'Welding Gauge',
             'requires_calibration' => true,
@@ -369,7 +380,7 @@ class AssetManagementTest extends TestCase
 
         $this->get(route('assets.verify', ['asset' => $asset->public_id]))
             ->assertOk()
-            ->assertSee('AWA-WLD-001')
+            ->assertSee('ATP-WLD-001')
             ->assertDontSee('QR ini menampilkan identitas dan status alat.')
             ->assertDontSee('asset-inspection-form', false);
 
@@ -419,7 +430,7 @@ class AssetManagementTest extends TestCase
             ->assertSee('Aktifkan kamera')
             ->assertSee('Masukkan Asset ID');
 
-        $this->getJson(route('assets.inspections.resolve', ['asset_code' => 'awa-wld-001']))
+        $this->getJson(route('assets.inspections.resolve', ['asset_code' => 'atp-wld-001']))
             ->assertOk()
             ->assertJson([
                 'inspection_url' => route('assets.inspections.create', ['asset' => $asset->public_id]),
@@ -432,7 +443,7 @@ class AssetManagementTest extends TestCase
 
     public function test_scanner_modal_api_shows_error_for_unknown_asset_id(): void
     {
-        $this->getJson(route('assets.inspections.resolve', ['asset_code' => 'AWA-WLD-999']))
+        $this->getJson(route('assets.inspections.resolve', ['asset_code' => 'ATP-WLD-999']))
             ->assertNotFound()
             ->assertJson([
                 'message' => 'Asset ID tidak ditemukan. Periksa kembali nomor pada label aset.',
@@ -468,10 +479,10 @@ class AssetManagementTest extends TestCase
             $stylesXml = $archive['xl/styles.xml']->getContent();
 
             $this->assertStringContainsString('DAFTAR ASET ALPHA WELDING ACADEMY', $sheetXml);
-            $this->assertStringContainsString('AWA-MSR-001', $sheetXml);
+            $this->assertStringContainsString('ATP-MSR-001', $sheetXml);
             $this->assertStringContainsString('Digital Caliper', $sheetXml);
             $this->assertStringContainsString('Kategori: MSR', $sheetXml);
-            $this->assertStringNotContainsString('AWA-WLD-001', $sheetXml);
+            $this->assertStringNotContainsString('ATP-WLD-001', $sheetXml);
             $this->assertStringContainsString('autoFilter ref="A6:W7"', $sheetXml);
             $this->assertStringContainsString('formatCode="dd mmm yyyy"', $stylesXml);
         } finally {
@@ -531,7 +542,7 @@ class AssetManagementTest extends TestCase
             ->get(route('assets.inspections.create', ['asset' => $asset->public_id]))
             ->assertForbidden();
 
-        $this->getJson(route('assets.inspections.resolve', ['asset_code' => 'AWA-WLD-001']))
+        $this->getJson(route('assets.inspections.resolve', ['asset_code' => 'ATP-WLD-001']))
             ->assertForbidden();
 
         $this->post(route('assets.inspections.store', ['asset' => $asset->public_id]), [])
@@ -544,15 +555,15 @@ class AssetManagementTest extends TestCase
         $asset = Asset::query()->firstOrFail();
 
         $this->put(route('admin.assets.update', $asset), $this->assetPayload([
-            'asset_code' => 'AWA-PPE-999',
-            'category_code' => 'PPE',
+            'asset_code' => 'ATP-DEV-999',
+            'category_code' => 'DEV',
             'equipment_name' => 'SMAW Welding Machine Updated',
             'location' => 'Workshop Welding Bay 03',
             'status' => 'maintenance',
         ]))->assertRedirect(route('admin.assets.index'));
 
         $asset->refresh();
-        $this->assertSame('AWA-WLD-001', $asset->asset_code);
+        $this->assertSame('ATP-WLD-001', $asset->asset_code);
         $this->assertSame('WLD', $asset->category_code);
         $this->assertSame('Workshop Welding Bay 03', $asset->location);
 
@@ -563,8 +574,8 @@ class AssetManagementTest extends TestCase
             'serial_number' => 'REPLACEMENT-002',
         ]));
 
-        $this->assertDatabaseHas('assets', ['asset_code' => 'AWA-WLD-002']);
-        $this->assertDatabaseMissing('assets', ['asset_code' => 'AWA-WLD-001']);
+        $this->assertDatabaseHas('assets', ['asset_code' => 'ATP-WLD-002']);
+        $this->assertDatabaseMissing('assets', ['asset_code' => 'ATP-WLD-001']);
     }
 
     public function test_participant_cannot_access_asset_administration(): void
@@ -605,7 +616,7 @@ class AssetManagementTest extends TestCase
     private function calibratedPayload(array $overrides = []): array
     {
         return $this->assetPayload(array_replace([
-            'category_code' => 'NDT',
+            'category_code' => 'DEV',
             'equipment_name' => 'UT Flaw Detector',
             'brand' => 'Olympus',
             'model' => 'EPOCH 650',
