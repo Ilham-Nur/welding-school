@@ -270,6 +270,10 @@ class AssetManagementTest extends TestCase
             '/\.asset-sticker--measuring:not\(\.asset-sticker--compact\) \.asset-sticker__details\s*\{[^}]*align-content:\s*stretch;[^}]*grid-template-rows:\s*repeat\(6, minmax\(0, 1fr\)\);/s',
             $styles,
         );
+        $this->assertMatchesRegularExpression(
+            '/\.asset-sticker--compact:not\(\.asset-sticker--measuring\) \.asset-sticker__details\s*\{[^}]*align-content:\s*stretch;[^}]*grid-template-rows:\s*repeat\(3, minmax\(0, 1fr\)\);/s',
+            $styles,
+        );
     }
 
     public function test_active_calibration_asset_requires_complete_and_chronological_data(): void
