@@ -12,6 +12,8 @@ export default defineConfig({
                 'resources/js/assets.js',
                 'resources/js/asset-photo.js',
                 'resources/js/asset-scanner.js',
+                'resources/js/storage.js',
+                'resources/js/locations.js',
             ],
             refresh: true,
         }),

@@ -123,6 +123,11 @@ class User extends Authenticatable implements MustVerifyEmailContract
         return $this->hasMany(TrainingApplication::class);
     }
 
+    public function assetLoans(): HasMany
+    {
+        return $this->hasMany(AssetExternalLoan::class, 'borrower_user_id');
+    }
+
     public function invoices(): HasMany
     {
         return $this->hasMany(Invoice::class);

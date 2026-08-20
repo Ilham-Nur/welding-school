@@ -99,17 +99,68 @@
                         </div>
                     @endcanany
 
-                    @canany(['users.view', 'roles.view'])
-                        <div class="admin-sidebar__label">Akses & pengguna</div>
+                    @canany(['storage.view', 'storage.items.manage', 'storage.transactions.manage', 'storage.loans.manage', 'storage.stocktakes.manage', 'storage.reports.view'])
+                        @php($storageMenuOpen = request()->routeIs('admin.storage.*', 'admin.storage-items.*'))
+                        <div @class(['admin-nav-group', 'is-open' => $storageMenuOpen]) data-admin-nav-group>
+                            <button
+                                type="button"
+                                class="admin-nav-group__toggle {{ $storageMenuOpen ? 'is-active' : '' }}"
+                                data-admin-nav-toggle
+                                aria-expanded="{{ $storageMenuOpen ? 'true' : 'false' }}"
+                                aria-controls="admin-storage-submenu"
+                                data-label="Storage"
+                                title="Storage"
+                            >
+                                <span aria-hidden="true"><x-ui.icon name="storage" /></span>
+                                <span class="admin-nav-label">Storage</span>
+                                <span class="admin-nav-group__chevron" aria-hidden="true"><x-ui.icon name="chevron-down" size="14" /></span>
+                            </button>
+                            <div class="admin-nav-group__items" id="admin-storage-submenu" data-admin-nav-items @if (! $storageMenuOpen) hidden @endif>
+                                @can('storage.view')
+                                    <a class="{{ request()->routeIs('admin.storage.dashboard') ? 'is-active' : '' }}" href="{{ route('admin.storage.dashboard') }}" data-label="Dashboard Storage" title="Dashboard Storage">
+                                        <span aria-hidden="true"><x-ui.icon name="home" size="16" /></span><span class="admin-nav-label">Dashboard</span>
+                                    </a>
+                                    <a class="{{ request()->routeIs('admin.storage-items.*') ? 'is-active' : '' }}" href="{{ route('admin.storage-items.index') }}" data-label="Stok Consumable" title="Stok Consumable">
+                                        <span aria-hidden="true"><x-ui.icon name="list" size="16" /></span><span class="admin-nav-label">Stok Consumable</span>
+                                    </a>
+                                    <a class="{{ request()->routeIs('admin.storage.receipts.*') ? 'is-active' : '' }}" href="{{ route('admin.storage.receipts.index') }}" data-label="Penerimaan Barang" title="Penerimaan Barang">
+                                        <span aria-hidden="true"><x-ui.icon name="upload" size="16" /></span><span class="admin-nav-label">Penerimaan Barang</span>
+                                    </a>
+                                    <a class="{{ request()->routeIs('admin.storage.issues.*') ? 'is-active' : '' }}" href="{{ route('admin.storage.issues.index') }}" data-label="Pengeluaran Barang" title="Pengeluaran Barang">
+                                        <span aria-hidden="true"><x-ui.icon name="download" size="16" /></span><span class="admin-nav-label">Pengeluaran Barang</span>
+                                    </a>
+                                    <a class="{{ request()->routeIs('admin.storage.loans.*') ? 'is-active' : '' }}" href="{{ route('admin.storage.loans.index') }}" data-label="Pinjaman Keluar" title="Pinjaman Keluar">
+                                        <span aria-hidden="true"><x-ui.icon name="asset" size="16" /></span><span class="admin-nav-label">Pinjaman Keluar</span>
+                                    </a>
+                                    <a class="{{ request()->routeIs('admin.storage.opnames.*') ? 'is-active' : '' }}" href="{{ route('admin.storage.opnames.index') }}" data-label="Stock Opname" title="Stock Opname">
+                                        <span aria-hidden="true"><x-ui.icon name="clipboard-check" size="16" /></span><span class="admin-nav-label">Stock Opname</span>
+                                    </a>
+                                @endcan
+                                @can('storage.reports.view')
+                                    <a class="{{ request()->routeIs('admin.storage.reports.*') ? 'is-active' : '' }}" href="{{ route('admin.storage.reports.index') }}" data-label="Laporan Storage" title="Laporan Storage">
+                                        <span aria-hidden="true"><x-ui.icon name="file" size="16" /></span><span class="admin-nav-label">Laporan</span>
+                                    </a>
+                                @endcan
+                            </div>
+                        </div>
                     @endcanany
+
+                    @canany(['users.view', 'roles.view', 'locations.view'])
+                        <div class="admin-sidebar__label">Master data</div>
+                    @endcanany
+                    @can('roles.view')
+                        <a class="{{ request()->routeIs('admin.roles.*') ? 'is-active' : '' }}" href="{{ route('admin.roles.index') }}" data-label="Role Management" title="Role Management">
+                            <span aria-hidden="true"><x-ui.icon name="shield" /></span><span class="admin-nav-label">Role Management</span>
+                        </a>
+                    @endcan
                     @can('users.view')
                         <a class="{{ request()->routeIs('admin.users.*') ? 'is-active' : '' }}" href="{{ route('admin.users.index') }}" data-label="User Management" title="User Management">
                             <span aria-hidden="true"><x-ui.icon name="users" /></span><span class="admin-nav-label">User Management</span>
                         </a>
                     @endcan
-                    @can('roles.view')
-                        <a class="{{ request()->routeIs('admin.roles.*') ? 'is-active' : '' }}" href="{{ route('admin.roles.index') }}" data-label="Role Management" title="Role Management">
-                            <span aria-hidden="true"><x-ui.icon name="shield" /></span><span class="admin-nav-label">Role Management</span>
+                    @can('locations.view')
+                        <a class="{{ request()->routeIs('admin.locations.*') ? 'is-active' : '' }}" href="{{ route('admin.locations.index') }}" data-label="Lokasi" title="Lokasi">
+                            <span aria-hidden="true"><x-ui.icon name="location" /></span><span class="admin-nav-label">Lokasi</span>
                         </a>
                     @endcan
                 </nav>

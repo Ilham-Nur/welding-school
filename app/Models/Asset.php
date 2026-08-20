@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 use LogicException;
@@ -45,6 +46,7 @@ class Asset extends Model
         'active' => 'Aktif',
         'maintenance' => 'Dalam perbaikan',
         'under_calibration' => 'Dalam kalibrasi',
+        'on_loan' => 'Dipinjamkan keluar',
         'out_of_service' => 'Tidak layak pakai',
         'retired' => 'Tidak digunakan',
     ];
@@ -62,6 +64,7 @@ class Asset extends Model
         'quantity',
         'purchase_year',
         'location',
+        'location_id',
         'condition',
         'inspection_interval_months',
         'last_inspected_at',
@@ -126,6 +129,21 @@ class Asset extends Model
     public function inspections(): HasMany
     {
         return $this->hasMany(AssetInspection::class)->latest('inspected_at');
+    }
+
+    public function locationRecord(): BelongsTo
+    {
+        return $this->belongsTo(Location::class, 'location_id');
+    }
+
+    public function externalLoans(): BelongsToMany
+    {
+        return $this->belongsToMany(AssetExternalLoan::class, 'asset_external_loan_items')->withTimestamps();
+    }
+
+    public function externalLoanItems(): HasMany
+    {
+        return $this->hasMany(AssetExternalLoanItem::class);
     }
 
     public function categoryLabel(): string
@@ -243,7 +261,7 @@ class Asset extends Model
     {
         return match ($this->status) {
             'active' => 'success',
-            'maintenance', 'under_calibration' => 'info',
+            'maintenance', 'under_calibration', 'on_loan' => 'info',
             'out_of_service' => 'danger',
             default => 'neutral',
         };
@@ -259,5 +277,4 @@ class Asset extends Model
             default => 'neutral',
         };
     }
-
 }

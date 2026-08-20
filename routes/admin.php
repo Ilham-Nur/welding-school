@@ -3,9 +3,16 @@
 use App\Http\Controllers\Admin\ActivityController;
 use App\Http\Controllers\Admin\AssetController;
 use App\Http\Controllers\Admin\AssetDashboardController;
+use App\Http\Controllers\Admin\AssetExternalLoanController;
 use App\Http\Controllers\Admin\AssetLabelController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\LocationController;
 use App\Http\Controllers\Admin\RoleController;
+use App\Http\Controllers\Admin\StorageDashboardController;
+use App\Http\Controllers\Admin\StorageItemController;
+use App\Http\Controllers\Admin\StorageReportController;
+use App\Http\Controllers\Admin\StorageStockOpnameController;
+use App\Http\Controllers\Admin\StorageTransactionController;
 use App\Http\Controllers\Admin\TrainingApplicationController;
 use App\Http\Controllers\Admin\TrainingBatchController;
 use App\Http\Controllers\Admin\TrainingProgramController;
@@ -83,6 +90,60 @@ Route::prefix('admin')
             ->except(['show'])
             ->middlewareFor(['index'], 'permission:activities.view')
             ->middlewareFor(['create', 'store', 'edit', 'update', 'destroy'], 'permission:activities.manage');
+
+        Route::post('/locations/{location}/children', [LocationController::class, 'storeChildren'])
+            ->middleware('permission:locations.manage')
+            ->name('locations.children.store');
+        Route::resource('locations', LocationController::class)
+            ->except(['show', 'destroy'])
+            ->middlewareFor(['index'], 'permission:locations.view')
+            ->middlewareFor(['create', 'store', 'edit', 'update'], 'permission:locations.manage');
+
+        Route::get('/storage/dashboard', StorageDashboardController::class)
+            ->middleware('permission:storage.view')->name('storage.dashboard');
+        Route::resource('storage-items', StorageItemController::class)
+            ->except(['destroy'])
+            ->middlewareFor(['index', 'show'], 'permission:storage.view')
+            ->middlewareFor(['create', 'store', 'edit', 'update'], 'permission:storage.items.manage');
+
+        Route::get('/storage/receipts', [StorageTransactionController::class, 'receipts'])
+            ->middleware('permission:storage.view')->name('storage.receipts.index');
+        Route::get('/storage/receipts/create', [StorageTransactionController::class, 'createReceipt'])
+            ->middleware('permission:storage.transactions.manage')->name('storage.receipts.create');
+        Route::post('/storage/receipts', [StorageTransactionController::class, 'storeReceipt'])
+            ->middleware('permission:storage.transactions.manage')->name('storage.receipts.store');
+        Route::get('/storage/issues', [StorageTransactionController::class, 'issues'])
+            ->middleware('permission:storage.view')->name('storage.issues.index');
+        Route::get('/storage/issues/create', [StorageTransactionController::class, 'createIssue'])
+            ->middleware('permission:storage.transactions.manage')->name('storage.issues.create');
+        Route::post('/storage/issues', [StorageTransactionController::class, 'storeIssue'])
+            ->middleware('permission:storage.transactions.manage')->name('storage.issues.store');
+
+        Route::get('/storage/loans', [AssetExternalLoanController::class, 'index'])
+            ->middleware('permission:storage.view')->name('storage.loans.index');
+        Route::get('/storage/loans/create', [AssetExternalLoanController::class, 'create'])
+            ->middleware('permission:storage.loans.manage')->name('storage.loans.create');
+        Route::post('/storage/loans', [AssetExternalLoanController::class, 'store'])
+            ->middleware('permission:storage.loans.manage')->name('storage.loans.store');
+        Route::patch('/storage/loans/{loan}/return', [AssetExternalLoanController::class, 'returnLoan'])
+            ->middleware('permission:storage.loans.manage')->name('storage.loans.return');
+
+        Route::get('/storage/opnames', [StorageStockOpnameController::class, 'index'])
+            ->middleware('permission:storage.view')->name('storage.opnames.index');
+        Route::get('/storage/opnames/create', [StorageStockOpnameController::class, 'create'])
+            ->middleware('permission:storage.stocktakes.manage')->name('storage.opnames.create');
+        Route::post('/storage/opnames', [StorageStockOpnameController::class, 'store'])
+            ->middleware('permission:storage.stocktakes.manage')->name('storage.opnames.store');
+        Route::get('/storage/opnames/{opname}', [StorageStockOpnameController::class, 'show'])
+            ->middleware('permission:storage.view')->name('storage.opnames.show');
+        Route::patch('/storage/opnames/{opname}/complete', [StorageStockOpnameController::class, 'complete'])
+            ->middleware('permission:storage.stocktakes.manage')->name('storage.opnames.complete');
+        Route::get('/storage/reports/export/excel', [StorageReportController::class, 'excel'])
+            ->middleware('permission:storage.reports.view')->name('storage.reports.excel');
+        Route::get('/storage/reports/export/pdf', [StorageReportController::class, 'pdf'])
+            ->middleware('permission:storage.reports.view')->name('storage.reports.pdf');
+        Route::get('/storage/reports', [StorageReportController::class, 'index'])
+            ->middleware('permission:storage.reports.view')->name('storage.reports.index');
 
         Route::get('/assets/labels', AssetLabelController::class)
             ->middleware('permission:assets.view')

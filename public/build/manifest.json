@@ -8,7 +8,7 @@
     "name": "cropper.esm.raw"
   },
   "resources/css/app.css": {
-    "file": "assets/app-0PSaDyZt.css",
+    "file": "assets/app-QqTZIdos.css",
     "src": "resources/css/app.css",
     "isEntry": true,
     "name": "app",
@@ -57,5 +57,17 @@
     "imports": [
       "__commonjsHelpers-Cpj98o6Y.js"
     ]
+  },
+  "resources/js/locations.js": {
+    "file": "assets/locations-DWcBN4Qa.js",
+    "name": "locations",
+    "src": "resources/js/locations.js",
+    "isEntry": true
+  },
+  "resources/js/storage.js": {
+    "file": "assets/storage-DajSRNjz.js",
+    "name": "storage",
+    "src": "resources/js/storage.js",
+    "isEntry": true
   }
 }

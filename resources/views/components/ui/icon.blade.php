@@ -99,6 +99,14 @@
             <path d="m4 7.5 8 4.5 8-4.5V16l-8 5-8-5Z" />
             <path d="M12 12v9" />
             @break
+        @case('storage')
+            <path d="M3 9h18v11H3Z" />
+            <path d="m4 9 2-5h12l2 5M8 13h8M8 17h8" />
+            @break
+        @case('location')
+            <path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z" />
+            <circle cx="12" cy="10" r="2.5" />
+            @break
         @case('printer')
             <path d="M6 9V3h12v6" />
             <rect x="6" y="14" width="12" height="7" rx="1" />

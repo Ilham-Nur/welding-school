@@ -28,6 +28,8 @@ class RolePermissionSeeder extends Seeder
             'admin.access',
             'users.view',
             'roles.view',
+            'locations.view',
+            'locations.manage',
             'applications.view',
             'applications.approve',
             'programs.view',
@@ -39,6 +41,12 @@ class RolePermissionSeeder extends Seeder
             'assets.view',
             'assets.manage',
             'assets.inspect',
+            'storage.view',
+            'storage.items.manage',
+            'storage.transactions.manage',
+            'storage.loans.manage',
+            'storage.stocktakes.manage',
+            'storage.reports.view',
         ]);
         $participant->syncPermissions([]);
 

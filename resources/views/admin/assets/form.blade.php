@@ -185,14 +185,19 @@
                 </header>
                 <div class="admin-panel__body">
                     <div class="admin-form-grid">
-                        <x-ui.text-input
-                            label="Lokasi"
-                            name="location"
-                            :value="$asset->location"
-                            placeholder="Contoh: Workshop Welding Bay 01"
-                            maxlength="255"
-                            required
-                        />
+                        <label class="ui-field admin-field">
+                            <span class="ui-field__label">Lokasi induk <em>Wajib</em></span>
+                            <select name="location_id" required>
+                                <option value="">Pilih lokasi</option>
+                                @foreach ($locations as $location)
+                                    <option value="{{ $location->id }}" @selected((string) old('location_id', $asset->location_id) === (string) $location->id)>
+                                        {{ $location->fullName() }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            <small>Lokasi berasal dari Master Data dan dipakai bersama oleh Asset serta Storage.</small>
+                            @error('location_id')<small class="ui-field__error">{{ $message }}</small>@enderror
+                        </label>
                         <label class="ui-field admin-field">
                             <span class="ui-field__label">Kondisi <em>Wajib</em></span>
                             <select name="condition" required>

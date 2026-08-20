@@ -174,7 +174,7 @@
       label: "Batch Agustus 2026",
       start: "10 Agustus 2026",
       end: "21 Agustus 2026",
-      schedule: "Senin–Jumat, 08.00–16.00 WIB",
+      schedule: "Senin sampai Jumat, 08.00 sampai 16.00 WIB",
       location: "Workshop Batam Centre · Area 1",
       seatsLeft: 5,
       recommended: true,
@@ -184,7 +184,7 @@
       label: "Batch September 2026",
       start: "7 September 2026",
       end: "18 September 2026",
-      schedule: "Senin–Jumat, 08.00–16.00 WIB",
+      schedule: "Senin sampai Jumat, 08.00 sampai 16.00 WIB",
       location: "Workshop Batam Centre · Area 2",
       seatsLeft: 9,
     },
@@ -193,7 +193,7 @@
       label: "Batch Weekend September",
       start: "5 September 2026",
       end: "4 Oktober 2026",
-      schedule: "Sabtu–Minggu, 08.00–16.00 WIB",
+      schedule: "Sabtu sampai Minggu, 08.00 sampai 16.00 WIB",
       location: "Workshop Batam Centre · Area 1",
       seatsLeft: 3,
     },
@@ -243,59 +243,37 @@
 
   let batches = programBatches(programs[0]);
 
-  const academyNews = [
-    {
-      id: "uji-kompetensi-smaw",
-      category: "Kegiatan Akademi",
-      date: "2 Agustus 2026",
-      title: "24 peserta menyelesaikan uji kompetensi SMAW posisi 3G",
-      excerpt:
-        "Rangkaian evaluasi praktik, inspeksi visual, dan pengujian hasil las menutup pelatihan intensif Batch Juli.",
-      featured: true,
-      image: "assets/images/activity-fabrication.jpg",
-      imagePosition: "50% center",
-    },
-    {
-      id: "safety-induction",
-      category: "Safety",
-      date: "28 Juli 2026",
-      title: "Safety induction membuka program pelatihan Batch Agustus",
-      excerpt:
-        "Peserta memulai perjalanan belajar dengan pengenalan budaya K3, APD, dan tata kerja workshop.",
-      image: "assets/images/activity-workshop.jpg",
-      imagePosition: "50% 40%",
-    },
-    {
-      id: "industry-sharing",
-      category: "Kolaborasi Industri",
-      date: "21 Juli 2026",
-      title: "Praktisi fabrikasi berbagi kebutuhan kompetensi welder terkini",
-      excerpt:
-        "Sesi industry sharing membantu peserta memahami standar kualitas, disiplin kerja, dan peluang karier.",
-      image: "assets/images/activity-welding-sparks.jpg",
-      imagePosition: "50% center",
-    },
-    {
-      id: "alumni-day",
-      category: "Alumni",
-      date: "12 Juli 2026",
-      title: "Alumni Day 2026 mempertemukan lulusan dan mitra recruiter",
-      excerpt:
-        "Forum jejaring perdana membuka akses mentoring, informasi lowongan, dan pembaruan profil kompetensi.",
-      image: "assets/images/welding-hero.png",
-      imagePosition: "60% center",
-    },
-    {
-      id: "open-house",
-      category: "Event",
-      date: "5 Juli 2026",
-      title: "Open House Workshop: melihat langsung proses belajar di Alpha Academy",
-      excerpt:
-        "Calon peserta dan keluarga diajak menjelajahi fasilitas, bertemu instruktur, dan mencoba simulasi dasar.",
-      image: "assets/images/activity-workshop.jpg",
-      imagePosition: "50% 58%",
-    },
-  ];
+  const academyNews = (Array.isArray(backend.activities)
+    ? backend.activities
+    : []
+  ).map((activity) => ({
+    id: String(activity.id || ""),
+    category: activity.category || "Kegiatan Akademi",
+    date: activity.date || "",
+    publishedAt: activity.published_at || "",
+    title: activity.title || "Aktivitas Alpha Academy",
+    excerpt: activity.excerpt || "",
+    content: activity.content || "",
+    featured: Boolean(activity.featured),
+    image: activity.image || "",
+    imageAlt: activity.image_alt || activity.title || "Dokumentasi aktivitas",
+    imagePosition: activity.image_position || "50% center",
+    viewCount: Math.max(0, Number(activity.view_count || 0)),
+    viewUrl: activity.view_url || "",
+  }));
+
+  const latestAcademyNews = [...academyNews].sort(
+    (left, right) =>
+      new Date(right.publishedAt).getTime() - new Date(left.publishedAt).getTime(),
+  );
+  const featuredAcademyActivity =
+    academyNews.find((activity) => activity.featured) ||
+    latestAcademyNews[0] ||
+    null;
+  const sharedActivityId = new URLSearchParams(window.location.search).get("activity");
+  const sharedAcademyActivity = academyNews.find(
+    (activity) => activity.id === sharedActivityId,
+  );
 
   const alumniProfiles = [
     {
@@ -759,6 +737,8 @@
     { id: "recruiter-account", label: "Akun Recruiter" },
     { id: "certificate", label: "Verifikasi Sertifikat" },
     { id: "account", label: "Akun" },
+    { id: "forgot-password", label: "Lupa Password" },
+    { id: "reset-password", label: "Reset Password" },
     { id: "member-programs", label: "Dashboard Peserta" },
     { id: "detail", label: "Detail" },
     { id: "batch", label: "Batch" },
@@ -798,7 +778,11 @@
     uploadedFiles: {},
     search: "",
     level: "Semua Level",
-    selectedArticle: academyNews[0],
+    selectedArticle: sharedAcademyActivity || featuredAcademyActivity,
+    activityQuery: "",
+    activityCategory: "Semua",
+    activityVisibleCount: 6,
+    viewedActivities: new Set(),
     selectedWelder: alumniProfiles[0],
     welderDetailOpen: false,
     recruiterCandidate: alumniProfiles[0],
@@ -817,6 +801,11 @@
       pending: Boolean(backend.verification?.pending),
       email: backend.verification?.email || "",
       debugCode: "",
+    },
+    passwordReset: {
+      token: backend.passwordReset?.token || "",
+      email: backend.passwordReset?.email || "",
+      requestSent: false,
     },
     registration: {
       username: backend.auth?.user?.username || "",
@@ -1304,8 +1293,10 @@
       "recruiter-account",
       "certificate",
       "account",
+      "forgot-password",
     ];
     if (state.verification.pending) publicRoutes.push("verification");
+    if (state.passwordReset.token) publicRoutes.push("reset-password");
     if (!state.loggedIn && !publicRoutes.includes(steps[index].id)) {
       index = steps.findIndex((step) => step.id === "account");
     }
@@ -1314,7 +1305,14 @@
     if (steps[index].id !== "welders") state.welderDetailOpen = false;
     state.dashboardSidebarOpen = false;
     window.clearInterval(invoiceTimer);
-    window.history.replaceState(null, "", `#${steps[index].id}`);
+    const nextUrl = new URL(window.location.href);
+    nextUrl.hash = steps[index].id;
+    if (steps[index].id === "article" && state.selectedArticle?.id) {
+      nextUrl.searchParams.set("activity", state.selectedArticle.id);
+    } else {
+      nextUrl.searchParams.delete("activity");
+    }
+    window.history.replaceState(null, "", nextUrl);
     document.querySelector(".public-nav")?.classList.remove("is-open");
     const mobileMenu = document.querySelector(".mobile-menu-button");
     mobileMenu?.setAttribute("aria-expanded", "false");
@@ -1377,10 +1375,36 @@
     `;
   }
 
+  function formatActivityViews(value) {
+    return new Intl.NumberFormat("id-ID").format(Math.max(0, Number(value || 0)));
+  }
+
+  function activityShareUrl(article) {
+    const url = new URL(window.location.href);
+    url.searchParams.set("activity", article.id);
+    url.hash = "article";
+
+    return url.toString();
+  }
+
+  function activityContent(article) {
+    const paragraphs = String(article.content || article.excerpt || "")
+      .split(/\n\s*\n/)
+      .map((paragraph) => paragraph.trim())
+      .filter(Boolean);
+
+    return paragraphs
+      .map(
+        (paragraph, index) =>
+          `<p${index === 0 ? ' class="academy-article__lead"' : ""}>${escapeHtml(paragraph).replace(/\n/g, "<br>")}</p>`,
+      )
+      .join("");
+  }
+
   function newsCard(article, compact = false) {
     return `
       <article class="academy-news-card${article.featured ? " academy-news-card--featured" : ""}${compact ? " academy-news-card--compact" : ""}">
-        <button class="academy-news-card__media" data-action="open-article" data-id="${article.id}" type="button" style="--news-image:url('${escapeHtml(article.image)}');--news-position:${article.imagePosition}" aria-label="Lihat ${escapeHtml(article.title)}">
+        <button class="academy-news-card__media" data-action="open-article" data-id="${article.id}" type="button" style="--news-image:url('${escapeHtml(article.image)}');--news-position:${article.imagePosition}" aria-label="${escapeHtml(article.imageAlt)}">
           <span>${escapeHtml(article.category)}</span>
         </button>
         <div class="academy-news-card__body">
@@ -1419,7 +1443,7 @@
             <dl>
               <div><dt>Durasi</dt><dd>80 Jam</dd></div>
               <div><dt>Praktik</dt><dd>60 Jam</dd></div>
-              <div><dt>Posisi</dt><dd>1G–4G</dd></div>
+              <div><dt>Posisi</dt><dd>1G sampai 4G</dd></div>
             </dl>
             <button data-action="select-program" data-id="smaw" type="button">Lihat detail program <span>→</span></button>
           </aside>
@@ -1523,7 +1547,11 @@
           <button class="text-link company-all-programs" data-action="go-public-page" data-target="news" type="button">Lihat semua aktivitas &rarr;</button>
         </div>
         <div class="academy-latest__grid">
-          ${academyNews.slice(0, 3).map((article) => newsCard(article, true)).join("")}
+          ${
+            latestAcademyNews.length
+              ? latestAcademyNews.slice(0, 3).map((article) => newsCard(article, true)).join("")
+              : '<div class="academy-activity-empty"><strong>Aktivitas segera hadir</strong><p>Dokumentasi terbaru Alpha Academy akan ditampilkan di sini.</p></div>'
+          }
         </div>
       </section>
 
@@ -1630,9 +1658,42 @@
   }
 
   function renderNews() {
-    const featured = academyNews[0];
-    const popularActivities = academyNews.slice(1, 4);
-    const popularViews = ["8.420", "6.315", "4.860"];
+    const featured = featuredAcademyActivity;
+
+    if (!featured) {
+      return `
+        <section class="academy-activity-page">
+          <div class="page-shell academy-activity-heading">
+            <h1>Aktivitas Alpha Academy</h1>
+            <p>Dokumentasi pelatihan, kegiatan peserta, kolaborasi industri, dan agenda terbaru dari workshop kami.</p>
+          </div>
+          <div class="page-shell academy-activity-empty academy-activity-empty--page">
+            <strong>Belum ada aktivitas yang diterbitkan</strong>
+            <p>Silakan kembali lagi untuk melihat kabar terbaru dari Alpha Academy.</p>
+          </div>
+        </section>
+      `;
+    }
+
+    const popularActivities = [...academyNews]
+      .filter((activity) => activity.id !== featured.id)
+      .sort((left, right) => right.viewCount - left.viewCount)
+      .slice(0, 3);
+    const categories = [...new Set(latestAcademyNews.map((activity) => activity.category))];
+    const normalizedQuery = state.activityQuery.trim().toLocaleLowerCase("id-ID");
+    const filteredActivities = latestAcademyNews.filter((activity) => {
+      const matchesCategory =
+        state.activityCategory === "Semua" ||
+        activity.category === state.activityCategory;
+      const matchesQuery =
+        !normalizedQuery ||
+        `${activity.title} ${activity.excerpt} ${activity.category}`
+          .toLocaleLowerCase("id-ID")
+          .includes(normalizedQuery);
+      return matchesCategory && matchesQuery;
+    });
+    const visibleActivities = filteredActivities.slice(0, state.activityVisibleCount);
+
     return `
       <section class="academy-activity-page">
         <div class="page-shell academy-activity-heading">
@@ -1642,9 +1703,9 @@
 
         <div class="page-shell academy-activity-lead">
           <article class="academy-activity-featured">
-            <button class="academy-activity-featured__media" data-action="open-article" data-id="${featured.id}" type="button" style="--activity-image:url('${escapeHtml(featured.image)}');--activity-position:${featured.imagePosition}" aria-label="Lihat ${escapeHtml(featured.title)}"></button>
+            <button class="academy-activity-featured__media" data-action="open-article" data-id="${featured.id}" type="button" style="--activity-image:url('${escapeHtml(featured.image)}');--activity-position:${featured.imagePosition}" aria-label="${escapeHtml(featured.imageAlt)}"></button>
             <div class="academy-activity-featured__body">
-              <div class="academy-activity-meta"><span>${escapeHtml(featured.category)}</span><time>${escapeHtml(featured.date)}</time><span>&#9673; 12.680 dilihat</span></div>
+              <div class="academy-activity-meta"><span>${escapeHtml(featured.category)}</span><time>${escapeHtml(featured.date)}</time><span>&#9673; ${formatActivityViews(featured.viewCount)} dilihat</span></div>
               <h2>${escapeHtml(featured.title)}</h2>
               <p>${escapeHtml(featured.excerpt)}</p>
               <button class="academy-activity-link" data-action="open-article" data-id="${featured.id}" type="button">Lihat selengkapnya &rarr;</button>
@@ -1654,24 +1715,28 @@
           <aside class="academy-activity-popular">
             <header><h2>Aktivitas Terpopuler</h2></header>
             <div class="academy-activity-popular__list">
-              ${popularActivities
+              ${popularActivities.length ? popularActivities
                 .map(
-                  (article, index) => `
+                  (article) => `
                     <button class="academy-activity-popular__item" data-action="open-article" data-id="${article.id}" type="button">
                       <span class="academy-activity-popular__thumb" style="--activity-image:url('${escapeHtml(article.image)}');--activity-position:${article.imagePosition}"></span>
-                      <span class="academy-activity-popular__copy"><strong>${escapeHtml(article.title)}</strong><small><span>&#9638; ${escapeHtml(article.date)}</span><span>&#9673; ${popularViews[index]} dilihat</span></small></span>
+                      <span class="academy-activity-popular__copy"><strong>${escapeHtml(article.title)}</strong><small><span>&#9638; ${escapeHtml(article.date)}</span><span>&#9673; ${formatActivityViews(article.viewCount)} dilihat</span></small></span>
                     </button>`,
                 )
-                .join("")}
+                .join("") : '<div class="academy-activity-empty academy-activity-empty--compact"><p>Aktivitas populer akan tampil setelah lebih banyak dokumentasi diterbitkan.</p></div>'}
             </div>
           </aside>
         </div>
 
         <section class="page-shell academy-activity-latest">
-          <div class="academy-activity-latest__heading"><div><h2>Aktivitas Terbaru</h2><p>Ikuti perkembangan kegiatan di Alpha Academy Welding School.</p></div><label class="academy-news-search"><span aria-hidden="true">&#9906;</span><input type="search" placeholder="Cari aktivitas..." aria-label="Cari aktivitas"></label></div>
-          <div class="academy-chip-row" aria-label="Kategori aktivitas"><button class="is-active" type="button">Semua</button><button type="button">Pelatihan</button><button type="button">Alumni</button><button type="button">Industri</button><button type="button">Safety</button></div>
-          <div class="academy-news-grid">${academyNews.slice(1).map((article) => newsCard(article)).join("")}</div>
-          <button class="academy-load-more" data-action="load-more-news" type="button">Muat lebih banyak aktivitas</button>
+          <div class="academy-activity-latest__heading"><div><h2>Aktivitas Terbaru</h2><p>Ikuti perkembangan kegiatan di Alpha Academy Welding School.</p></div><label class="academy-news-search"><span aria-hidden="true">&#9906;</span><input id="activity-search" type="search" value="${escapeHtml(state.activityQuery)}" placeholder="Cari aktivitas..." aria-label="Cari aktivitas"></label></div>
+          <div class="academy-chip-row" aria-label="Kategori aktivitas">
+            ${["Semua", ...categories].map((category) => `<button class="${state.activityCategory === category ? "is-active" : ""}" data-action="filter-activities" data-category="${escapeHtml(category)}" type="button">${escapeHtml(category)}</button>`).join("")}
+          </div>
+          <div class="academy-news-grid">
+            ${visibleActivities.length ? visibleActivities.map((article) => newsCard(article)).join("") : '<div class="academy-activity-empty"><strong>Aktivitas tidak ditemukan</strong><p>Coba gunakan kata kunci atau kategori lain.</p></div>'}
+          </div>
+          ${filteredActivities.length > visibleActivities.length ? '<button class="academy-load-more" data-action="load-more-news" type="button">Muat lebih banyak aktivitas</button>' : ""}
         </section>
       </section>
 
@@ -1685,33 +1750,52 @@
   }
 
   function renderArticle() {
-    const article = state.selectedArticle || academyNews[0];
-    const related = academyNews.filter((item) => item.id !== article.id).slice(0, 3);
+    const article = state.selectedArticle || featuredAcademyActivity;
+    if (!article) return renderNews();
+
+    const related = latestAcademyNews
+      .filter((item) => item.id !== article.id)
+      .slice(0, 3);
+    const shareUrl = activityShareUrl(article);
+    const encodedShareUrl = encodeURIComponent(shareUrl);
     return `
       <article class="academy-article">
         <header class="academy-article__header page-shell">
           <button class="academy-back-link" data-action="go-public-page" data-target="news" type="button">&larr; Kembali ke aktivitas</button>
-          <span>${escapeHtml(article.category)} &middot; ${escapeHtml(article.date)}</span>
+          <span>${escapeHtml(article.category)} &middot; ${escapeHtml(article.date)} &middot; ${formatActivityViews(article.viewCount)} dilihat</span>
           <h1>${escapeHtml(article.title)}</h1>
           <p>${escapeHtml(article.excerpt)}</p>
         </header>
-        <div class="academy-article__image" role="img" aria-label="Dokumentasi kegiatan Alpha Academy" style="--article-image:url('${escapeHtml(article.image)}');--article-position:${article.imagePosition}"></div>
+        <div class="academy-article__image" role="img" aria-label="${escapeHtml(article.imageAlt)}" style="--article-image:url('${escapeHtml(article.image)}');--article-position:${article.imagePosition}"></div>
         <div class="academy-article__layout page-shell">
-          <aside><strong>BAGIKAN</strong><button type="button">in</button><button type="button">f</button><button type="button">&#8599;</button></aside>
+          <aside class="academy-article-share" aria-label="Bagikan aktivitas">
+            <strong>Bagikan aktivitas</strong>
+            <div class="academy-article-share__actions">
+              <a href="https://www.linkedin.com/sharing/share-offsite/?url=${encodedShareUrl}" target="_blank" rel="noopener noreferrer" aria-label="Bagikan ke LinkedIn">
+                <span class="academy-article-share__mark" aria-hidden="true">in</span>
+                <span>LinkedIn</span>
+              </a>
+              <a href="https://www.facebook.com/sharer/sharer.php?u=${encodedShareUrl}" target="_blank" rel="noopener noreferrer" aria-label="Bagikan ke Facebook">
+                <span class="academy-article-share__mark" aria-hidden="true">f</span>
+                <span>Facebook</span>
+              </a>
+              <button data-action="copy-article-link" data-url="${escapeHtml(shareUrl)}" type="button">
+                <span class="academy-article-share__mark" aria-hidden="true">&#8599;</span>
+                <span data-copy-label>Salin tautan</span>
+              </button>
+            </div>
+          </aside>
           <div class="academy-article__body">
-            <p class="academy-article__lead">Kegiatan ini menjadi bagian dari komitmen Alpha Academy untuk menghadirkan proses belajar yang terukur, aman, dan dekat dengan kebutuhan dunia kerja.</p>
-            <p>Peserta menjalani rangkaian pembelajaran yang mencakup penguatan teori dasar, demonstrasi instruktur, latihan terarah, hingga evaluasi hasil kerja. Setiap tahapan dilaksanakan dengan memperhatikan prosedur keselamatan dan standar kualitas workshop.</p>
-            <h2>Kompetensi dibangun melalui proses</h2>
-            <p>Tim instruktur melakukan pendampingan secara personal melalui logbook perkembangan. Catatan tersebut membantu peserta memahami area yang sudah dikuasai dan bagian yang masih perlu ditingkatkan sebelum evaluasi akhir.</p>
-            <blockquote>Hasil terbaik lahir dari kombinasi disiplin, jam praktik yang cukup, dan keberanian untuk terus memperbaiki teknik.</blockquote>
-            <p>Ke depan, Alpha Academy akan terus memperluas kolaborasi dengan praktisi dan mitra industri agar setiap program tetap relevan dengan dinamika kebutuhan tenaga kerja.</p>
+            ${activityContent(article)}
           </div>
         </div>
       </article>
-      <section class="page-shell academy-related-news">
-        <div class="company-section-heading"><div><h2>Aktivitas lainnya.</h2></div></div>
-        <div class="academy-latest__grid">${related.map((item) => newsCard(item, true)).join("")}</div>
-      </section>
+      ${related.length ? `
+        <section class="page-shell academy-related-news">
+          <div class="company-section-heading"><div><h2>Aktivitas lainnya.</h2></div></div>
+          <div class="academy-latest__grid">${related.map((item) => newsCard(item, true)).join("")}</div>
+        </section>
+      ` : ""}
     `;
   }
 
@@ -2681,7 +2765,7 @@
                         ${batch.recommended ? '<span class="badge badge--green">Direkomendasikan</span>' : ""}
                       </div>
                       <dl>
-                        <div><dt>Periode</dt><dd>${batch.start} – ${batch.end}</dd></div>
+                        <div><dt>Periode</dt><dd>${batch.start} sampai ${batch.end}</dd></div>
                         <div><dt>Jadwal</dt><dd>${batch.schedule}</dd></div>
                         <div><dt>Lokasi</dt><dd>${batch.location}</dd></div>
                       </dl>
@@ -2732,8 +2816,8 @@
           ${googleAuthButton()}
           <label class="field field--full"><span>Email atau username</span><input name="login" type="text" value="" placeholder="nama@email.com atau username" autocomplete="username" required></label>
           <label class="field field--full"><span>Password</span><input name="password" type="password" placeholder="Masukkan password" autocomplete="current-password" required></label>
-          <div class="auth-options"><label><input name="remember" type="checkbox"> Ingat saya</label><button class="text-link" type="button">Lupa password?</button></div>
-          <button class="button button--primary button--large button--full" type="submit" data-submit-label="Masuk ke Dashboard">Masuk ke Dashboard <span>→</span></button>
+          <div class="auth-options"><label><input name="remember" type="checkbox"> Ingat saya</label><button class="text-link" data-action="forgot-password" type="button">Lupa password?</button></div>
+          <button class="button button--primary button--large button--full" type="submit" data-submit-label="Masuk ke Dashboard Peserta">Masuk ke Dashboard Peserta <span>→</span></button>
         </form>
       `;
     }
@@ -2770,16 +2854,117 @@
         </div>
         <div class="auth-panel">
           <div class="auth-panel__inner">
-            <span class="eyebrow">PORTAL CALON PESERTA</span>
+            <span class="eyebrow">PORTAL PESERTA</span>
             <h1>${state.accountMode === "register" ? "Buat akun baru" : "Selamat datang kembali"}</h1>
-            <p>${state.accountMode === "register" ? "Daftar menggunakan email untuk melihat dan memilih program pelatihan." : "Masuk menggunakan email untuk membuka dashboard Anda."}</p>
+            <p>${state.accountMode === "register" ? "Daftar menggunakan email untuk melihat dan memilih program pelatihan." : "Masuk menggunakan akun peserta untuk membuka dashboard pelatihan Anda."}</p>
             <div class="auth-tabs" role="tablist">
               <button class="${state.accountMode === "register" ? "is-active" : ""}" data-action="account-mode" data-mode="register" type="button">Saya belum punya akun</button>
               <button class="${state.accountMode === "login" ? "is-active" : ""}" data-action="account-mode" data-mode="login" type="button">Saya sudah punya akun</button>
             </div>
             ${accountForm()}
             <div class="secure-caption"><span>◇</span> Informasi Anda disimpan dengan aman dan hanya digunakan untuk proses pelatihan.</div>
+            <div class="portal-switch-link">Bagian dari tim Alpha Academy? <a href="${escapeHtml(backend.routes?.internalLogin || "/admin/login")}">Masuk ke Portal Internal</a></div>
           </div>
+        </div>
+      </section>
+    `;
+  }
+
+  function renderForgotPassword() {
+    const content = state.passwordReset.requestSent
+      ? `
+        <span class="verification-icon" aria-hidden="true">&check;</span>
+        <span class="eyebrow">PERIKSA EMAIL</span>
+        <h1>Permintaan sudah diproses</h1>
+        <p>Jika <strong>${escapeHtml(state.passwordReset.email)}</strong> terdaftar, tautan reset telah dikirim. Periksa inbox atau folder spam.</p>
+        <button class="button button--primary button--large button--full" data-action="back-to-account" type="button">Kembali ke Login</button>
+      `
+      : `
+        <span class="verification-icon" aria-hidden="true">?</span>
+        <span class="eyebrow">PEMULIHAN AKUN</span>
+        <h1>Lupa password?</h1>
+        <p>Masukkan email akun Anda. Kami akan mengirim tautan aman untuk membuat password baru.</p>
+        <form class="auth-form verification-form" data-form="forgot-password">
+          <label class="field field--full">
+            <span>Alamat email</span>
+            <input name="email" type="email" value="${escapeHtml(state.passwordReset.email)}" placeholder="nama@email.com" autocomplete="email" required>
+          </label>
+          <button class="button button--primary button--large button--full" type="submit" data-submit-label="Kirim Tautan Reset">
+            Kirim Tautan Reset <span>&rarr;</span>
+          </button>
+        </form>
+        <button class="verification-back" data-action="back-to-account" type="button">&larr; Kembali ke halaman login</button>
+      `;
+
+    return `
+      <section class="auth-page verification-page">
+        <div class="auth-visual verification-visual">
+          <div class="auth-visual__overlay">
+            <span class="eyebrow eyebrow--light">KEAMANAN AKUN</span>
+            <h1>Password lama tidak akan pernah dikirim melalui email.</h1>
+            <p>Tautan reset hanya berlaku 60 menit dan tidak dapat digunakan kembali setelah password diganti.</p>
+            <div class="auth-trust">
+              <div><span>&check;</span><strong>Tautan sekali pakai</strong></div>
+              <div><span>&check;</span><strong>Berlaku 60 menit</strong></div>
+              <div><span>&check;</span><strong>Respons tidak membocorkan akun</strong></div>
+            </div>
+          </div>
+        </div>
+        <div class="auth-panel">
+          <div class="auth-panel__inner verification-panel">${content}</div>
+        </div>
+      </section>
+    `;
+  }
+
+  function renderResetPassword() {
+    const email = state.passwordReset.email;
+    const hasValidLink = Boolean(state.passwordReset.token && email);
+
+    const content = hasValidLink
+      ? `
+        <span class="verification-icon" aria-hidden="true">&#128274;</span>
+        <span class="eyebrow">PASSWORD BARU</span>
+        <h1>Buat password baru</h1>
+        <p>Password akan diperbarui untuk akun <strong>${escapeHtml(email)}</strong>.</p>
+        <form class="auth-form verification-form" data-form="reset-password">
+          <label class="field field--full">
+            <span>Password baru</span>
+            <input name="password" type="password" placeholder="Minimal 8 karakter, huruf dan angka" minlength="8" autocomplete="new-password" required>
+          </label>
+          <label class="field field--full">
+            <span>Ulangi password baru</span>
+            <input name="password_confirmation" type="password" placeholder="Ketik ulang password" minlength="8" autocomplete="new-password" required>
+          </label>
+          <button class="button button--primary button--large button--full" type="submit" data-submit-label="Simpan Password Baru">
+            Simpan Password Baru <span>&rarr;</span>
+          </button>
+        </form>
+      `
+      : `
+        <span class="verification-icon" aria-hidden="true">!</span>
+        <span class="eyebrow">TAUTAN TIDAK LENGKAP</span>
+        <h1>Minta tautan baru</h1>
+        <p>Tautan reset password tidak lengkap. Silakan kirim permintaan reset kembali.</p>
+        <button class="button button--primary button--large button--full" data-action="forgot-password" type="button">Minta Tautan Reset</button>
+      `;
+
+    return `
+      <section class="auth-page verification-page">
+        <div class="auth-visual verification-visual">
+          <div class="auth-visual__overlay">
+            <span class="eyebrow eyebrow--light">LINDUNGI AKUN ANDA</span>
+            <h1>Gunakan password yang unik dan mudah Anda ingat.</h1>
+            <p>Setelah password diganti, seluruh sesi login lama akan dikeluarkan untuk melindungi akun.</p>
+            <div class="auth-trust">
+              <div><span>&check;</span><strong>Minimal 8 karakter</strong></div>
+              <div><span>&check;</span><strong>Mengandung huruf</strong></div>
+              <div><span>&check;</span><strong>Mengandung angka</strong></div>
+            </div>
+          </div>
+        </div>
+        <div class="auth-panel">
+          <div class="auth-panel__inner verification-panel">${content}</div>
         </div>
       </section>
     `;
@@ -3474,7 +3659,7 @@
               ${inputField("Alamat lengkap", "address", data.address, { full: true })}
               ${inputField("Kota / Kabupaten", "city", data.city)}
               ${selectField("Pendidikan terakhir", "education", data.education, ["SMP", "SMA/SMK", "Diploma", "Sarjana"])}
-              ${selectField("Pengalaman welding", "experience", data.experience, ["Belum pernah", "Kurang dari 1 tahun", "1–3 tahun", "Lebih dari 3 tahun"])}
+              ${selectField("Pengalaman welding", "experience", data.experience, ["Belum pernah", "Kurang dari 1 tahun", "1 sampai 3 tahun", "Lebih dari 3 tahun"])}
               <label class="field"><span>Ukuran wearpack *</span><select name="wearpack"><option>M</option><option selected>L</option><option>XL</option><option>XXL</option></select></label>
             </div>
           </div>
@@ -3621,7 +3806,7 @@
             </div>
             <dl class="order-detail-grid">
               <div><dt>Batch</dt><dd>${state.selectedBatch.label}</dd></div>
-              <div><dt>Periode</dt><dd>${state.selectedBatch.start} – ${state.selectedBatch.end}</dd></div>
+              <div><dt>Periode</dt><dd>${state.selectedBatch.start} sampai ${state.selectedBatch.end}</dd></div>
               <div><dt>Jadwal</dt><dd>${state.selectedBatch.schedule}</dd></div>
               <div><dt>Lokasi</dt><dd>${state.selectedBatch.location}</dd></div>
             </dl>
@@ -3880,6 +4065,8 @@
       detail: renderDetail,
       batch: renderBatch,
       account: renderAccount,
+      "forgot-password": renderForgotPassword,
+      "reset-password": renderResetPassword,
       verification: renderVerification,
       registration: renderRegistration,
       documents: renderDocuments,
@@ -4023,6 +4210,82 @@
       state.recruiterPortalView = "pipeline";
       refreshPortal("recruiter-demo");
       showToast("Undangan rekrutmen simulasi berhasil dibuat.", "success");
+      return;
+    }
+
+    if (form.dataset.form === "forgot-password") {
+      const submitButton = form.querySelector('button[type="submit"]');
+      const submitLabel =
+        submitButton?.dataset.submitLabel || "Kirim Tautan Reset";
+      const data = new FormData(form);
+      state.passwordReset.email = String(data.get("email") || "").trim();
+
+      if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.innerHTML =
+          '<span class="button-spinner"></span> Mengirim...';
+      }
+
+      try {
+        const result = await backendRequest(backend.routes?.forgotPassword, {
+          email: state.passwordReset.email,
+        });
+        state.passwordReset.requestSent = true;
+        render();
+        showToast(result.message, "success");
+      } catch (error) {
+        showToast(error.message, "danger");
+        if (submitButton) {
+          submitButton.disabled = false;
+          submitButton.innerHTML = `${submitLabel} <span>&rarr;</span>`;
+        }
+      }
+      return;
+    }
+
+    if (form.dataset.form === "reset-password") {
+      const data = new FormData(form);
+      const password = String(data.get("password") || "");
+      const confirmation = String(data.get("password_confirmation") || "");
+
+      if (password !== confirmation) {
+        showToast("Konfirmasi password belum sama.", "warning");
+        return;
+      }
+
+      const submitButton = form.querySelector('button[type="submit"]');
+      const submitLabel =
+        submitButton?.dataset.submitLabel || "Simpan Password Baru";
+
+      if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.innerHTML =
+          '<span class="button-spinner"></span> Menyimpan...';
+      }
+
+      try {
+        const result = await backendRequest(backend.routes?.resetPassword, {
+          token: state.passwordReset.token,
+          email: state.passwordReset.email,
+          password,
+          password_confirmation: confirmation,
+        });
+
+        state.passwordReset.token = "";
+        state.passwordReset.requestSent = false;
+        state.accountMode = "login";
+        const homeUrl = new URL(backend.routes?.home || "/", window.location.origin);
+        homeUrl.hash = "account";
+        window.history.replaceState(null, "", homeUrl);
+        navigate("account");
+        showToast(result.message, "success");
+      } catch (error) {
+        showToast(error.message, "danger");
+        if (submitButton) {
+          submitButton.disabled = false;
+          submitButton.innerHTML = `${submitLabel} <span>&rarr;</span>`;
+        }
+      }
       return;
     }
 
@@ -4309,10 +4572,60 @@
       showToast("CV lengkap tersedia setelah perusahaan memiliki akun recruiter terverifikasi.", "info");
     }
     if (action === "open-article") {
-      state.selectedArticle =
-        academyNews.find((article) => article.id === button.dataset.id) ||
-        academyNews[0];
+      const selectedArticle = academyNews.find(
+        (article) => article.id === button.dataset.id,
+      );
+      if (!selectedArticle) return;
+
+      state.selectedArticle = selectedArticle;
+      if (!state.viewedActivities.has(selectedArticle.id)) {
+        state.viewedActivities.add(selectedArticle.id);
+        selectedArticle.viewCount += 1;
+        backendRequest(selectedArticle.viewUrl).then((result) => {
+          selectedArticle.viewCount = Math.max(
+            selectedArticle.viewCount,
+            Number(result.view_count || 0),
+          );
+        }).catch(() => {});
+      }
       navigate("article");
+    }
+    if (action === "copy-article-link") {
+      const shareUrl = button.dataset.url || window.location.href;
+
+      try {
+        if (navigator.clipboard?.writeText) {
+          await navigator.clipboard.writeText(shareUrl);
+        } else {
+          const textarea = document.createElement("textarea");
+          textarea.value = shareUrl;
+          textarea.setAttribute("readonly", "");
+          textarea.style.position = "fixed";
+          textarea.style.opacity = "0";
+          document.body.append(textarea);
+          textarea.select();
+          const copied = document.execCommand("copy");
+          textarea.remove();
+          if (!copied) throw new Error("Tautan tidak dapat disalin.");
+        }
+
+        const label = button.querySelector("[data-copy-label]");
+        if (label) label.textContent = "Tautan disalin";
+        button.classList.add("is-copied");
+        showToast("Tautan aktivitas berhasil disalin.", "success");
+        window.setTimeout(() => {
+          if (label) label.textContent = "Salin tautan";
+          button.classList.remove("is-copied");
+        }, 1800);
+      } catch (error) {
+        showToast("Tautan belum dapat disalin. Silakan coba kembali.", "warning");
+      }
+      return;
+    }
+    if (action === "filter-activities") {
+      state.activityCategory = button.dataset.category || "Semua";
+      state.activityVisibleCount = 6;
+      render();
     }
     if (action === "fill-certificate") {
       const input = document.getElementById("certificate-number");
@@ -4363,7 +4676,8 @@
       showToast("Form minat dan kontak akan dihubungkan pada fase berikutnya.", "info");
     }
     if (action === "load-more-news") {
-      showToast("Seluruh aktivitas sudah ditampilkan.", "info");
+      state.activityVisibleCount += 6;
+      render();
     }
     if (action === "go-home-section") {
       event.preventDefault();
@@ -4485,6 +4799,15 @@
       render();
     }
 
+    if (action === "forgot-password") {
+      state.passwordReset.token = "";
+      state.passwordReset.requestSent = false;
+      const homeUrl = new URL(backend.routes?.home || "/", window.location.origin);
+      homeUrl.hash = "forgot-password";
+      window.history.replaceState(null, "", homeUrl);
+      navigate("forgot-password");
+    }
+
     if (action === "resend-verification") {
       button.disabled = true;
       try {
@@ -4501,6 +4824,7 @@
     }
 
     if (action === "back-to-account") {
+      state.passwordReset.requestSent = false;
       navigate("account");
     }
 
@@ -4788,6 +5112,18 @@
       input.focus();
       input.setSelectionRange(state.search.length, state.search.length);
     }
+
+    if (event.target.id === "activity-search") {
+      state.activityQuery = event.target.value;
+      state.activityVisibleCount = 6;
+      render();
+      const input = document.getElementById("activity-search");
+      input?.focus();
+      input?.setSelectionRange(
+        state.activityQuery.length,
+        state.activityQuery.length,
+      );
+    }
   });
 
   document.addEventListener("change", (event) => {
@@ -4837,9 +5173,9 @@
     }
   });
 
-  const initialStep = steps.findIndex(
-    (step) => `#${step.id}` === window.location.hash,
-  );
+  const initialStep = state.passwordReset.token
+    ? steps.findIndex((step) => step.id === "reset-password")
+    : steps.findIndex((step) => `#${step.id}` === window.location.hash);
   if (state.loggedIn && backend.auth?.user?.is_admin) {
     window.location.replace(backend.routes?.admin || "/admin");
     return;
@@ -4855,8 +5191,10 @@
     "recruiter-account",
     "certificate",
     "account",
+    "forgot-password",
   ];
   if (state.verification.pending) initialPublicRoutes.push("verification");
+  if (state.passwordReset.token) initialPublicRoutes.push("reset-password");
   state.step =
     initialStep >= 0 &&
     (state.loggedIn || initialPublicRoutes.includes(steps[initialStep].id))

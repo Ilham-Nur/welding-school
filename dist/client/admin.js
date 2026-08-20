@@ -9,6 +9,9 @@
   const backdrop = document.querySelector("[data-admin-backdrop]");
   const accountButton = document.querySelector("[data-admin-account]");
   const accountMenu = document.querySelector("[data-admin-account-menu]");
+  const navigationToggles = document.querySelectorAll(
+    "[data-admin-nav-toggle]",
+  );
 
   function closeSidebar() {
     sidebar?.classList.remove("is-open");
@@ -51,6 +54,12 @@
     });
   });
 
+  sidebar?.querySelectorAll("[data-open-asset-scanner]").forEach((button) => {
+    button.addEventListener("click", () => {
+      if (window.matchMedia("(max-width: 820px)").matches) closeSidebar();
+    });
+  });
+
   collapseButton?.addEventListener("click", () => {
     const collapsed = !document.body.classList.contains(
       "admin-sidebar-collapsed",
@@ -60,6 +69,24 @@
       "welding-admin-sidebar",
       collapsed ? "collapsed" : "expanded",
     );
+  });
+
+  navigationToggles.forEach((toggle) => {
+    toggle.addEventListener("click", () => {
+      if (document.body.classList.contains("admin-sidebar-collapsed")) {
+        setDesktopSidebar(false);
+        window.localStorage.setItem("welding-admin-sidebar", "expanded");
+      }
+
+      const group = toggle.closest("[data-admin-nav-group]");
+      const items = group?.querySelector("[data-admin-nav-items]");
+      if (!group || !items) return;
+
+      const open = items.hidden;
+      items.hidden = !open;
+      group.classList.toggle("is-open", open);
+      toggle.setAttribute("aria-expanded", String(open));
+    });
   });
 
   accountButton?.addEventListener("click", () => {

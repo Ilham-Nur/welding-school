@@ -4,12 +4,13 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Asset;
+use App\Models\Location;
 use App\Services\Assets\AssetCodeGenerator;
 use App\Services\Assets\AssetExcelExporter;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -51,7 +52,7 @@ class AssetController extends Controller
 
     public function create(): View
     {
-        return view('admin.assets.form', ['asset' => new Asset]);
+        return view('admin.assets.form', ['asset' => new Asset, 'locations' => $this->locations()]);
     }
 
     public function store(Request $request): RedirectResponse
@@ -106,7 +107,7 @@ class AssetController extends Controller
     {
         $asset->load('checklistItems');
 
-        return view('admin.assets.form', compact('asset'));
+        return view('admin.assets.form', ['asset' => $asset, 'locations' => $this->locations()]);
     }
 
     public function update(Request $request, Asset $asset): RedirectResponse
@@ -211,7 +212,7 @@ class AssetController extends Controller
             ],
             'quantity' => ['required', 'integer', 'min:1', 'max:10000'],
             'purchase_year' => ['nullable', 'integer', 'min:1950', 'max:'.(date('Y') + 1)],
-            'location' => ['required', 'string', 'max:255'],
+            'location_id' => ['required', Rule::exists('locations', 'id')->where('is_active', true)],
             'condition' => ['required', Rule::in(array_keys(Asset::CONDITIONS))],
             'inspection_interval_months' => ['required', 'integer', Rule::in(array_keys(Asset::INSPECTION_INTERVALS))],
             'checklist_items' => ['required', 'array', 'min:1', 'max:30'],
@@ -245,6 +246,7 @@ class AssetController extends Controller
         unset($data['photo'], $data['calibration_certificate'], $data['remove_calibration_certificate']);
         $data['requires_calibration'] = $request->boolean('requires_calibration');
         $data['asset_type'] = $data['requires_calibration'] ? Asset::TYPE_MEASURING : Asset::TYPE_GENERAL;
+        $data['location'] = Location::query()->findOrFail($data['location_id'])->fullName();
 
         if ($data['status'] === 'under_calibration' && ! $data['requires_calibration']) {
             throw ValidationException::withMessages([
@@ -290,10 +292,16 @@ class AssetController extends Controller
                         ->orWhere('model', 'like', $search)
                         ->orWhere('serial_number', 'like', $search)
                         ->orWhere('location', 'like', $search);
+                    $query->orWhereHas('locationRecord', fn (Builder $location) => $location->where('name', 'like', $search));
                 });
             })
             ->when($request->filled('category'), fn (Builder $query) => $query->where('category_code', $request->string('category')))
             ->when($request->filled('status'), fn (Builder $query) => $query->where('status', $request->string('status')));
+    }
+
+    private function locations()
+    {
+        return Location::query()->with('parent')->where('is_active', true)->orderBy('name')->get();
     }
 
     private function deleteUploadedPhoto(string $path): void

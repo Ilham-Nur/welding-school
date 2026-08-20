@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Asset;
+use App\Models\Location;
 use App\Models\User;
 use Database\Seeders\RolePermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -18,6 +19,8 @@ class AssetManagementTest extends TestCase
 
     private User $admin;
 
+    private Location $location;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -26,6 +29,10 @@ class AssetManagementTest extends TestCase
         $this->admin = User::factory()->create();
         $this->admin->assignRole('admin');
         $this->actingAs($this->admin);
+        $this->location = Location::query()->create([
+            'name' => 'Workshop Welding Bay 01',
+            'is_active' => true,
+        ]);
     }
 
     public function test_asset_id_is_generated_automatically_per_category(): void
@@ -557,12 +564,16 @@ class AssetManagementTest extends TestCase
     {
         $this->post(route('admin.assets.store'), $this->assetPayload());
         $asset = Asset::query()->firstOrFail();
+        $updatedLocation = Location::query()->create([
+            'name' => 'Workshop Welding Bay 03',
+            'is_active' => true,
+        ]);
 
         $this->put(route('admin.assets.update', $asset), $this->assetPayload([
             'asset_code' => 'ATP-DEV-999',
             'category_code' => 'DEV',
             'equipment_name' => 'SMAW Welding Machine Updated',
-            'location' => 'Workshop Welding Bay 03',
+            'location_id' => $updatedLocation->id,
             'status' => 'maintenance',
         ]))->assertRedirect(route('admin.assets.index'));
 
@@ -603,6 +614,7 @@ class AssetManagementTest extends TestCase
             'serial_number' => 'SMAW-001',
             'quantity' => 1,
             'purchase_year' => 2026,
+            'location_id' => $this->location->id,
             'location' => 'Workshop Welding Bay 01',
             'condition' => 'good',
             'inspection_interval_months' => 2,
