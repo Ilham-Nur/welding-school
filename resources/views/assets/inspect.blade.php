@@ -7,6 +7,7 @@
         <meta name="robots" content="noindex, nofollow">
         <title>Inspeksi {{ $asset->asset_code }} | {{ $brand['name'] }}</title>
         <link rel="icon" href="{{ asset('favicon.ico') }}" sizes="any">
+        <link rel="stylesheet" href="{{ asset('templates/welding-school/components.css') }}?v={{ filemtime(public_path('templates/welding-school/components.css')) }}">
         <link rel="stylesheet" href="{{ asset('templates/welding-school/assets.css') }}?v={{ filemtime(public_path('templates/welding-school/assets.css')) }}">
     </head>
     <body class="asset-inspection-page">
@@ -37,23 +38,11 @@
             </section>
 
             @if (session('success'))
-                <div class="asset-inspection-message asset-inspection-message--success">
-                    {{ session('success') }}
-                    @if (auth()->user()->isAdmin() && auth()->user()->can('assets.view'))
-                        <a href="{{ route('admin.assets.dashboard', ['scan' => 1]) }}">Scan aset berikutnya</a>
-                    @endif
-                </div>
+                <button type="button" hidden data-flash-toast data-toast="{{ session('success') }}" data-toast-type="success"></button>
             @endif
 
             @if ($errors->any())
-                <div class="asset-inspection-message asset-inspection-message--error">
-                    <strong>Inspeksi belum dapat disimpan.</strong>
-                    <ul>
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
+                <button type="button" hidden data-flash-toast data-toast="{{ implode(' • ', $errors->all()) }}" data-toast-type="danger"></button>
             @endif
 
             <form class="asset-inspection-form" method="POST" action="{{ route('assets.inspections.store', ['asset' => $asset->public_id]) }}">
@@ -152,5 +141,7 @@
                 @endforelse
             </section>
         </main>
+        <x-ui.toast-stack />
+        <script src="{{ asset('templates/welding-school/components.js') }}?v={{ filemtime(public_path('templates/welding-school/components.js')) }}" defer></script>
     </body>
 </html>

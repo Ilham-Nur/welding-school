@@ -870,7 +870,7 @@
 /* Toasts */
 
 .ui-toast-stack {
-  bottom: 22px;
+  bottom: auto;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -878,7 +878,8 @@
   pointer-events: none;
   position: fixed;
   right: 22px;
-  width: 350px;
+  top: 18px;
+  width: min(420px, calc(100vw - 36px));
   z-index: 1000;
 }
 
@@ -1447,7 +1448,7 @@
   bottom: auto;
   right: 18px;
   top: 18px;
-  width: 340px;
+  width: min(420px, calc(100vw - 36px));
 }
 
 .ui-toast {
@@ -1493,6 +1494,10 @@
 
 .ui-toast__message {
   color: var(--muted);
+  display: block;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+  white-space: normal;
 }
 
 .ui-toast__close {

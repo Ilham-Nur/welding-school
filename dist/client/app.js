@@ -877,9 +877,13 @@
     toast.className = `toast ${tone ? `toast--${tone}` : ""}`;
     toast.textContent = message;
     toast.hidden = false;
+    const characterCount = String(message || "").trim().length;
+    const readingTime = 6000 + Math.ceil(characterCount / 20) * 1000;
+    const minimum = ["danger", "warning"].includes(tone) ? 10000 : 8000;
+    const duration = Math.min(Math.max(readingTime, minimum), 18000);
     toastTimer = window.setTimeout(() => {
       toast.hidden = true;
-    }, 3200);
+    }, duration);
   }
 
   function csrfToken() {

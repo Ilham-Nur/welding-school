@@ -225,26 +225,43 @@
 
                 <main id="admin-content" class="admin-content" tabindex="-1">
                     @if (session('success'))
-                        <x-ui.alert type="success" title="Berhasil" dismissible>
-                            {{ session('success') }}
-                        </x-ui.alert>
                         <button
                             type="button"
                             hidden
-                            data-admin-flash-toast
+                            data-flash-toast
                             data-toast="{{ session('success') }}"
                             data-toast-type="success"
                         ></button>
                     @endif
 
+                    @if (session('warning'))
+                        <button
+                            type="button"
+                            hidden
+                            data-flash-toast
+                            data-toast="{{ session('warning') }}"
+                            data-toast-type="warning"
+                        ></button>
+                    @endif
+
+                    @if (session('error'))
+                        <button
+                            type="button"
+                            hidden
+                            data-flash-toast
+                            data-toast="{{ session('error') }}"
+                            data-toast-type="danger"
+                        ></button>
+                    @endif
+
                     @if ($errors->any())
-                        <x-ui.alert type="danger" title="Ada data yang perlu diperbaiki" dismissible>
-                            <ul>
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </x-ui.alert>
+                        <button
+                            type="button"
+                            hidden
+                            data-flash-toast
+                            data-toast="{{ implode(' • ', $errors->all()) }}"
+                            data-toast-type="danger"
+                        ></button>
                     @endif
 
                     @yield('content')

@@ -2026,7 +2026,8 @@
 }
 
 body.whatsapp-visible .toast {
-  bottom: 98px;
+  bottom: auto;
+  top: 20px;
 }
 
 @media (max-width: 620px) {
@@ -2047,7 +2048,8 @@ body.whatsapp-visible .toast {
   }
 
   body.whatsapp-visible .toast {
-    bottom: 86px;
+    bottom: auto;
+    top: 16px;
   }
 }
 
@@ -9921,15 +9923,18 @@ a {
   background: var(--navy-900);
   border: 1px solid rgba(255, 255, 255, 0.13);
   border-radius: 8px;
-  bottom: 20px;
+  bottom: auto;
   box-shadow: var(--shadow-md);
   color: white;
   font-size: 14px;
   font-weight: 700;
-  max-width: calc(100% - 30px);
+  line-height: 1.5;
+  max-width: min(420px, calc(100% - 30px));
+  overflow-wrap: anywhere;
   padding: 13px 17px;
   position: fixed;
   right: 20px;
+  top: 20px;
   z-index: 150;
 }
 

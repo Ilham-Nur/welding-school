@@ -131,6 +131,4 @@
       dialog.showModal();
     }
   });
-
-  document.querySelector("[data-admin-flash-toast]")?.click();
 })();

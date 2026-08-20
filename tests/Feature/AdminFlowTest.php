@@ -83,6 +83,7 @@ class AdminFlowTest extends TestCase
         $admin->assignRole('super-admin');
 
         $this->actingAs($admin)
+            ->withSession(['success' => 'Data berhasil disimpan.'])
             ->get(route('admin.users.index'))
             ->assertOk()
             ->assertSee('name="robots" content="noindex, nofollow"', false)
@@ -94,6 +95,9 @@ class AdminFlowTest extends TestCase
             ->assertSee('admin-action-button--edit', false)
             ->assertSee('admin-action-button--delete', false)
             ->assertSee('id="toast-stack"', false)
+            ->assertSee('data-flash-toast', false)
+            ->assertSee('data-toast="Data berhasil disimpan."', false)
+            ->assertDontSee('ui-alert--success', false)
             ->assertSee('data-admin-sidebar-collapse', false)
             ->assertSee('data-label="User Management"', false)
             ->assertDontSee('Lihat tampilan peserta')
@@ -101,6 +105,11 @@ class AdminFlowTest extends TestCase
 
         $this->get(route('admin.roles.index'))
             ->assertOk()
+            ->assertSee('ui-table-shell', false)
+            ->assertSeeInOrder(['Role', 'Jenis', 'Pengguna', 'Akses diberikan', 'Aksi'])
+            ->assertSee('Detail akses role')
+            ->assertSee('data-modal-open="edit-role-', false)
+            ->assertSee('admin-role-permission-scroll', false)
             ->assertSeeInOrder([
                 'Akses internal',
                 'Pengguna &amp; role',
@@ -111,6 +120,8 @@ class AdminFlowTest extends TestCase
             ], false)
             ->assertSee('data-permission-group="system"', false)
             ->assertSee('data-permission-group="assets"', false)
+            ->assertSee('data-permission-group="employees"', false)
+            ->assertSee('data-permission-group="storage"', false)
             ->assertSee('Melihat aktivitas')
             ->assertSee('Mengelola dan menerbitkan aktivitas')
             ->assertSee('value="activities.view"', false)

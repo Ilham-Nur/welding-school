@@ -19,6 +19,12 @@ tmp/
 work/
 outputs/
 
+# Panduan cetak lokal (dibuat sekali, tidak dikirim ke GitHub)
+/output/guides/
+/output/guides-detailed/
+/output/pdf/panduan-*.pdf
+/tools/build_print_guides.py
+
 # Dependensi dan hasil build
 /vendor/
 /node_modules/

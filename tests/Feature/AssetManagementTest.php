@@ -538,6 +538,8 @@ class AssetManagementTest extends TestCase
 
         $this->get(route('assets.inspections.create', ['asset' => $asset->public_id]))
             ->assertOk()
+            ->assertSee('data-flash-toast', false)
+            ->assertDontSee('asset-inspection-message--success', false)
             ->assertSee('Riwayat inspeksi')
             ->assertSee('Kabel perlu diganti sebelum alat digunakan kembali.');
     }

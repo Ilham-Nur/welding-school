@@ -1082,8 +1082,7 @@
 
 /* Cards and tables */
 
-.admin-panel,
-.admin-role-card {
+.admin-panel {
   background: white;
   border: 1px solid var(--admin-border);
   border-radius: var(--admin-radius-lg);
@@ -1447,33 +1446,48 @@
 
 /* Roles and permissions */
 
-.admin-role-grid {
+.admin-role-access-summary {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  color: var(--admin-info);
+  cursor: pointer;
+  display: inline-flex;
+  gap: 8px;
+  padding: 0;
+}
+
+.admin-role-access-summary strong {
+  color: var(--admin-ink);
+  font-size: 14px;
+}
+
+.admin-role-access-summary span {
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.admin-role-permission-form {
   display: grid;
   gap: 16px;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-.admin-role-card {
-  padding: 18px;
+.admin-role-permission-scroll,
+.admin-role-detail-permissions {
+  max-height: min(56vh, 580px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-right: 5px;
+  scrollbar-gutter: stable;
 }
 
-.admin-role-card__heading {
-  align-items: start;
-  display: flex;
-  gap: 16px;
-  justify-content: space-between;
-  margin-bottom: 16px;
-}
-
-.admin-role-card h2 {
-  font-size: 15px;
-  margin: 0 0 3px;
-}
-
-.admin-role-card p {
-  color: var(--admin-muted);
-  font-size: 14px;
-  margin: 0;
+.admin-role-permission-scroll {
+  border-bottom: 1px solid var(--admin-border);
+  border-top: 1px solid var(--admin-border);
+  padding-bottom: 14px;
+  padding-top: 14px;
 }
 
 .admin-permissions {
@@ -1569,6 +1583,17 @@
 .admin-check small {
   color: var(--admin-muted);
   font-size: 13px;
+  font-weight: 500;
+}
+
+.admin-role-detail-permissions .admin-permission-tags span {
+  display: grid;
+  gap: 2px;
+}
+
+.admin-role-detail-permissions .admin-permission-tags small {
+  color: var(--admin-muted);
+  font-size: 11px;
   font-weight: 500;
 }
 
@@ -2298,9 +2323,6 @@
     grid-template-columns: 1fr 1fr;
   }
 
-  .admin-role-grid {
-    grid-template-columns: 1fr;
-  }
 }
 
 @media (max-width: 580px) {
@@ -2465,4 +2487,3 @@
     grid-row: auto;
   }
 }
-

@@ -10,6 +10,7 @@
         <title>Login Portal Internal · {{ $brand['name'] }}</title>
         <link rel="icon" href="{{ asset('favicon.ico') }}" sizes="any">
         <link rel="stylesheet" href="{{ asset('templates/welding-school/style.css') }}?v={{ filemtime(public_path('templates/welding-school/style.css')) }}">
+        <link rel="stylesheet" href="{{ asset('templates/welding-school/components.css') }}?v={{ filemtime(public_path('templates/welding-school/components.css')) }}">
         <link rel="stylesheet" href="{{ asset('templates/welding-school/admin.css') }}?v={{ filemtime(public_path('templates/welding-school/admin.css')) }}">
     </head>
     <body class="internal-login-page">
@@ -43,15 +44,11 @@
                     <p>Masukkan email atau username akun staf Anda untuk melanjutkan.</p>
 
                     @if (session('auth_status'))
-                        <div class="internal-login-alert internal-login-alert--success" role="status">
-                            {{ session('auth_status') }}
-                        </div>
+                        <button type="button" hidden data-flash-toast data-toast="{{ session('auth_status') }}" data-toast-type="success"></button>
                     @endif
 
                     @if ($errors->any())
-                        <div class="internal-login-alert internal-login-alert--danger" role="alert">
-                            {{ $errors->first() }}
-                        </div>
+                        <button type="button" hidden data-flash-toast data-toast="{{ implode(' • ', $errors->all()) }}" data-toast-type="danger"></button>
                     @endif
 
                     <form class="internal-login-form" method="POST" action="{{ route('admin.login.store') }}">
@@ -91,5 +88,7 @@
                 </div>
             </section>
         </main>
+        <x-ui.toast-stack />
+        <script src="{{ asset('templates/welding-school/components.js') }}?v={{ filemtime(public_path('templates/welding-school/components.js')) }}" defer></script>
     </body>
 </html>

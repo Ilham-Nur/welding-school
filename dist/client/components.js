@@ -17,6 +17,14 @@
     window.setTimeout(() => toast.remove(), 180);
   }
 
+  function toastDuration(message, tone) {
+    const characterCount = String(message || "").trim().length;
+    const readingTime = 6000 + Math.ceil(characterCount / 20) * 1000;
+    const minimum = ["danger", "warning"].includes(tone) ? 10000 : 8000;
+
+    return Math.min(Math.max(readingTime, minimum), 18000);
+  }
+
   function showToast(message, type) {
     if (!toastStack) return;
 
@@ -65,7 +73,10 @@
       toastStack.lastElementChild.remove();
     }
 
-    window.setTimeout(() => removeToast(toast), 4200);
+    window.setTimeout(
+      () => removeToast(toast),
+      toastDuration(message, tone),
+    );
   }
 
   function openDialog(id, trigger) {
@@ -219,4 +230,8 @@
       menuButton.setAttribute("aria-label", isOpen ? "Tutup menu" : "Buka menu");
     });
   }
+
+  document.querySelectorAll("[data-flash-toast]").forEach((trigger) => {
+    trigger.click();
+  });
 })();
