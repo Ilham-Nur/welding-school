@@ -113,6 +113,11 @@ class StorageManagementTest extends TestCase
 
         $this->assertSame(10.0, (float) StorageStock::query()->firstOrFail()->quantity);
 
+        $this->get(route('admin.storage-items.show', $item))
+            ->assertOk()
+            ->assertSee('10 box')
+            ->assertDontSee('10.000 box');
+
         $this->post(route('admin.storage.issues.store'), [
             'transaction_date' => '2026-08-13', 'location_id' => $this->storage->id,
             'purpose' => 'Praktik SMAW',
@@ -122,6 +127,18 @@ class StorageManagementTest extends TestCase
         $this->assertSame(7.0, (float) StorageStock::query()->firstOrFail()->quantity);
         $this->assertDatabaseCount('storage_transactions', 2);
         $this->assertDatabaseCount('storage_transaction_lines', 2);
+
+        $this->get(route('admin.storage-items.show', $item))
+            ->assertOk()
+            ->assertSee('7 box')
+            ->assertDontSee('7.000 box');
+
+        $this->get(route('admin.storage-items.index'))
+            ->assertOk()
+            ->assertSee('7 box')
+            ->assertSee('2 box')
+            ->assertDontSee('7.000 box')
+            ->assertDontSee('2.000 box');
     }
 
     public function test_consumable_internal_code_is_generated_automatically_and_cannot_be_changed(): void
@@ -274,6 +291,23 @@ class StorageManagementTest extends TestCase
         ])->assertRedirect(route('admin.storage.receipts.index'));
         $this->assertSame(1000.0, (float) StorageStock::query()->where('storage_item_id', $item->id)->value('quantity'));
         $this->assertSame(1.5, (float) StorageStock::query()->where('storage_item_id', $decimalItem->id)->value('quantity'));
+
+        $this->get(route('admin.storage-items.index'))
+            ->assertOk()
+            ->assertSee('1.000 pcs')
+            ->assertSee('1,5 kg');
+
+        $this->get(route('admin.storage-items.show', $item))
+            ->assertOk()
+            ->assertSee('1.000 pcs');
+
+        $this->get(route('admin.storage-items.show', $decimalItem))
+            ->assertOk()
+            ->assertSee('1,5 kg');
+
+        $this->get(route('admin.storage-items.edit', $item))
+            ->assertOk()
+            ->assertSee('value="1.000"', false);
     }
 
     public function test_storage_report_can_export_excel_and_pdf_with_company_identity(): void

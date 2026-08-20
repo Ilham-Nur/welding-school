@@ -10,7 +10,7 @@
             <x-ui.table class="admin-table-wrap"><thead><tr><th>Barang</th><th>Kategori</th><th>Stok total</th><th>Minimum</th><th>Status</th><th>Aksi</th></tr></thead><tbody>
             @foreach($items as $item)@php($total=(float)($item->stocks_sum_quantity ?? 0))<tr>
                 <td><strong>{{ $item->name }}</strong><small>{{ $item->code }} · {{ $item->unit }}</small></td><td>{{ $item->category }}</td>
-                <td><strong>{{ number_format($total, 3) }} {{ $item->unit }}</strong></td><td>{{ number_format((float)$item->minimum_stock, 3) }} {{ $item->unit }}</td>
+                <td><strong>{{ format_quantity($total) }} {{ $item->unit }}</strong></td><td>{{ format_quantity($item->minimum_stock) }} {{ $item->unit }}</td>
                 <td>@if(!$item->is_active)<x-admin.status-badge status="inactive" />@elseif($total<=0)<x-admin.status-badge status="inactive">Habis</x-admin.status-badge>@elseif($total<=(float)$item->minimum_stock)<x-admin.status-badge status="pending">Menipis</x-admin.status-badge>@else<x-admin.status-badge status="active">Aman</x-admin.status-badge>@endif</td>
                 <td><div class="admin-action-group"><a class="admin-action-button admin-action-button--view" href="{{ route('admin.storage-items.show', $item) }}"><x-ui.icon name="eye" size="14" /> Detail</a>@can('storage.items.manage')<a class="admin-action-button admin-action-button--edit" href="{{ route('admin.storage-items.edit', $item) }}"><x-ui.icon name="edit" size="14" /> Edit</a>@endcan</div></td>
             </tr>@endforeach</tbody></x-ui.table><x-ui.pagination :paginator="$items" />

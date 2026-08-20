@@ -66,7 +66,7 @@
                         />
                         <label class="ui-field admin-field">
                             <span class="ui-field__label">Stok minimum <em>Wajib</em></span>
-                            <input type="text" inputmode="decimal" data-number-format data-number-decimals="3" name="minimum_stock" value="{{ rtrim(rtrim(number_format((float) old('minimum_stock', $storageItem->minimum_stock ?? 0), 3, ',', '.'), '0'), ',') }}" required>
+                            <input type="text" inputmode="decimal" data-number-format data-number-decimals="3" name="minimum_stock" value="{{ format_quantity(old('minimum_stock', $storageItem->minimum_stock ?? 0)) }}" required>
                             @error('minimum_stock')<span class="ui-field__error">{{ $message }}</span>@enderror
                         </label>
 
@@ -98,4 +98,8 @@
 
 @push('styles')
     <link rel="stylesheet" href="{{ asset('templates/welding-school/storage.css') }}?v={{ filemtime(public_path('templates/welding-school/storage.css')) }}">
+@endpush
+
+@push('scripts')
+    @vite('resources/js/storage.js')
 @endpush

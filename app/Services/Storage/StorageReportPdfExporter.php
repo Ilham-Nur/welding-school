@@ -94,7 +94,7 @@ class StorageReportPdfExporter
                 $line->item->name,
                 $transaction->location->fullName(),
                 ucfirst($transaction->type),
-                number_format((float) $line->quantity, 3, ',', '.'),
+                format_quantity($line->quantity),
                 $line->item->unit,
                 $transaction->purpose ?? $transaction->supplier ?? $transaction->reference ?? 'Tidak dicatat',
             ];

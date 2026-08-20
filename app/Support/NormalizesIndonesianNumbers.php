@@ -4,6 +4,22 @@ namespace App\Support;
 
 trait NormalizesIndonesianNumbers
 {
+    public static function formatQuantity(float|int|string|null $value, int $maxDecimals = 3): string
+    {
+        if ($value === null || $value === '') {
+            return '0';
+        }
+
+        $num = (float) $value;
+        $formatted = number_format($num, $maxDecimals, ',', '.');
+
+        if (str_contains($formatted, ',')) {
+            $formatted = rtrim(rtrim($formatted, '0'), ',');
+        }
+
+        return $formatted;
+    }
+
     protected function normalizeIndonesianNumber(mixed $value): mixed
     {
         if (! is_string($value)) {

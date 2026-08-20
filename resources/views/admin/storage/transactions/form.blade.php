@@ -100,7 +100,7 @@
 
                             <label class="ui-field admin-field">
                                 <span class="ui-field__label">Jumlah <em>Wajib</em></span>
-                                <input type="text" inputmode="decimal" data-number-format data-number-decimals="3" name="lines[{{ $index }}][quantity]" value="{{ filled($line['quantity'] ?? null) ? rtrim(rtrim(number_format((float) $line['quantity'], 3, ',', '.'), '0'), ',') : '' }}" required>
+                                <input type="text" inputmode="decimal" data-number-format data-number-decimals="3" name="lines[{{ $index }}][quantity]" value="{{ filled($line['quantity'] ?? null) ? format_quantity($line['quantity']) : '' }}" required>
                             </label>
 
                             <label class="ui-field admin-field">

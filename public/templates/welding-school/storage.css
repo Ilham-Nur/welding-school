@@ -165,7 +165,7 @@
 .storage-loan-asset-option[aria-selected="true"] .storage-loan-asset-option-mark { opacity: 1; }
 .storage-loan-asset-option:hover .storage-loan-asset-option-mark,
 .storage-loan-asset-option:focus-visible .storage-loan-asset-option-mark { color: #fff; }
-.admin-field [data-number-format] { font-variant-numeric: tabular-nums; text-align: right; }
+.admin-field [data-number-format] { font-variant-numeric: tabular-nums; text-align: left; }
 .storage-return-trigger { white-space: nowrap; }
 .storage-loan-return-summary { display: grid; gap: 10px; grid-template-columns: repeat(2, minmax(0, 1fr)); margin-bottom: 18px; }
 .storage-loan-return-summary article { background: var(--admin-surface-soft); border: 1px solid var(--admin-border); border-radius: var(--admin-radius); display: grid; gap: 3px; padding: 12px; }

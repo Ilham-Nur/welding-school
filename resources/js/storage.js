@@ -7,22 +7,53 @@ const normalize = (value) => String(value ?? '')
     .trim();
 
 const formatLocalizedNumber = (value, decimals = 3) => {
-    const cleaned = String(value ?? '').replace(/[^\d,]/g, '');
+    const raw = String(value ?? '').trim();
+    if (!raw) return '';
+
+    const cleaned = raw.replace(/[^\d,]/g, '');
+    if (!cleaned) return '';
+
     const [integerPart = '', decimalPart] = cleaned.split(',', 2);
-    const integer = integerPart.replace(/^0+(?=\d)/, '') || (cleaned ? '0' : '');
+    const integer = integerPart.replace(/^0+(?=\d)/, '') || (integerPart.includes('0') ? '0' : '');
     const grouped = integer.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 
     return decimalPart !== undefined ? `${grouped},${decimalPart.slice(0, decimals)}` : grouped;
 };
 
-const normalizeLocalizedNumber = (value) => String(value ?? '').replaceAll('.', '');
+const normalizeLocalizedNumber = (value) => String(value ?? '').trim().replaceAll('.', '');
 
 const enhanceNumberInput = (input) => {
     if (input.dataset.numberEnhanced === 'true') return;
     input.dataset.numberEnhanced = 'true';
-    input.value = formatLocalizedNumber(input.value, Number(input.dataset.numberDecimals || 3));
-    input.addEventListener('input', () => {
+    if (input.value) {
         input.value = formatLocalizedNumber(input.value, Number(input.dataset.numberDecimals || 3));
+    }
+    input.addEventListener('input', () => {
+        const decimals = Number(input.dataset.numberDecimals || 3);
+        const cursorPosition = input.selectionStart ?? input.value.length;
+        const rawBeforeCursor = input.value.slice(0, cursorPosition);
+        const significantBefore = rawBeforeCursor.replace(/[^\d,]/g, '').length;
+
+        const formatted = formatLocalizedNumber(input.value, decimals);
+        input.value = formatted;
+
+        let newPos = 0;
+        let count = 0;
+        for (let i = 0; i < formatted.length; i++) {
+            if (/[\d,]/.test(formatted[i])) {
+                count++;
+            }
+            if (count >= significantBefore) {
+                newPos = i + 1;
+                break;
+            }
+        }
+        if (significantBefore === 0) {
+            newPos = 0;
+        } else if (count < significantBefore) {
+            newPos = formatted.length;
+        }
+        input.setSelectionRange(newPos, newPos);
     });
 };
 
@@ -243,13 +274,17 @@ if (form) {
 }
 
 enhanceNumberInputs();
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => enhanceNumberInputs());
+}
 
-document.querySelectorAll('form').forEach((currentForm) => {
-    currentForm.addEventListener('submit', () => {
+document.addEventListener('submit', (event) => {
+    const currentForm = event.target;
+    if (currentForm instanceof HTMLFormElement) {
         currentForm.querySelectorAll('[data-number-format]').forEach((input) => {
             input.value = normalizeLocalizedNumber(input.value);
         });
-    });
+    }
 });
 
 const loanAssetPicker = document.querySelector('[data-loan-asset-picker]');
