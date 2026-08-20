@@ -26,6 +26,19 @@ return new class extends Migration
             $table->foreignId('location_id')->nullable()->after('location')->constrained()->nullOnDelete();
         });
 
+        $makeCode = function (string $name): string {
+            $base = Str::upper(Str::slug($name, '-')) ?: 'LOKASI';
+            $code = Str::limit($base, 24, '');
+            $candidate = $code;
+            $suffix = 1;
+
+            while (DB::table('locations')->where('code', $candidate)->exists()) {
+                $candidate = Str::limit($code, 20, '').'-'.(++$suffix);
+            }
+
+            return $candidate;
+        };
+
         DB::table('assets')
             ->select('location')
             ->whereNotNull('location')
@@ -33,27 +46,74 @@ return new class extends Migration
             ->distinct()
             ->orderBy('location')
             ->get()
-            ->each(function (object $row): void {
-                $base = Str::upper(Str::slug((string) $row->location, '-')) ?: 'LOKASI';
-                $code = Str::limit($base, 24, '');
-                $candidate = $code;
-                $suffix = 1;
+            ->each(function (object $row) use ($makeCode): void {
+                $rawLocation = trim((string) $row->location);
+                $isStorage = (strcasecmp($rawLocation, 'Tool Storage Area') === 0) || str_contains(strtolower($rawLocation), 'storage');
 
-                while (DB::table('locations')->where('code', $candidate)->exists()) {
-                    $candidate = Str::limit($code, 20, '').'-'.(++$suffix);
+                $parts = preg_split('/\s*[\x{2013}\x{2014}\-\/]\s*/u', $rawLocation, 2);
+
+                if (is_array($parts) && count($parts) === 2 && ! empty(trim($parts[0])) && ! empty(trim($parts[1]))) {
+                    $parentName = trim($parts[0]);
+                    $childName = trim($parts[1]);
+
+                    $parent = DB::table('locations')->whereNull('parent_id')->where('name', $parentName)->first();
+                    if (! $parent) {
+                        $parentId = DB::table('locations')->insertGetId([
+                            'code' => $makeCode($parentName),
+                            'name' => $parentName,
+                            'type' => 'area',
+                            'parent_id' => null,
+                            'is_storage' => false,
+                            'is_active' => true,
+                            'created_at' => now(),
+                            'updated_at' => now(),
+                        ]);
+                    } else {
+                        $parentId = $parent->id;
+                    }
+
+                    $child = DB::table('locations')->where('parent_id', $parentId)->where('name', $childName)->first();
+                    if (! $child) {
+                        $childId = DB::table('locations')->insertGetId([
+                            'code' => $makeCode($parentName.'-'.$childName),
+                            'name' => $childName,
+                            'type' => 'area',
+                            'parent_id' => $parentId,
+                            'is_storage' => false,
+                            'is_active' => true,
+                            'created_at' => now(),
+                            'updated_at' => now(),
+                        ]);
+                    } else {
+                        $childId = $child->id;
+                    }
+
+                    DB::table('assets')->where('location', $row->location)->update([
+                        'location_id' => $childId,
+                        'location' => $parentName.' / '.$childName,
+                    ]);
+                } else {
+                    $loc = DB::table('locations')->whereNull('parent_id')->where('name', $rawLocation)->first();
+                    if (! $loc) {
+                        $locId = DB::table('locations')->insertGetId([
+                            'code' => $makeCode($rawLocation),
+                            'name' => $rawLocation,
+                            'type' => 'area',
+                            'parent_id' => null,
+                            'is_storage' => $isStorage,
+                            'is_active' => true,
+                            'created_at' => now(),
+                            'updated_at' => now(),
+                        ]);
+                    } else {
+                        $locId = $loc->id;
+                    }
+
+                    DB::table('assets')->where('location', $row->location)->update([
+                        'location_id' => $locId,
+                        'location' => $rawLocation,
+                    ]);
                 }
-
-                $id = DB::table('locations')->insertGetId([
-                    'code' => $candidate,
-                    'name' => (string) $row->location,
-                    'type' => 'area',
-                    'is_storage' => false,
-                    'is_active' => true,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]);
-
-                DB::table('assets')->where('location', $row->location)->update(['location_id' => $id]);
             });
 
         Schema::create('storage_items', function (Blueprint $table): void {
