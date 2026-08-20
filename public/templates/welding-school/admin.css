@@ -2112,8 +2112,51 @@
   color: var(--admin-success);
 }
 
-.admin-activity-cropper-status[data-tone="error"] {
+.admin-activity-cropper-status[data-tone="error"],
+.admin-employee-cropper-status[data-tone="error"] {
   color: var(--admin-danger);
+}
+
+.admin-employee-cropper-layout {
+  display: grid;
+  gap: 14px;
+}
+
+.admin-employee-cropper-stage {
+  aspect-ratio: 1 / 1;
+  background: #071b2c;
+  border: 1px solid var(--admin-border-strong);
+  border-radius: var(--admin-radius);
+  margin: 0 auto;
+  max-width: 440px;
+  min-height: 260px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.admin-employee-cropper-stage cropper-canvas {
+  height: 100%;
+  width: 100%;
+}
+
+.admin-employee-cropper-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+
+.admin-employee-cropper-status {
+  color: var(--admin-muted);
+  font-size: 13px;
+  line-height: 1.5;
+  margin: 0;
+  text-align: center;
+}
+
+.admin-employee-cropper-status[data-tone="success"],
+.admin-employee-cropper-status[data-tone="ready"] {
+  color: var(--admin-success);
 }
 
 .admin-activity-featured-check {
@@ -2370,3 +2413,56 @@
   text-overflow: clip;
   white-space: normal;
 }
+
+.admin-asset-id-preview,
+.admin-code-preview {
+  align-items: center;
+  background: linear-gradient(135deg, #071b32, #123e62);
+  border-radius: 12px;
+  color: white;
+  display: grid;
+  gap: 3px 16px;
+  grid-template-columns: auto minmax(0, 1fr);
+  margin-bottom: 18px;
+  padding: 15px 17px;
+}
+
+.admin-asset-id-preview span,
+.admin-code-preview span {
+  color: #9fc2dc;
+  font-size: 12px;
+  font-weight: 800;
+  grid-column: 1;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.admin-asset-id-preview strong,
+.admin-code-preview strong {
+  font-size: 21px;
+  grid-column: 1;
+  letter-spacing: 0.035em;
+}
+
+.admin-asset-id-preview small,
+.admin-code-preview small {
+  color: #c8d8e5;
+  font-size: 13px;
+  grid-column: 2;
+  grid-row: 1 / 3;
+  line-height: 1.45;
+}
+
+@media (max-width: 580px) {
+  .admin-asset-id-preview,
+  .admin-code-preview {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-asset-id-preview small,
+  .admin-code-preview small {
+    grid-column: 1;
+    grid-row: auto;
+  }
+}
+

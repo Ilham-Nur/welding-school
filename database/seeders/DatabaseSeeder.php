@@ -13,6 +13,7 @@ class DatabaseSeeder extends Seeder
             AdminUserSeeder::class,
             TrainingProgramSeeder::class,
             TrainingBatchSeeder::class,
+            EmployeePositionSeeder::class,
         ]);
     }
 }

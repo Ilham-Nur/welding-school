@@ -11,6 +11,7 @@ export default defineConfig({
                 'resources/js/activity-focus.js',
                 'resources/js/assets.js',
                 'resources/js/asset-photo.js',
+                'resources/js/employee-photo.js',
                 'resources/js/asset-scanner.js',
                 'resources/js/storage.js',
                 'resources/js/locations.js',

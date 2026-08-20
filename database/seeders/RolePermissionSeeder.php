@@ -47,6 +47,8 @@ class RolePermissionSeeder extends Seeder
             'storage.loans.manage',
             'storage.stocktakes.manage',
             'storage.reports.view',
+            'employees.view',
+            'employees.manage',
         ]);
         $participant->syncPermissions([]);
 

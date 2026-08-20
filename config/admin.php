@@ -32,6 +32,8 @@ return [
         'storage.loans.manage' => 'Mencatat pinjaman aset ke luar area',
         'storage.stocktakes.manage' => 'Melakukan dan menyelesaikan stock opname',
         'storage.reports.view' => 'Melihat laporan Storage',
+        'employees.view' => 'Melihat data karyawan',
+        'employees.manage' => 'Mengelola data karyawan',
     ],
 
     'permission_groups' => [
@@ -52,6 +54,14 @@ return [
                 'roles.manage',
                 'locations.view',
                 'locations.manage',
+            ],
+        ],
+        'employees' => [
+            'label' => 'Kepegawaian & SDM',
+            'description' => 'Pengelolaan data karyawan, biodata, riwayat pendidikan, dan berkas kepegawaian.',
+            'permissions' => [
+                'employees.view',
+                'employees.manage',
             ],
         ],
         'applications' => [

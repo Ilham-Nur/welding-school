@@ -6,6 +6,8 @@ use App\Http\Controllers\Admin\AssetDashboardController;
 use App\Http\Controllers\Admin\AssetExternalLoanController;
 use App\Http\Controllers\Admin\AssetLabelController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\EmployeeController;
+use App\Http\Controllers\Admin\EmployeePositionController;
 use App\Http\Controllers\Admin\LocationController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\StorageDashboardController;
@@ -59,6 +61,48 @@ Route::prefix('admin')
         Route::delete('/roles/{role}', [RoleController::class, 'destroy'])
             ->middleware('permission:roles.manage')
             ->name('roles.destroy');
+
+        Route::get('/employees/{employee}/documents/{document}/preview', [EmployeeController::class, 'previewDocument'])
+            ->middleware('permission:employees.view')
+            ->name('employees.documents.preview');
+        Route::get('/employees/{employee}/documents/{document}/download', [EmployeeController::class, 'downloadDocument'])
+            ->middleware('permission:employees.view')
+            ->name('employees.documents.download');
+        Route::get('/employees/{employee}/educations/{education}/preview', [EmployeeController::class, 'previewEducation'])
+            ->middleware('permission:employees.view')
+            ->name('employees.educations.preview');
+        Route::get('/employees/{employee}/educations/{education}/download', [EmployeeController::class, 'downloadEducation'])
+            ->middleware('permission:employees.view')
+            ->name('employees.educations.download');
+        Route::get('/employees/{employee}/last-education/preview', [EmployeeController::class, 'previewLastEducation'])
+            ->middleware('permission:employees.view')
+            ->name('employees.last-education.preview');
+        Route::get('/employees/{employee}/last-education/download', [EmployeeController::class, 'downloadLastEducation'])
+            ->middleware('permission:employees.view')
+            ->name('employees.last-education.download');
+
+        Route::post('/employees/{employee}/educations', [EmployeeController::class, 'storeEducation'])
+            ->middleware('permission:employees.manage')
+            ->name('employees.educations.store');
+        Route::delete('/employees/{employee}/educations/{education}', [EmployeeController::class, 'destroyEducation'])
+            ->middleware('permission:employees.manage')
+            ->name('employees.educations.destroy');
+
+        Route::post('/employees/{employee}/documents', [EmployeeController::class, 'storeDocument'])
+            ->middleware('permission:employees.manage')
+            ->name('employees.documents.store');
+        Route::delete('/employees/{employee}/documents/{document}', [EmployeeController::class, 'destroyDocument'])
+            ->middleware('permission:employees.manage')
+            ->name('employees.documents.destroy');
+
+        Route::resource('employees', EmployeeController::class)
+            ->middlewareFor(['index', 'show'], 'permission:employees.view')
+            ->middlewareFor(['create', 'store', 'edit', 'update', 'destroy'], 'permission:employees.manage');
+
+        Route::resource('employee-positions', EmployeePositionController::class)
+            ->except(['create', 'show', 'edit'])
+            ->middlewareFor(['index'], 'permission:employees.view')
+            ->middlewareFor(['store', 'update', 'destroy'], 'permission:employees.manage');
 
         Route::get('/applications', [TrainingApplicationController::class, 'index'])
             ->middleware('permission:applications.view')

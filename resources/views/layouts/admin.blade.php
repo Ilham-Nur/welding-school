@@ -145,9 +145,17 @@
                         </div>
                     @endcanany
 
-                    @canany(['users.view', 'roles.view', 'locations.view'])
+                    @canany(['users.view', 'roles.view', 'locations.view', 'employees.view'])
                         <div class="admin-sidebar__label">Master data</div>
                     @endcanany
+                    @can('employees.view')
+                        <a class="{{ request()->routeIs('admin.employees.*') ? 'is-active' : '' }}" href="{{ route('admin.employees.index') }}" data-label="Data Karyawan" title="Data Karyawan">
+                            <span aria-hidden="true"><x-ui.icon name="users" /></span><span class="admin-nav-label">Data Karyawan</span>
+                        </a>
+                        <a class="{{ request()->routeIs('admin.employee-positions.*') ? 'is-active' : '' }}" href="{{ route('admin.employee-positions.index') }}" data-label="Master Jabatan" title="Master Jabatan">
+                            <span aria-hidden="true"><x-ui.icon name="shield" /></span><span class="admin-nav-label">Master Jabatan</span>
+                        </a>
+                    @endcan
                     @can('roles.view')
                         <a class="{{ request()->routeIs('admin.roles.*') ? 'is-active' : '' }}" href="{{ route('admin.roles.index') }}" data-label="Role Management" title="Role Management">
                             <span aria-hidden="true"><x-ui.icon name="shield" /></span><span class="admin-nav-label">Role Management</span>
