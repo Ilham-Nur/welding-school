@@ -21,6 +21,7 @@ class RoleController extends Controller
 
         return view('admin.roles.index', [
             'roles' => Role::query()
+                ->where('name', '!=', 'participant')
                 ->with('permissions')
                 ->withCount('users')
                 ->orderBy('name')

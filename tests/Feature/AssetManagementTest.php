@@ -10,6 +10,8 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Worksheet\PageSetup;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
@@ -481,24 +483,52 @@ class AssetManagementTest extends TestCase
         $response->assertHeader('content-type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
 
         $sourcePath = $response->baseResponse->getFile()->getPathname();
-        $zipPath = tempnam(sys_get_temp_dir(), 'asset-export-test-').'.zip';
-        copy($sourcePath, $zipPath);
+        $workbook = null;
 
         try {
-            $archive = new \PharData($zipPath);
-            $sheetXml = $archive['xl/worksheets/sheet1.xml']->getContent();
-            $stylesXml = $archive['xl/styles.xml']->getContent();
+            $workbook = IOFactory::load($sourcePath);
+            $this->assertSame(2, $workbook->getSheetCount());
 
-            $this->assertStringContainsString('DAFTAR ASET ALPHA WELDING ACADEMY', $sheetXml);
-            $this->assertStringContainsString('ATP-MSR-001', $sheetXml);
-            $this->assertStringContainsString('Digital Caliper', $sheetXml);
-            $this->assertStringContainsString('Kategori: MSR', $sheetXml);
-            $this->assertStringNotContainsString('ATP-WLD-001', $sheetXml);
-            $this->assertStringContainsString('autoFilter ref="A6:W7"', $sheetXml);
-            $this->assertStringContainsString('formatCode="dd mmm yyyy"', $stylesXml);
+            $sheet = $workbook->getSheetByName('Daftar Aset');
+            $this->assertNotNull($sheet);
+            $pageSetup = $sheet->getPageSetup();
+
+            $this->assertSame('Daftar Aset', $sheet->getTitle());
+            $this->assertSame('ALPHA ACADEMY', $sheet->getCell('B1')->getValue());
+            $this->assertSame('WELDING SCHOOL', $sheet->getCell('B2')->getValue());
+            $this->assertStringNotContainsString('Kompeten', (string) $sheet->getCell('B2')->getValue());
+            $this->assertSame('DAFTAR ASET ALPHA WELDING ACADEMY', $sheet->getCell('A4')->getValue());
+            $this->assertStringContainsString('Kategori: MSR', (string) $sheet->getCell('A5')->getValue());
+            $this->assertSame('ATP-MSR-001', $sheet->getCell('A8')->getValue());
+            $this->assertSame('Digital Caliper', $sheet->getCell('C8')->getValue());
+            $this->assertNull($sheet->getCell('A9')->getValue());
+            $this->assertSame('A7:K8', $sheet->getAutoFilter()->getRange());
+            $this->assertSame('dd mmm yyyy', $sheet->getStyle('I8')->getNumberFormat()->getFormatCode());
+            $this->assertCount(1, $sheet->getDrawingCollection());
+            $this->assertSame('Logo Alpha Academy', $sheet->getDrawingCollection()[0]->getName());
+            $this->assertSame('A1', $sheet->getDrawingCollection()[0]->getCoordinates());
+            $this->assertArrayHasKey('A1:A3', $sheet->getMergeCells());
+            $this->assertArrayNotHasKey('A1:B3', $sheet->getMergeCells());
+            $this->assertEquals(13, $sheet->getColumnDimension('A')->getWidth());
+            $this->assertSame(PageSetup::PAPERSIZE_A4, $pageSetup->getPaperSize());
+            $this->assertSame(PageSetup::ORIENTATION_LANDSCAPE, $pageSetup->getOrientation());
+            $this->assertSame(1, $pageSetup->getFitToWidth());
+            $this->assertSame(0, $pageSetup->getFitToHeight());
+            $this->assertSame([7, 7], $pageSetup->getRowsToRepeatAtTop());
+            $this->assertSame('A1:K8', str_replace('$', '', $pageSetup->getPrintArea()));
+            $this->assertFalse($sheet->getShowGridlines());
+
+            $detailSheet = $workbook->getSheetByName('Data Lengkap');
+            $this->assertNotNull($detailSheet);
+            $this->assertSame('ATP-MSR-001', $detailSheet->getCell('A8')->getValue());
+            $this->assertSame('Digital Caliper', $detailSheet->getCell('C8')->getValue());
+            $this->assertSame('A7:W8', $detailSheet->getAutoFilter()->getRange());
+            $this->assertSame('dd mmm yyyy', $detailSheet->getStyle('M8')->getNumberFormat()->getFormatCode());
+            $this->assertSame(3, $detailSheet->getPageSetup()->getFitToWidth());
+            $this->assertSame('A1:W8', str_replace('$', '', $detailSheet->getPageSetup()->getPrintArea()));
+            $this->assertStringContainsString('/assets/', $detailSheet->getCell('W8')->getHyperlink()->getUrl());
         } finally {
-            unset($archive);
-            @unlink($zipPath);
+            $workbook?->disconnectWorksheets();
             @unlink($sourcePath);
         }
     }

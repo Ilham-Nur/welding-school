@@ -49,7 +49,7 @@
                                 ? $permissions->count()
                                 : $role->permissions->count();
                         @endphp
-                        <tr>
+                        <tr data-role-name="{{ $role->name }}">
                             <td>
                                 <strong>{{ str_replace('-', ' ', ucfirst($role->name)) }}</strong>
                                 <small>{{ $role->name }}</small>
