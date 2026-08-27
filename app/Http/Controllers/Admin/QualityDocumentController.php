@@ -9,7 +9,6 @@ use App\Models\DocumentCategory;
 use App\Models\DocumentRevision;
 use App\Models\DocumentSection;
 use App\Models\DocumentStandard;
-use App\Services\DocumentConversionService;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -115,7 +114,7 @@ class QualityDocumentController extends Controller
         ]);
     }
 
-    public function storeDocument(Request $request, DocumentStandard $standard, DocumentConversionService $converter): RedirectResponse
+    public function storeDocument(Request $request, DocumentStandard $standard): RedirectResponse
     {
         $existingDocument = $request->filled('document_id')
             ? Document::query()->findOrFail($request->integer('document_id'))
@@ -154,7 +153,7 @@ class QualityDocumentController extends Controller
             'effective_date' => ['nullable', 'date'],
             'status' => ['nullable', Rule::in(['draft', 'active'])],
             'original_file' => ['required', 'file', 'mimes:pdf,doc,docx,xls,xlsx', 'max:20480'],
-            'preview_file' => ['nullable', 'file', 'mimes:pdf', 'max:20480'],
+            'preview_file' => ['required', 'file', 'mimes:pdf', 'max:20480'],
             'notes' => ['nullable', 'string', 'max:10000'],
         ]);
 
@@ -166,7 +165,7 @@ class QualityDocumentController extends Controller
         $sectionIds = $this->validatedSectionIds($standard, $category, $validated['section_ids'] ?? [], $existingDocument);
         $relatedDocumentIds = collect($validated['related_document_ids'] ?? [])->map(fn ($id) => (int) $id)->unique()->values()->all();
         $previousManualSectionId = $existingDocument && $category->code === 'MM' ? $existingDocument->section_id : null;
-        $files = $this->storeFiles($request, $standard, $converter);
+        $files = $this->storeFiles($request, $standard);
 
         try {
             $document = DB::transaction(function () use (
@@ -256,7 +255,6 @@ class QualityDocumentController extends Controller
         Request $request,
         DocumentStandard $standard,
         Document $document,
-        DocumentConversionService $converter,
     ): RedirectResponse {
         $this->ensureDocumentBelongsToStandard($document, $standard);
         $document->load(['category', 'sections', 'latestRevision']);
@@ -284,7 +282,7 @@ class QualityDocumentController extends Controller
             'related_document_ids' => ['nullable', 'array'],
             'related_document_ids.*' => ['integer', Rule::exists('documents', 'id')->where('standard_id', $standard->id)],
             'original_file' => ['nullable', 'file', 'mimes:pdf,doc,docx,xls,xlsx', 'max:20480'],
-            'preview_file' => ['nullable', 'file', 'mimes:pdf', 'max:20480'],
+            'preview_file' => ['nullable', 'required_with:original_file', 'file', 'mimes:pdf', 'max:20480'],
         ]);
 
         if ($document->status !== 'draft' && ($request->hasFile('original_file') || $request->hasFile('preview_file'))) {
@@ -300,7 +298,7 @@ class QualityDocumentController extends Controller
         $fileAttributes = [];
 
         if ($request->hasFile('original_file')) {
-            $fileAttributes = $this->storeFiles($request, $standard, $converter);
+            $fileAttributes = $this->storeFiles($request, $standard);
             $oldPaths = [$document->original_file_path, $document->preview_file_path];
         } elseif ($request->hasFile('preview_file')) {
             $oldPaths = [$document->preview_file_path];
@@ -616,7 +614,7 @@ class QualityDocumentController extends Controller
     }
 
     /** @param array<int, int|string> $requestedIds
-     *  @return array<int, int>
+     * @return array<int, int>
      */
     private function validatedSectionIds(
         DocumentStandard $standard,
@@ -698,27 +696,15 @@ class QualityDocumentController extends Controller
     }
 
     /**
-     * @return array{original_file_path: string, original_file_name: string, original_file_type: string, original_file_size: int, preview_file_path: ?string, conversion_status: string}
+     * @return array{original_file_path: string, original_file_name: string, original_file_type: string, original_file_size: int, preview_file_path: string, conversion_status: string}
      */
-    private function storeFiles(Request $request, DocumentStandard $standard, DocumentConversionService $converter): array
+    private function storeFiles(Request $request, DocumentStandard $standard): array
     {
         $original = $request->file('original_file');
         $directory = 'quality-documents/'.$standard->slug;
         $originalPath = $original->store($directory.'/original', 'local');
         $extension = strtolower($original->getClientOriginalExtension());
-        $previewPath = null;
-        $conversionStatus = 'not_required';
-
-        if ($request->hasFile('preview_file')) {
-            $previewPath = $request->file('preview_file')->store($directory.'/preview', 'local');
-            $conversionStatus = 'uploaded';
-        } elseif ($extension === 'pdf') {
-            $previewPath = $originalPath;
-        } else {
-            $conversion = $converter->convertToPdf($originalPath, $directory.'/preview');
-            $previewPath = $conversion['path'];
-            $conversionStatus = $conversion['status'];
-        }
+        $previewPath = $request->file('preview_file')->store($directory.'/preview', 'local');
 
         return [
             'original_file_path' => $originalPath,
@@ -726,7 +712,7 @@ class QualityDocumentController extends Controller
             'original_file_type' => $extension,
             'original_file_size' => (int) $original->getSize(),
             'preview_file_path' => $previewPath,
-            'conversion_status' => $conversionStatus,
+            'conversion_status' => 'uploaded',
         ];
     }
 

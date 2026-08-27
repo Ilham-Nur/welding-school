@@ -207,6 +207,7 @@ class QualityDocumentManagementTest extends TestCase
             'title' => 'Prosedur Pengendalian Dokumen',
             'effective_date' => '2026-08-27',
             'original_file' => UploadedFile::fake()->create('prosedur.pdf', 120, 'application/pdf'),
+            'preview_file' => UploadedFile::fake()->create('prosedur-preview.pdf', 100, 'application/pdf'),
             'notes' => 'Penerbitan awal.',
         ])->assertRedirect();
         $procedure = Document::query()->where('document_code', 'QP-QA-001')->firstOrFail();
@@ -221,6 +222,7 @@ class QualityDocumentManagementTest extends TestCase
             'title' => 'Manual Mutu Bab 7',
             'effective_date' => '2026-08-27',
             'original_file' => UploadedFile::fake()->create('manual-bab-7.pdf', 180, 'application/pdf'),
+            'preview_file' => UploadedFile::fake()->create('manual-bab-7-preview.pdf', 160, 'application/pdf'),
             'notes' => 'Draft awal.',
         ])->assertRedirect();
 
@@ -239,6 +241,7 @@ class QualityDocumentManagementTest extends TestCase
             'document_code' => 'MM-QA-008',
             'title' => 'Manual Mutu Bab 8',
             'original_file' => UploadedFile::fake()->create('manual-bab-8.pdf', 170, 'application/pdf'),
+            'preview_file' => UploadedFile::fake()->create('manual-bab-8-preview.pdf', 150, 'application/pdf'),
         ])->assertRedirect();
         $secondManual = Document::query()->where('document_code', 'MM-QA-008')->firstOrFail();
 
@@ -281,6 +284,7 @@ class QualityDocumentManagementTest extends TestCase
             'section_ids' => [$chapter->id],
             'related_document_ids' => [$procedure->id],
             'original_file' => UploadedFile::fake()->create('manual-bab-7-benar.pdf', 190, 'application/pdf'),
+            'preview_file' => UploadedFile::fake()->create('manual-bab-7-benar-preview.pdf', 170, 'application/pdf'),
         ])->assertRedirect();
         $manual->refresh();
         $this->assertSame(0, $manual->revision_number);
@@ -325,6 +329,7 @@ class QualityDocumentManagementTest extends TestCase
                 'title' => $procedure->title,
                 'section_ids' => [$chapter->id],
                 'original_file' => UploadedFile::fake()->create('tidak-boleh.pdf', 100, 'application/pdf'),
+                'preview_file' => UploadedFile::fake()->create('tidak-boleh-preview.pdf', 90, 'application/pdf'),
             ])->assertSessionHasErrors('original_file');
 
         $this->post(route('admin.quality-documents.documents.store', $standard), [
@@ -335,6 +340,7 @@ class QualityDocumentManagementTest extends TestCase
             'title' => $procedure->title,
             'effective_date' => '2026-09-01',
             'original_file' => UploadedFile::fake()->create('prosedur-rev-01.pdf', 130, 'application/pdf'),
+            'preview_file' => UploadedFile::fake()->create('prosedur-rev-01-preview.pdf', 110, 'application/pdf'),
             'notes' => 'Menambahkan ketentuan distribusi.',
         ])->assertRedirect();
         $procedure->refresh()->load(['revisions', 'activityLogs']);
@@ -348,6 +354,7 @@ class QualityDocumentManagementTest extends TestCase
             'document_code' => 'MM-QA-DUPLICATE',
             'title' => 'Manual Mutu Ganda',
             'original_file' => UploadedFile::fake()->create('ganda.pdf', 100, 'application/pdf'),
+            'preview_file' => UploadedFile::fake()->create('ganda-preview.pdf', 90, 'application/pdf'),
         ])->assertSessionHasErrors('section_ids');
     }
 
@@ -374,6 +381,7 @@ class QualityDocumentManagementTest extends TestCase
             'document_code' => 'MM-QA-001',
             'title' => 'Manual Mutu Lama',
             'original_file' => UploadedFile::fake()->create('manual-lama.pdf', 100, 'application/pdf'),
+            'preview_file' => UploadedFile::fake()->create('manual-lama-preview.pdf', 90, 'application/pdf'),
         ])->assertRedirect();
         $oldManual = Document::query()->where('document_code', 'MM-QA-001')->firstOrFail();
 
@@ -387,6 +395,7 @@ class QualityDocumentManagementTest extends TestCase
             'document_code' => 'MM-QA-001-BARU',
             'title' => 'Manual Mutu Pengganti',
             'original_file' => UploadedFile::fake()->create('manual-pengganti.pdf', 110, 'application/pdf'),
+            'preview_file' => UploadedFile::fake()->create('manual-pengganti-preview.pdf', 100, 'application/pdf'),
         ])->assertRedirect();
         $newManual = Document::query()->where('document_code', 'MM-QA-001-BARU')->firstOrFail();
 
@@ -399,6 +408,56 @@ class QualityDocumentManagementTest extends TestCase
             ->assertSee('id="publish-quality-document-'.$newManual->id.'"', false)
             ->assertSee('Terbitkan dokumen?')
             ->assertDontSee('data-confirmed=', false);
+    }
+
+    public function test_excel_original_requires_a_separate_uploaded_pdf_preview(): void
+    {
+        Storage::fake('local');
+        $this->seedQualityModule();
+        $admin = User::factory()->create();
+        $admin->assignRole('super-admin');
+        $this->actingAs($admin);
+
+        $standard = DocumentStandard::query()->where('slug', '9001')->firstOrFail();
+        $formCategory = DocumentCategory::query()->where('code', 'F')->firstOrFail();
+
+        $this->post(route('admin.quality-documents.documents.store', $standard), [
+            'category_id' => $formCategory->id,
+            'document_code' => 'F-QA-001',
+            'title' => 'Form Pemeriksaan',
+            'original_file' => UploadedFile::fake()->create(
+                'form-pemeriksaan.xlsx',
+                120,
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            ),
+        ])->assertSessionHasErrors('preview_file');
+
+        $this->assertDatabaseMissing('documents', ['document_code' => 'F-QA-001']);
+
+        $this->post(route('admin.quality-documents.documents.store', $standard), [
+            'category_id' => $formCategory->id,
+            'document_code' => 'F-QA-001',
+            'title' => 'Form Pemeriksaan',
+            'original_file' => UploadedFile::fake()->create(
+                'form-pemeriksaan.xlsx',
+                120,
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            ),
+            'preview_file' => UploadedFile::fake()->create('form-pemeriksaan-preview.pdf', 100, 'application/pdf'),
+        ])->assertRedirect();
+
+        $document = Document::query()->where('document_code', 'F-QA-001')->firstOrFail();
+        $this->assertSame('xlsx', $document->original_file_type);
+        $this->assertSame('uploaded', $document->conversion_status);
+        $this->assertNotSame($document->original_file_path, $document->preview_file_path);
+        Storage::disk('local')->assertExists($document->original_file_path);
+        Storage::disk('local')->assertExists($document->preview_file_path);
+
+        $this->put(route('admin.quality-documents.documents.update', [$standard, $document]), [
+            'document_code' => 'F-QA-001',
+            'title' => 'Form Pemeriksaan Terbaru',
+            'original_file' => UploadedFile::fake()->create('form-pemeriksaan-baru.xls', 110, 'application/vnd.ms-excel'),
+        ])->assertSessionHasErrors('preview_file');
     }
 
     private function seedQualityModule(): void

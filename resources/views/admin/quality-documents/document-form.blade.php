@@ -95,8 +95,8 @@
 
                         @if (! $isEditing || $document->status === 'draft')
                             <x-ui.file-input label="{{ $isEditing ? 'File asli pengganti (opsional)' : 'File asli' }}" name="original_file" accept=".pdf,.doc,.docx,.xls,.xlsx" hint="PDF, Word, atau Excel. Maksimal 20 MB." :max-size-mb="20" :required="! $isEditing" />
-                            <x-ui.file-input label="PDF preview (opsional)" name="preview_file" accept="application/pdf,.pdf" hint="PDF maksimal 20 MB. Kosongkan jika file asli sudah berupa PDF." :max-size-mb="20" />
-                            <p class="qd-file-conversion-note">File Word atau Excel akan dicoba dikonversi otomatis. Unggah PDF preview apabila konverter server belum tersedia.</p>
+                            <x-ui.file-input label="{{ $isEditing ? 'PDF preview pengganti' : 'PDF preview' }}" name="preview_file" accept="application/pdf,.pdf" hint="PDF maksimal 20 MB. Wajib untuk dokumen baru, revisi, atau saat mengganti file asli." :max-size-mb="20" :required="! $isEditing" />
+                            <p class="qd-file-conversion-note">Unggah file PDF yang akan ditampilkan sebagai preview. Sistem tidak mengubah file asli secara otomatis.</p>
                         @else
                             <div class="qd-inline-empty">File dokumen aktif hanya dapat diganti melalui <strong>Buat Revisi</strong>.</div>
                         @endif
