@@ -65,6 +65,34 @@
                             <span aria-hidden="true"><x-ui.icon name="file" /></span><span class="admin-nav-label">Aktivitas</span>
                         </a>
                     @endcan
+                    @can('quality-documents.view')
+                        @php($qualityDocumentsMenuOpen = request()->routeIs('admin.quality-documents.*'))
+                        <div @class(['admin-nav-group', 'is-open' => $qualityDocumentsMenuOpen]) data-admin-nav-group>
+                            <button
+                                type="button"
+                                class="admin-nav-group__toggle {{ $qualityDocumentsMenuOpen ? 'is-active' : '' }}"
+                                data-admin-nav-toggle
+                                aria-expanded="{{ $qualityDocumentsMenuOpen ? 'true' : 'false' }}"
+                                aria-controls="admin-quality-documents-submenu"
+                                data-label="Quality Documents"
+                                title="Quality Documents"
+                            >
+                                <span aria-hidden="true"><x-ui.icon name="file" /></span>
+                                <span class="admin-nav-label">Quality Documents</span>
+                                <span class="admin-nav-group__chevron" aria-hidden="true"><x-ui.icon name="chevron-down" size="14" /></span>
+                            </button>
+                            <div class="admin-nav-group__items" id="admin-quality-documents-submenu" data-admin-nav-items @if (! $qualityDocumentsMenuOpen) hidden @endif>
+                                <a class="{{ request()->routeIs('admin.quality-documents.*') ? 'is-active' : '' }}" href="{{ route('admin.quality-documents.index') }}" data-label="Quality" title="Quality">
+                                    <span aria-hidden="true"><x-ui.icon name="shield" size="16" /></span>
+                                    <span class="admin-nav-label">Quality</span>
+                                </a>
+                                <span class="admin-nav-submenu-item is-disabled" aria-disabled="true" data-label="Training" title="Training belum tersedia">
+                                    <span aria-hidden="true"><x-ui.icon name="book-open" size="16" /></span>
+                                    <span class="admin-nav-label">Training</span>
+                                </span>
+                            </div>
+                        </div>
+                    @endcan
                     @canany(['assets.view', 'assets.inspect'])
                         @php($assetMenuOpen = request()->routeIs('admin.assets.*', 'assets.inspections.*'))
                         <div @class(['admin-nav-group', 'is-open' => $assetMenuOpen]) data-admin-nav-group>

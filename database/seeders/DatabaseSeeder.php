@@ -14,6 +14,7 @@ class DatabaseSeeder extends Seeder
             TrainingProgramSeeder::class,
             TrainingBatchSeeder::class,
             EmployeePositionSeeder::class,
+            QualityDocumentSeeder::class,
         ]);
     }
 }

@@ -3,6 +3,7 @@
     'name',
     'accept' => '.pdf,.jpg,.jpeg,.png',
     'hint' => 'PDF, JPG, atau PNG. Maksimal 5 MB.',
+    'maxSizeMb' => 5,
     'required' => false,
 ])
 
@@ -16,7 +17,7 @@
         {{ $label }}
         @if ($required)<em>Wajib</em>@endif
     </span>
-    <label @class(['ui-file-drop', 'is-invalid' => $hasError]) data-file-drop>
+    <label @class(['ui-file-drop', 'is-invalid' => $hasError]) data-file-drop data-max-size-mb="{{ $maxSizeMb }}">
         <input
             id="{{ $fieldId }}"
             type="file"

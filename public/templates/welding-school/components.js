@@ -156,6 +156,7 @@
     const input = dropZone.querySelector('input[type="file"]');
     const label = dropZone.querySelector("[data-file-label]");
     const defaultLabel = label.textContent;
+    const maxSizeMb = Number.parseFloat(dropZone.dataset.maxSizeMb) || 5;
 
     function updateFile(file) {
       if (!file) {
@@ -164,11 +165,11 @@
         return;
       }
 
-      if (file.size > 5 * 1024 * 1024) {
+      if (file.size > maxSizeMb * 1024 * 1024) {
         input.value = "";
         dropZone.classList.remove("has-file");
         label.textContent = defaultLabel;
-        showToast("Ukuran file melebihi batas maksimal 5 MB.", "danger");
+        showToast(`Ukuran file melebihi batas maksimal ${maxSizeMb} MB.`, "danger");
         return;
       }
 

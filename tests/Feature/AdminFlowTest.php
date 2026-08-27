@@ -100,6 +100,9 @@ class AdminFlowTest extends TestCase
             ->assertDontSee('ui-alert--success', false)
             ->assertSee('data-admin-sidebar-collapse', false)
             ->assertSee('data-label="User Management"', false)
+            ->assertSee('data-label="Quality Documents"', false)
+            ->assertSee('data-label="Training"', false)
+            ->assertDontSee('Coming Soon')
             ->assertDontSee('Lihat tampilan peserta')
             ->assertSee('templates/welding-school/components.js');
 
@@ -125,6 +128,7 @@ class AdminFlowTest extends TestCase
             ->assertSee('data-permission-group="assets"', false)
             ->assertSee('data-permission-group="employees"', false)
             ->assertSee('data-permission-group="storage"', false)
+            ->assertSee('data-permission-group="quality-documents"', false)
             ->assertSee('Melihat aktivitas')
             ->assertSee('Mengelola dan menerbitkan aktivitas')
             ->assertSee('value="activities.view"', false)
@@ -132,6 +136,8 @@ class AdminFlowTest extends TestCase
 
         $this->assertTrue($admin->can('activities.view'));
         $this->assertTrue($admin->can('activities.manage'));
+        $this->assertTrue($admin->can('quality-documents.view'));
+        $this->assertTrue($admin->can('quality-documents.manage'));
 
         $this->assertIsString($adminStyles);
         $this->assertStringContainsString(
