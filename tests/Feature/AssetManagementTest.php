@@ -51,7 +51,12 @@ class AssetManagementTest extends TestCase
             ->assertDontSee('PPE | Safety Equipment / APD')
             ->assertSee('Generate Asset ID &amp; simpan', false)
             ->assertSee('Daftar pemeriksaan')
-            ->assertSee('Setiap 2 bulan')
+            ->assertSee('Setiap 3 bulan')
+            ->assertSee('Setiap 6 bulan')
+            ->assertSee('Setiap 9 bulan')
+            ->assertSee('Setiap 12 bulan')
+            ->assertDontSee('Setiap 1 bulan')
+            ->assertDontSee('Setiap 2 bulan')
             ->assertSee('enctype="multipart/form-data"', false)
             ->assertSee('data-asset-photo-input', false)
             ->assertSee('capture="environment"', false)
@@ -79,6 +84,62 @@ class AssetManagementTest extends TestCase
             Asset::query()->orderBy('asset_code')->pluck('asset_code')->all(),
         );
         $this->assertSame(2, Asset::query()->where('asset_code', 'ATP-WLD-001')->firstOrFail()->checklistItems()->count());
+    }
+
+    public function test_only_new_inspection_intervals_are_accepted(): void
+    {
+        foreach ([3, 6, 9, 12] as $interval) {
+            $this->post(route('admin.assets.store'), $this->assetPayload([
+                'equipment_name' => "Aset interval {$interval} bulan",
+                'serial_number' => "INTERVAL-{$interval}",
+                'inspection_interval_months' => $interval,
+            ]))->assertRedirect(route('admin.assets.index'));
+        }
+
+        $this->from(route('admin.assets.create'))
+            ->post(route('admin.assets.store'), $this->assetPayload([
+                'equipment_name' => 'Aset interval lama',
+                'serial_number' => 'INTERVAL-OLD',
+                'inspection_interval_months' => 2,
+            ]))
+            ->assertRedirect(route('admin.assets.create'))
+            ->assertSessionHasErrors('inspection_interval_months');
+
+        $this->assertSame([3, 6, 9, 12], Asset::query()->orderBy('inspection_interval_months')->pluck('inspection_interval_months')->all());
+    }
+
+    public function test_legacy_asset_schedule_is_preserved_until_a_new_interval_is_selected(): void
+    {
+        $legacyDueDate = today()->addMonthsNoOverflow(2);
+        $asset = Asset::query()->create(array_merge($this->directAssetData(), [
+            'asset_code' => 'ATP-WLD-001',
+            'category_code' => 'WLD',
+            'equipment_name' => 'Aset lama',
+            'inspection_interval_months' => 2,
+            'last_inspected_at' => null,
+            'next_inspection_at' => $legacyDueDate,
+        ]));
+
+        $this->get(route('admin.assets.edit', $asset))
+            ->assertOk()
+            ->assertSee('Pilih interval inspeksi baru')
+            ->assertSee('Aset ini masih memakai interval lama 2 bulan')
+            ->assertSee('Setiap 3 bulan')
+            ->assertSee('Setiap 6 bulan')
+            ->assertSee('Setiap 9 bulan')
+            ->assertSee('Setiap 12 bulan');
+
+        $asset->refresh();
+        $this->assertSame(2, $asset->inspection_interval_months);
+        $this->assertTrue($asset->next_inspection_at->isSameDay($legacyDueDate));
+
+        $this->put(route('admin.assets.update', $asset), $this->assetPayload([
+            'inspection_interval_months' => 3,
+        ]))->assertRedirect(route('admin.assets.index'));
+
+        $asset->refresh();
+        $this->assertSame(3, $asset->inspection_interval_months);
+        $this->assertTrue($asset->next_inspection_at->isSameDay($asset->created_at->copy()->addMonthsNoOverflow(3)));
     }
 
     public function test_asset_photo_can_be_uploaded_replaced_displayed_and_deleted(): void
@@ -347,8 +408,8 @@ class AssetManagementTest extends TestCase
             ->assertSee('Lincoln Electric')
             ->assertSee('Invertec V270-S')
             ->assertSee('Workshop Welding Bay 01')
-            ->assertSee('Setiap 2 bulan')
-            ->assertSee(today()->addMonthsNoOverflow(2)->translatedFormat('d F Y'))
+            ->assertSee('Setiap 6 bulan')
+            ->assertSee(today()->addMonthsNoOverflow(6)->translatedFormat('d F Y'))
             ->assertDontSee('QR ini menampilkan identitas dan status alat.')
             ->assertDontSee('Informasi aset publik')
             ->assertDontSee('PIC')
@@ -553,7 +614,7 @@ class AssetManagementTest extends TestCase
         $this->assertSame('damaged', $asset->condition);
         $this->assertSame('maintenance', $asset->status);
         $this->assertTrue($asset->last_inspected_at->isToday());
-        $this->assertTrue($asset->next_inspection_at->isSameDay(today()->addMonthsNoOverflow(2)));
+        $this->assertTrue($asset->next_inspection_at->isSameDay(today()->addMonthsNoOverflow(6)));
 
         $this->assertDatabaseHas('asset_inspections', [
             'asset_id' => $asset->id,
@@ -649,7 +710,7 @@ class AssetManagementTest extends TestCase
             'location_id' => $this->location->id,
             'location' => 'Workshop Welding Bay 01',
             'condition' => 'good',
-            'inspection_interval_months' => 2,
+            'inspection_interval_months' => 6,
             'checklist_items' => [
                 'Periksa kondisi fisik alat',
                 'Pastikan fungsi alat berjalan normal',
@@ -689,7 +750,7 @@ class AssetManagementTest extends TestCase
             'purchase_year' => 2026,
             'location' => 'QC Room',
             'condition' => 'good',
-            'inspection_interval_months' => 2,
+            'inspection_interval_months' => 6,
             'last_inspected_at' => today()->subWeek(),
             'next_inspection_at' => today()->addMonths(3),
             'status' => 'active',

@@ -193,13 +193,13 @@ class StorageManagementTest extends TestCase
         $asset = Asset::query()->create([
             'asset_code' => 'ATP-TOL-001', 'category_code' => 'TOL', 'equipment_name' => 'Gerinda Tangan',
             'asset_type' => Asset::TYPE_GENERAL, 'quantity' => 1, 'location' => $this->storage->name,
-            'location_id' => $this->storage->id, 'condition' => 'good', 'inspection_interval_months' => 2,
+            'location_id' => $this->storage->id, 'condition' => 'good', 'inspection_interval_months' => 6,
             'status' => 'active', 'requires_calibration' => false,
         ]);
         $secondAsset = Asset::query()->create([
             'asset_code' => 'ATP-TOL-002', 'category_code' => 'TOL', 'equipment_name' => 'Mesin Bor',
             'asset_type' => Asset::TYPE_GENERAL, 'quantity' => 1, 'location' => $this->storage->name,
-            'location_id' => $this->storage->id, 'condition' => 'good', 'inspection_interval_months' => 2,
+            'location_id' => $this->storage->id, 'condition' => 'good', 'inspection_interval_months' => 6,
             'status' => 'active', 'requires_calibration' => false,
         ]);
 
@@ -256,7 +256,7 @@ class StorageManagementTest extends TestCase
         $asset = Asset::query()->create([
             'asset_code' => 'ATP-TOL-003', 'category_code' => 'TOL', 'equipment_name' => 'Tang Las',
             'asset_type' => Asset::TYPE_GENERAL, 'quantity' => 1, 'location' => $this->storage->name,
-            'location_id' => $this->storage->id, 'condition' => 'good', 'inspection_interval_months' => 2,
+            'location_id' => $this->storage->id, 'condition' => 'good', 'inspection_interval_months' => 6,
             'status' => 'active', 'requires_calibration' => false,
         ]);
 

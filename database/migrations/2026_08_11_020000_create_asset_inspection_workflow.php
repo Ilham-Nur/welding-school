@@ -11,7 +11,7 @@ return new class extends Migration
     {
         Schema::table('assets', function (Blueprint $table): void {
             $table->dropColumn('pic');
-            $table->unsignedTinyInteger('inspection_interval_months')->default(1)->after('condition');
+            $table->unsignedTinyInteger('inspection_interval_months')->default(3)->after('condition');
         });
 
         Schema::create('asset_checklist_items', function (Blueprint $table): void {
