@@ -95,17 +95,24 @@
     accountButton.setAttribute("aria-expanded", String(open));
   });
 
+  let pendingConfirmationForm = null;
+  const confirmedForms = new WeakSet();
+
   document.addEventListener("click", (event) => {
     if (!event.target.closest(".admin-account") && accountMenu) {
       accountMenu.hidden = true;
       accountButton?.setAttribute("aria-expanded", "false");
     }
 
+    if (event.target.closest("[data-modal-close]")) {
+      pendingConfirmationForm = null;
+    }
+
     const confirmation = event.target.closest("[data-confirm-action]");
     if (confirmation && pendingConfirmationForm) {
       const form = pendingConfirmationForm;
       pendingConfirmationForm = null;
-      form.dataset.confirmed = "true";
+      confirmedForms.add(form);
       form.requestSubmit();
     }
   });
@@ -118,11 +125,15 @@
     accountButton?.setAttribute("aria-expanded", "false");
   });
 
-  let pendingConfirmationForm = null;
   document.addEventListener("submit", (event) => {
     const form = event.target;
     const dialogId = form.dataset.confirmDialog;
-    if (!dialogId || form.dataset.confirmed === "true") return;
+    if (!dialogId) return;
+
+    if (confirmedForms.has(form)) {
+      confirmedForms.delete(form);
+      return;
+    }
 
     event.preventDefault();
     pendingConfirmationForm = form;
@@ -131,4 +142,14 @@
       dialog.showModal();
     }
   });
+
+  document.addEventListener(
+    "cancel",
+    (event) => {
+      if (event.target instanceof HTMLDialogElement) {
+        pendingConfirmationForm = null;
+      }
+    },
+    true,
+  );
 })();

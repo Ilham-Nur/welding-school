@@ -303,6 +303,56 @@ class QualityDocumentManagementTest extends TestCase
         ])->assertSessionHasErrors('section_ids');
     }
 
+    public function test_replacement_manual_after_archive_still_renders_publish_confirmation(): void
+    {
+        Storage::fake('local');
+        $this->seedQualityModule();
+        $admin = User::factory()->create();
+        $admin->assignRole('super-admin');
+        $this->actingAs($admin);
+
+        $standard = DocumentStandard::query()->where('slug', '9001')->firstOrFail();
+        $manualCategory = DocumentCategory::query()->where('code', 'MM')->firstOrFail();
+
+        $this->post(route('admin.quality-documents.sections.store', $standard), [
+            'chapter_number' => '1',
+            'title' => 'Ruang Lingkup',
+        ])->assertRedirect();
+        $chapter = DocumentSection::query()->where('standard_id', $standard->id)->firstOrFail();
+
+        $this->post(route('admin.quality-documents.documents.store', $standard), [
+            'category_id' => $manualCategory->id,
+            'section_ids' => [$chapter->id],
+            'document_code' => 'MM-QA-001',
+            'title' => 'Manual Mutu Lama',
+            'original_file' => UploadedFile::fake()->create('manual-lama.pdf', 100, 'application/pdf'),
+        ])->assertRedirect();
+        $oldManual = Document::query()->where('document_code', 'MM-QA-001')->firstOrFail();
+
+        $this->post(route('admin.quality-documents.documents.publish', [$standard, $oldManual]))->assertRedirect();
+        $this->post(route('admin.quality-documents.documents.archive', [$standard, $oldManual]))->assertRedirect();
+        $this->assertSame('archived', $oldManual->fresh()->status);
+
+        $this->post(route('admin.quality-documents.documents.store', $standard), [
+            'category_id' => $manualCategory->id,
+            'section_ids' => [$chapter->id],
+            'document_code' => 'MM-QA-001-BARU',
+            'title' => 'Manual Mutu Pengganti',
+            'original_file' => UploadedFile::fake()->create('manual-pengganti.pdf', 110, 'application/pdf'),
+        ])->assertRedirect();
+        $newManual = Document::query()->where('document_code', 'MM-QA-001-BARU')->firstOrFail();
+
+        $this->assertSame('draft', $newManual->status);
+        $this->assertSame($chapter->id, $newManual->section_id);
+
+        $this->get(route('admin.quality-documents.documents.show', [$standard, $newManual]))
+            ->assertOk()
+            ->assertSee('data-confirm-dialog="publish-quality-document-'.$newManual->id.'"', false)
+            ->assertSee('id="publish-quality-document-'.$newManual->id.'"', false)
+            ->assertSee('Terbitkan dokumen?')
+            ->assertDontSee('data-confirmed=', false);
+    }
+
     private function seedQualityModule(): void
     {
         $this->seed([RolePermissionSeeder::class, QualityDocumentSeeder::class]);
