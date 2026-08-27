@@ -1537,6 +1537,32 @@
   min-width: 230px;
 }
 
+.qd-audit-table td:nth-child(3) {
+  min-width: 190px;
+}
+
+.qd-audit-updated {
+  display: grid;
+  gap: 5px;
+}
+
+.qd-audit-updated time {
+  color: var(--admin-ink);
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.admin-page .ui-table .qd-audit-updated small {
+  display: block;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.qd-audit-updated small span {
+  color: var(--admin-muted);
+  font-weight: 600;
+}
+
 .qd-activity-list {
   display: grid;
   gap: 0;

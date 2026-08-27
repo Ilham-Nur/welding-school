@@ -45,7 +45,12 @@
                                 <small>{{ $document->file_name }} · {{ number_format(($document->file_size ?? 0) / 1024, 0, ',', '.') }} KB</small>
                             </td>
                             <td>{{ $document->description ?: 'Tidak ada keterangan.' }}</td>
-                            <td>{{ $document->updated_at->translatedFormat('d M Y, H:i') }}<small>{{ $document->updater?->name ?? 'Pengguna tidak tersedia' }}</small></td>
+                            <td>
+                                <div class="qd-audit-updated">
+                                    <time datetime="{{ $document->updated_at->toIso8601String() }}">{{ $document->updated_at->translatedFormat('d M Y, H:i') }}</time>
+                                    <small>Oleh <span>{{ $document->updater?->name ?? 'Pengguna tidak tersedia' }}</span></small>
+                                </div>
+                            </td>
                             <td>
                                 <div class="admin-action-group">
                                     @if ($document->canPreview())
