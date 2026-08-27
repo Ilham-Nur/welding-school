@@ -3,7 +3,9 @@
 namespace App\Exports\Assets;
 
 use App\Models\Asset;
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class DetailedAssetSheetExport extends AssetSheetExport
@@ -90,6 +92,7 @@ class DetailedAssetSheetExport extends AssetSheetExport
 
         $sheet->getStyle("G8:H{$lastRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
         $sheet->getStyle("M8:S{$lastRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle("F8:F{$lastRow}")->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_TEXT);
         $sheet->getStyle("M8:N{$lastRow}")->getNumberFormat()->setFormatCode('dd mmm yyyy');
         $sheet->getStyle("R8:S{$lastRow}")->getNumberFormat()->setFormatCode('dd mmm yyyy');
         foreach (['C', 'I', 'L'] as $column) {
@@ -100,6 +103,13 @@ class DetailedAssetSheetExport extends AssetSheetExport
         foreach ($this->assets as $index => $asset) {
             $row = $index + 8;
             $photoUrl = $asset->photoUrl();
+            if ($asset->serial_number !== null) {
+                $sheet->getCell("F{$row}")->setValueExplicit(
+                    $asset->serial_number,
+                    DataType::TYPE_STRING,
+                );
+            }
+
             if ($photoUrl) {
                 $sheet->getCell("V{$row}")->getHyperlink()
                     ->setUrl($photoUrl)
@@ -123,8 +133,4 @@ class DetailedAssetSheetExport extends AssetSheetExport
         return 3;
     }
 
-    protected function includesLogo(): bool
-    {
-        return false;
-    }
 }

@@ -10,7 +10,9 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use PhpOffice\PhpSpreadsheet\Worksheet\PageSetup;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
@@ -530,7 +532,7 @@ class AssetManagementTest extends TestCase
         $this->post(route('admin.assets.store'), $this->assetPayload([
             'category_code' => 'MSR',
             'equipment_name' => 'Digital Caliper',
-            'serial_number' => 'DC-2026-001',
+            'serial_number' => '00283475',
         ]));
 
         $exportUrl = route('admin.assets.export', ['category' => 'MSR']);
@@ -583,8 +585,14 @@ class AssetManagementTest extends TestCase
             $this->assertNotNull($detailSheet);
             $this->assertSame('ATP-MSR-001', $detailSheet->getCell('A8')->getValue());
             $this->assertSame('Digital Caliper', $detailSheet->getCell('C8')->getValue());
+            $this->assertSame('00283475', $detailSheet->getCell('F8')->getValue());
+            $this->assertSame(DataType::TYPE_STRING, $detailSheet->getCell('F8')->getDataType());
+            $this->assertSame(NumberFormat::FORMAT_TEXT, $detailSheet->getStyle('F8')->getNumberFormat()->getFormatCode());
             $this->assertSame('A7:W8', $detailSheet->getAutoFilter()->getRange());
             $this->assertSame('dd mmm yyyy', $detailSheet->getStyle('M8')->getNumberFormat()->getFormatCode());
+            $this->assertCount(1, $detailSheet->getDrawingCollection());
+            $this->assertSame('Logo Alpha Academy', $detailSheet->getDrawingCollection()[0]->getName());
+            $this->assertSame('A1', $detailSheet->getDrawingCollection()[0]->getCoordinates());
             $this->assertSame(3, $detailSheet->getPageSetup()->getFitToWidth());
             $this->assertSame('A1:W8', str_replace('$', '', $detailSheet->getPageSetup()->getPrintArea()));
             $this->assertStringContainsString('/assets/', $detailSheet->getCell('W8')->getHyperlink()->getUrl());
