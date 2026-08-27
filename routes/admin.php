@@ -162,7 +162,7 @@ Route::prefix('admin')
             ->middleware('permission:quality-documents.view')
             ->name('quality-documents.audit.preview');
         Route::get('/quality-documents/quality/audit/{auditDocument}/download', [AuditDocumentController::class, 'download'])
-            ->middleware('permission:quality-documents.view')
+            ->middleware('permission:quality-documents.manage')
             ->name('quality-documents.audit.download');
         Route::post('/quality-documents/quality/standards', [QualityDocumentController::class, 'storeStandard'])
             ->middleware('permission:quality-documents.structure.manage')
@@ -201,13 +201,13 @@ Route::prefix('admin')
             ->middleware('permission:quality-documents.view')
             ->name('quality-documents.documents.preview');
         Route::get('/quality-documents/quality/standards/{standard}/documents/{document}/download', [QualityDocumentController::class, 'downloadDocument'])
-            ->middleware('permission:quality-documents.view')
+            ->middleware('permission:quality-documents.manage')
             ->name('quality-documents.documents.download');
         Route::get('/quality-documents/quality/revisions/{revision}/preview', [QualityDocumentController::class, 'previewRevision'])
             ->middleware('permission:quality-documents.view')
             ->name('quality-documents.revisions.preview');
         Route::get('/quality-documents/quality/revisions/{revision}/download', [QualityDocumentController::class, 'downloadRevision'])
-            ->middleware('permission:quality-documents.view')
+            ->middleware('permission:quality-documents.manage')
             ->name('quality-documents.revisions.download');
         Route::get('/quality-documents/quality/standards/{standard}/sections/create', [QualityDocumentController::class, 'createSection'])
             ->middleware('permission:quality-documents.structure.manage')

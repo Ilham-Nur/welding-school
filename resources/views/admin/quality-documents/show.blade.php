@@ -35,12 +35,14 @@
     <section class="admin-panel qd-preview-panel">
         <header class="admin-panel__header">
             <div><h2>Preview dokumen aktif</h2><p>{{ $document->currentOriginalName() }} · {{ number_format(($latestRevision?->original_file_size ?? $document->original_file_size) / 1024, 0, ',', '.') }} KB</p></div>
-            <a class="button button--outline admin-button" href="{{ route('admin.quality-documents.documents.download', [$standard, $document]) }}"><x-ui.icon name="download" size="15" /> Download asli</a>
+            @can('quality-documents.manage')
+                <a class="button button--outline admin-button" href="{{ route('admin.quality-documents.documents.download', [$standard, $document]) }}"><x-ui.icon name="download" size="15" /> Download asli</a>
+            @endcan
         </header>
         @if ($document->currentPreviewPath())
             <iframe src="{{ route('admin.quality-documents.documents.preview', [$standard, $document]) }}" title="Preview {{ $document->document_code }}"></iframe>
         @else
-            <div class="admin-empty"><span><x-ui.icon name="file" /></span><h2>Preview PDF belum tersedia</h2><p>File asli tetap dapat diunduh. Unggah PDF preview pada revisi berikutnya jika konversi otomatis tidak tersedia.</p></div>
+            <div class="admin-empty"><span><x-ui.icon name="file" /></span><h2>Preview PDF belum tersedia</h2><p>@can('quality-documents.manage') File asli tetap dapat diunduh. Unggah PDF preview pada revisi berikutnya jika konversi otomatis tidak tersedia. @else Hubungi pengelola dokumen untuk membuka file asli. @endcan</p></div>
         @endif
     </section>
 
@@ -92,7 +94,10 @@
                             <td>{{ $revision->notes ?: 'Tidak ada catatan.' }}</td>
                             <td><div class="admin-action-group">
                                 @if ($revision->preview_file_path)<a class="admin-action-button admin-action-button--view" href="{{ route('admin.quality-documents.revisions.preview', $revision) }}" target="_blank"><x-ui.icon name="eye" size="14" /> PDF</a>@endif
-                                <a class="admin-action-button" href="{{ route('admin.quality-documents.revisions.download', $revision) }}"><x-ui.icon name="download" size="14" /> Asli</a>
+                                @can('quality-documents.manage')
+                                    <a class="admin-action-button" href="{{ route('admin.quality-documents.revisions.download', $revision) }}"><x-ui.icon name="download" size="14" /> Asli</a>
+                                @endcan
+                                @if (! $revision->preview_file_path && ! auth()->user()->can('quality-documents.manage'))<small>Tidak tersedia</small>@endif
                             </div></td>
                         </tr>
                     @endforeach

@@ -51,8 +51,8 @@
                                     @if ($document->canPreview())
                                         <a class="admin-action-button admin-action-button--view" href="{{ route('admin.quality-documents.audit.preview', $document) }}" target="_blank" rel="noopener"><x-ui.icon name="eye" size="14" /> Lihat</a>
                                     @endif
-                                    <a class="admin-action-button" href="{{ route('admin.quality-documents.audit.download', $document) }}"><x-ui.icon name="download" size="14" /> Unduh</a>
                                     @can('quality-documents.manage')
+                                        <a class="admin-action-button" href="{{ route('admin.quality-documents.audit.download', $document) }}"><x-ui.icon name="download" size="14" /> Unduh</a>
                                         <a class="admin-action-button admin-action-button--edit" href="{{ route('admin.quality-documents.audit.edit', $document) }}"><x-ui.icon name="edit" size="14" /> Edit</a>
                                         <form method="POST" action="{{ route('admin.quality-documents.audit.destroy', $document) }}" data-confirm-dialog="delete-audit-document-{{ $document->id }}">
                                             @csrf @method('DELETE')

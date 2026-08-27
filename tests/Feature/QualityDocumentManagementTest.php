@@ -70,9 +70,54 @@ class QualityDocumentManagementTest extends TestCase
         $viewer = User::factory()->create();
         $viewer->assignRole($role);
         $standard = DocumentStandard::query()->where('slug', '9001')->firstOrFail();
+        $manualCategory = DocumentCategory::query()->where('code', 'MM')->firstOrFail();
+        $auditDocument = AuditDocument::query()->create([
+            'title' => 'Dokumen Audit Viewer',
+            'file_path' => 'quality-documents/audit/viewer.pdf',
+            'file_name' => 'viewer.pdf',
+            'file_type' => 'pdf',
+            'file_size' => 1024,
+            'created_by' => $viewer->id,
+            'updated_by' => $viewer->id,
+        ]);
+        $document = Document::query()->create([
+            'standard_id' => $standard->id,
+            'category_id' => $manualCategory->id,
+            'document_code' => 'MM-VIEW-001',
+            'title' => 'Manual Mutu Viewer',
+            'status' => 'active',
+            'original_file_path' => 'quality-documents/9001/original/viewer.pdf',
+            'original_file_name' => 'viewer.pdf',
+            'original_file_type' => 'pdf',
+            'original_file_size' => 1024,
+            'created_by' => $viewer->id,
+            'updated_by' => $viewer->id,
+        ]);
+        $revision = $document->revisions()->create([
+            'document_code' => $document->document_code,
+            'title' => $document->title,
+            'status' => 'active',
+            'revision_number' => 0,
+            'original_file_path' => $document->original_file_path,
+            'original_file_name' => $document->original_file_name,
+            'original_file_type' => 'pdf',
+            'original_file_size' => 1024,
+            'conversion_status' => 'not_required',
+            'created_by' => $viewer->id,
+        ]);
 
         $this->actingAs($viewer)->get(route('admin.quality-documents.index'))->assertOk();
-        $this->get(route('admin.quality-documents.audit.index'))->assertOk();
+        $this->get(route('admin.quality-documents.audit.index'))
+            ->assertOk()
+            ->assertDontSee(route('admin.quality-documents.audit.download', $auditDocument), false);
+        $this->get(route('admin.quality-documents.documents.show', [$standard, $document]))
+            ->assertOk()
+            ->assertDontSee('Download asli')
+            ->assertDontSee(route('admin.quality-documents.documents.download', [$standard, $document]), false)
+            ->assertDontSee(route('admin.quality-documents.revisions.download', $revision), false);
+        $this->get(route('admin.quality-documents.audit.download', $auditDocument))->assertForbidden();
+        $this->get(route('admin.quality-documents.documents.download', [$standard, $document]))->assertForbidden();
+        $this->get(route('admin.quality-documents.revisions.download', $revision))->assertForbidden();
         $this->post(route('admin.quality-documents.standards.store'), ['name' => 'ISO 3834'])->assertForbidden();
         $this->get(route('admin.quality-documents.documents.create', $standard))->assertForbidden();
         $this->get(route('admin.quality-documents.audit.create'))->assertForbidden();
@@ -104,6 +149,7 @@ class QualityDocumentManagementTest extends TestCase
             ->assertSee('Hapus dokumen audit?')
             ->assertDontSee('return confirm(', false);
         $this->get(route('admin.quality-documents.audit.preview', $auditDocument))->assertOk();
+        $this->get(route('admin.quality-documents.audit.download', $auditDocument))->assertOk();
 
         $oldPath = $auditDocument->file_path;
         $this->put(route('admin.quality-documents.audit.update', $auditDocument), [
@@ -205,6 +251,8 @@ class QualityDocumentManagementTest extends TestCase
             ->assertSee('Terbitkan dokumen?')
             ->assertSee('Hapus Draft dokumen?')
             ->assertDontSee('return confirm(', false);
+        $this->get(route('admin.quality-documents.documents.download', [$standard, $manual]))->assertOk();
+        $this->get(route('admin.quality-documents.revisions.download', $manual->revisions()->firstOrFail()))->assertOk();
 
         $this->get(route('admin.quality-documents.standards.show', ['standard' => $standard, 'tab' => 'manual-mutu']))
             ->assertOk()

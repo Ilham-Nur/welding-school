@@ -123,7 +123,9 @@
                                     </div>
                                     <div class="admin-action-group">
                                         <a class="admin-action-button admin-action-button--view" data-review-main-detail href="{{ route('admin.quality-documents.documents.show', [$standard, $manualMutu]) }}"><x-ui.icon name="eye" size="14" /> Detail</a>
-                                        <a class="admin-action-button" data-review-main-download href="{{ route('admin.quality-documents.documents.download', [$standard, $manualMutu]) }}"><x-ui.icon name="download" size="14" /> Asli</a>
+                                        @can('quality-documents.manage')
+                                            <a class="admin-action-button" data-review-main-download href="{{ route('admin.quality-documents.documents.download', [$standard, $manualMutu]) }}"><x-ui.icon name="download" size="14" /> Asli</a>
+                                        @endcan
                                     </div>
                                 @endif
                             </div>
@@ -131,7 +133,7 @@
                             <div class="admin-empty qd-review-empty" data-review-main-empty @if ($manualMutu?->currentPreviewPath()) hidden @endif>
                                 <span><x-ui.icon name="file" /></span>
                                 <h2 data-review-empty-title>{{ $manualMutu ? 'Preview PDF belum tersedia' : 'Pilih Bab Manual Mutu' }}</h2>
-                                <p data-review-empty-copy>{{ $manualMutu ? 'File asli tetap dapat dibuka melalui tombol Detail atau diunduh.' : 'Pilih Bab pada Second Document untuk menampilkan file Manual Mutu.' }}</p>
+                                <p data-review-empty-copy>{{ $manualMutu ? (auth()->user()->can('quality-documents.manage') ? 'File asli tetap dapat dibuka melalui tombol Detail atau diunduh.' : 'Preview PDF belum tersedia. Hubungi pengelola dokumen untuk membuka file asli.') : 'Pilih Bab pada Second Document untuk menampilkan file Manual Mutu.' }}</p>
                             </div>
                         </div>
                     </article>
@@ -165,7 +167,9 @@
                                             data-manual-revision="{{ $chapterManual ? 'Rev. '.str_pad((string) $chapterManual->currentRevisionNumber(), 2, '0', STR_PAD_LEFT) : '' }}"
                                             data-manual-preview="{{ $chapterManual?->currentPreviewPath() ? route('admin.quality-documents.documents.preview', [$standard, $chapterManual]) : '' }}"
                                             data-manual-detail="{{ $chapterManual ? route('admin.quality-documents.documents.show', [$standard, $chapterManual]) : '' }}"
-                                            data-manual-download="{{ $chapterManual ? route('admin.quality-documents.documents.download', [$standard, $chapterManual]) : '' }}"
+                                            @can('quality-documents.manage')
+                                                data-manual-download="{{ $chapterManual ? route('admin.quality-documents.documents.download', [$standard, $chapterManual]) : '' }}"
+                                            @endcan
                                         >
                                             <strong><span class="qd-review-chapter-name">{{ $section->chapter_number }}. {{ $section->title }}</span><small>{{ $chapterManual ? 'Manual Mutu '.($chapterManual->status === 'draft' ? 'Draft' : 'Aktif') : 'Manual Mutu belum tersedia' }}</small></strong>
                                         </button>
@@ -340,7 +344,7 @@
                     if (mainEmpty) mainEmpty.hidden = hasPreview;
                     if (emptyTitle) emptyTitle.textContent = hasManual ? 'Preview PDF belum tersedia' : 'Manual Mutu Bab belum tersedia';
                     if (emptyCopy) emptyCopy.textContent = hasManual
-                        ? 'File asli tetap dapat dibuka melalui tombol Detail atau diunduh.'
+                        ? (mainDownload ? 'File asli tetap dapat dibuka melalui tombol Detail atau diunduh.' : 'Preview PDF belum tersedia. Hubungi pengelola dokumen untuk membuka file asli.')
                         : `${button.dataset.chapterLabel} belum memiliki file Manual Mutu aktif.`;
                 });
             });
