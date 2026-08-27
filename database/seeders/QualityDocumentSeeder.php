@@ -22,7 +22,6 @@ class QualityDocumentSeeder extends Seeder
 
         collect([
             ['name' => 'ISO 9001', 'slug' => '9001', 'order_number' => 1],
-            ['name' => 'ISO 17025', 'slug' => '17025', 'order_number' => 2],
         ])->each(fn (array $standard) => DocumentStandard::query()->updateOrCreate(
             ['slug' => $standard['slug']],
             $standard,

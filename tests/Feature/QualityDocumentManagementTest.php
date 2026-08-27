@@ -32,7 +32,7 @@ class QualityDocumentManagementTest extends TestCase
             ->assertSee('Quality Documents')
             ->assertSee('Data Audit')
             ->assertSee('ISO 9001')
-            ->assertSee('ISO 17025')
+            ->assertDontSee('ISO 17025')
             ->assertSee('Quality standard')
             ->assertDontSee('class="qd-tabs"', false)
             ->assertSee('Training')
