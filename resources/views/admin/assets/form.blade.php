@@ -216,11 +216,18 @@
                         </label>
                         <label class="ui-field admin-field">
                             <span class="ui-field__label">Interval inspeksi <em>Wajib</em></span>
+                            @php($selectedInspectionInterval = (int) old('inspection_interval_months', $asset->exists ? $asset->inspection_interval_months : 3))
                             <select name="inspection_interval_months" required>
+                                @if (! array_key_exists($selectedInspectionInterval, \App\Models\Asset::INSPECTION_INTERVALS))
+                                    <option value="" selected>Pilih interval inspeksi baru</option>
+                                @endif
                                 @foreach (\App\Models\Asset::INSPECTION_INTERVALS as $months => $label)
-                                    <option value="{{ $months }}" @selected((int) old('inspection_interval_months', $asset->inspection_interval_months ?? 1) === $months)>{{ $label }}</option>
+                                    <option value="{{ $months }}" @selected($selectedInspectionInterval === $months)>{{ $label }}</option>
                                 @endforeach
                             </select>
+                            @if ($asset->exists && ! array_key_exists((int) $asset->inspection_interval_months, \App\Models\Asset::INSPECTION_INTERVALS))
+                                <small class="ui-field__error">Aset ini masih memakai interval lama {{ $asset->inspection_interval_months }} bulan. Pilih interval baru saat menyimpan perubahan.</small>
+                            @endif
                             <small>Jadwal dihitung otomatis sejak registrasi dan diperbarui setelah setiap inspeksi.</small>
                         </label>
                         <label class="ui-field admin-field ui-field--full">

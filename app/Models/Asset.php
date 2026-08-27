@@ -37,8 +37,9 @@ class Asset extends Model
     ];
 
     public const INSPECTION_INTERVALS = [
-        1 => 'Setiap 1 bulan',
-        2 => 'Setiap 2 bulan',
+        3 => 'Setiap 3 bulan',
+        6 => 'Setiap 6 bulan',
+        9 => 'Setiap 9 bulan',
         12 => 'Setiap 12 bulan',
     ];
 
