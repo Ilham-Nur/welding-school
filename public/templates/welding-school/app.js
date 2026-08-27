@@ -890,38 +890,56 @@
     return document.querySelector('meta[name="csrf-token"]')?.content || "";
   }
 
+  async function withGlobalLoading(options, callback) {
+    const loadingToken = window.AppLoading?.show(options);
+
+    try {
+      return await callback();
+    } finally {
+      if (loadingToken) window.AppLoading?.hide(loadingToken);
+    }
+  }
+
   async function backendRequest(url, payload = {}) {
     if (!url) {
       throw new Error("Endpoint autentikasi belum tersedia.");
     }
 
-    const response = await fetch(url, {
-      method: "POST",
-      credentials: "same-origin",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-        "X-CSRF-TOKEN": csrfToken(),
+    return withGlobalLoading(
+      {
+        title: "Memproses permintaan",
+        message: "Data sedang diperiksa dan disimpan. Mohon tunggu sebentar.",
       },
-      body: JSON.stringify(payload),
-    });
-    const result = await response.json().catch(() => ({}));
+      async () => {
+        const response = await fetch(url, {
+          method: "POST",
+          credentials: "same-origin",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            "X-CSRF-TOKEN": csrfToken(),
+          },
+          body: JSON.stringify(payload),
+        });
+        const result = await response.json().catch(() => ({}));
 
-    if (!response.ok) {
-      const validationMessage = Object.values(result.errors || {})
-        .flat()
-        .find(Boolean);
-      const error = new Error(
-        validationMessage ||
-          result.message ||
-          "Permintaan tidak dapat diproses. Silakan coba kembali.",
-      );
-      error.data = result;
-      error.status = response.status;
-      throw error;
-    }
+        if (!response.ok) {
+          const validationMessage = Object.values(result.errors || {})
+            .flat()
+            .find(Boolean);
+          const error = new Error(
+            validationMessage ||
+              result.message ||
+              "Permintaan tidak dapat diproses. Silakan coba kembali.",
+          );
+          error.data = result;
+          error.status = response.status;
+          throw error;
+        }
 
-    return result;
+        return result;
+      },
+    );
   }
 
   async function backendGet(url) {
@@ -943,29 +961,37 @@
   async function backendFormRequest(url, formData) {
     if (!url) throw new Error("Endpoint pendaftaran belum tersedia.");
 
-    const response = await fetch(url, {
-      method: "POST",
-      credentials: "same-origin",
-      headers: {
-        Accept: "application/json",
-        "X-CSRF-TOKEN": csrfToken(),
+    return withGlobalLoading(
+      {
+        title: "Mengunggah data",
+        message: "Data dan dokumen sedang dikirim. Mohon jangan menutup halaman.",
       },
-      body: formData,
-    });
-    const result = await response.json().catch(() => ({}));
+      async () => {
+        const response = await fetch(url, {
+          method: "POST",
+          credentials: "same-origin",
+          headers: {
+            Accept: "application/json",
+            "X-CSRF-TOKEN": csrfToken(),
+          },
+          body: formData,
+        });
+        const result = await response.json().catch(() => ({}));
 
-    if (!response.ok) {
-      const validationMessage = Object.values(result.errors || {})
-        .flat()
-        .find(Boolean);
-      throw new Error(
-        validationMessage ||
-          result.message ||
-          "Pendaftaran tidak dapat dikirim.",
-      );
-    }
+        if (!response.ok) {
+          const validationMessage = Object.values(result.errors || {})
+            .flat()
+            .find(Boolean);
+          throw new Error(
+            validationMessage ||
+              result.message ||
+              "Pendaftaran tidak dapat dikirim.",
+          );
+        }
 
-    return result;
+        return result;
+      },
+    );
   }
 
   function applyParticipantProfile(profile = {}) {

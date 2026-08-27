@@ -88,7 +88,9 @@
                 </div>
             </section>
         </main>
+        <x-ui.loading />
         <x-ui.toast-stack />
         <script src="{{ asset('templates/welding-school/components.js') }}?v={{ filemtime(public_path('templates/welding-school/components.js')) }}" defer></script>
+        <script src="{{ asset('templates/welding-school/loading.js') }}?v={{ filemtime(public_path('templates/welding-school/loading.js')) }}" defer></script>
     </body>
 </html>

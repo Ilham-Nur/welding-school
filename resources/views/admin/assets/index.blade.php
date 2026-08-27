@@ -53,7 +53,7 @@
                 <p>{{ $assets->total() }} aset ditemukan. Pilih beberapa aset untuk mencetak label sekaligus.</p>
             </div>
             <div class="admin-actions">
-                <a class="button button--outline admin-button" href="{{ route('admin.assets.export', request()->only(['search', 'category', 'status'])) }}">
+                <a class="button button--outline admin-button" href="{{ route('admin.assets.export', request()->only(['search', 'category', 'status'])) }}" data-loading-download data-loading-title="Menyiapkan Excel aset">
                     <x-ui.icon name="download" size="16" /> Export Excel
                 </a>
                 @if ($assets->isNotEmpty())

@@ -313,7 +313,7 @@
                     <section class="asset-scan-manual">
                         <div><h2>Masukkan Asset ID</h2><p>Gunakan pilihan ini jika kamera tidak tersedia atau label sulit dipindai.</p></div>
                         <div class="asset-inspection-message asset-inspection-message--error" data-scanner-lookup-error hidden></div>
-                        <form data-scanner-manual>
+                        <form data-scanner-manual data-no-loading>
                             <label for="asset-code-modal">Asset ID</label>
                             <div><input id="asset-code-modal" name="asset_code" placeholder="ATP-WLD-001" autocomplete="off" required><button type="submit">Buka checklist</button></div>
                         </form>
@@ -324,6 +324,7 @@
             </dialog>
         @endcan
 
+        <x-ui.loading />
         <x-ui.toast-stack />
         <script src="{{ asset('templates/welding-school/components.js') }}" defer></script>
         <script src="{{ asset('templates/welding-school/admin.js') }}" defer></script>
@@ -331,5 +332,6 @@
             @vite('resources/js/asset-scanner.js')
         @endcan
         @stack('scripts')
+        <script src="{{ asset('templates/welding-school/loading.js') }}?v={{ filemtime(public_path('templates/welding-school/loading.js')) }}" defer></script>
     </body>
 </html>

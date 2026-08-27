@@ -137,6 +137,8 @@
             <span class="whatsapp-float__copy"><small>Butuh informasi?</small><strong>Chat WhatsApp</strong></span>
         </a>
 
+        <x-ui.loading />
         @stack('scripts')
+        <script src="{{ asset('templates/welding-school/loading.js') }}?v={{ filemtime(public_path('templates/welding-school/loading.js')) }}" defer></script>
     </body>
 </html>

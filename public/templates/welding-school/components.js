@@ -79,6 +79,8 @@
     );
   }
 
+  window.AppToast = { show: showToast };
+
   function openDialog(id, trigger) {
     const dialog = document.getElementById(id);
     if (!(dialog instanceof HTMLDialogElement)) return;

@@ -22,7 +22,7 @@
                     </div>
                 </div>
                 <dl class="component-stats">
-                    <div><dt>8</dt><dd>Komponen inti</dd></div>
+                    <div><dt>9</dt><dd>Komponen inti</dd></div>
                     <div><dt>Blade</dt><dd>Siap digunakan ulang</dd></div>
                     <div><dt>MySQL</dt><dd>Sumber data utama</dd></div>
                 </dl>
@@ -37,6 +37,7 @@
                 <a href="#table-components">Tabel</a>
                 <a href="#pagination">Pagination</a>
                 <a href="#dialogs">Modal</a>
+                <a href="#loading">Loading</a>
                 <a href="#toasts">Toast</a>
                 <a href="#dialogs">Konfirmasi</a>
             </div>
@@ -287,6 +288,34 @@
                             <p>Memastikan tindakan penting sebelum perubahan dijalankan.</p>
                         </div>
                         <button class="button button--outline ui-button--danger-outline" type="button" data-modal-open="delete-confirmation">Hapus Data</button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="loading" class="component-section">
+                <div class="component-section__heading">
+                    <div>
+                        <span class="eyebrow">Process feedback</span>
+                        <h2>Loading global</h2>
+                        <p>Umpan balik bermerek untuk submit, upload, navigasi, AJAX, dan penyiapan file.</p>
+                    </div>
+                    <span class="component-code">window.AppLoading</span>
+                </div>
+
+                <div class="component-demo-row">
+                    <div class="component-demo-card">
+                        <span class="component-demo-card__icon">↻</span>
+                        <div>
+                            <h3>Proses halaman</h3>
+                            <p>Overlay menjaga pengguna tetap mendapat konteks selama server menyelesaikan permintaan.</p>
+                        </div>
+                        <button
+                            class="button button--primary"
+                            type="button"
+                            data-loading-preview
+                            data-loading-title="Menyiapkan laporan"
+                            data-loading-message="Data sedang diproses. Simulasi akan selesai otomatis."
+                        >Lihat Loading</button>
                     </div>
                 </div>
             </section>
