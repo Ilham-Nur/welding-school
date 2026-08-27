@@ -23,6 +23,9 @@ return [
         'batches.manage' => 'Mengelola batch',
         'activities.view' => 'Melihat aktivitas',
         'activities.manage' => 'Mengelola dan menerbitkan aktivitas',
+        'quality-documents.view' => 'Melihat dan mengunduh dokumen Quality',
+        'quality-documents.manage' => 'Menambah dokumen dan revisi Quality',
+        'quality-documents.structure.manage' => 'Mengelola standar serta bab dokumen Quality',
         'assets.view' => 'Melihat aset dan label aset',
         'assets.manage' => 'Mengelola data aset',
         'assets.inspect' => 'Melakukan inspeksi aset',
@@ -88,6 +91,15 @@ return [
             'permissions' => [
                 'activities.view',
                 'activities.manage',
+            ],
+        ],
+        'quality-documents' => [
+            'label' => 'Quality Documents',
+            'description' => 'Standar ISO, struktur bab, dokumen terkendali, dan histori revisi.',
+            'permissions' => [
+                'quality-documents.view',
+                'quality-documents.manage',
+                'quality-documents.structure.manage',
             ],
         ],
         'assets' => [
