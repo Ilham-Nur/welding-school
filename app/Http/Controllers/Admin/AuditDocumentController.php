@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\AuditCollection;
 use App\Models\AuditDocument;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -14,10 +16,39 @@ class AuditDocumentController extends Controller
 {
     private const ACCEPTED_EXTENSIONS = 'pdf,doc,docx,xls,xlsx,ppt,pptx,csv,txt,jpg,jpeg,png,webp,zip';
 
-    public function index(Request $request): View
+    public function legacyIndex(): RedirectResponse
+    {
+        $collection = AuditCollection::query()->orderBy('order_number')->firstOrFail();
+
+        return to_route('admin.quality-documents.audit.index', $collection);
+    }
+
+    public function storeCollection(Request $request): RedirectResponse
+    {
+        $validated = $request->validate(['name' => ['required', 'string', 'max:255']]);
+        $name = trim($validated['name']);
+        $baseSlug = Str::slug($name) ?: 'data-audit';
+        $slug = $baseSlug;
+        $counter = 2;
+
+        while (AuditCollection::query()->where('slug', $slug)->exists()) {
+            $slug = $baseSlug.'-'.$counter++;
+        }
+
+        $collection = AuditCollection::query()->create([
+            'name' => $name,
+            'slug' => $slug,
+            'order_number' => ((int) AuditCollection::query()->max('order_number')) + 1,
+        ]);
+
+        return to_route('admin.quality-documents.audit.index', $collection)
+            ->with('success', $collection->name.' berhasil ditambahkan.');
+    }
+
+    public function index(Request $request, AuditCollection $auditCollection): View
     {
         $search = trim((string) $request->query('search'));
-        $documents = AuditDocument::query()
+        $documents = $auditCollection->documents()
             ->with('updater')
             ->when($search !== '', fn ($query) => $query->where(function ($query) use ($search): void {
                 $query->where('title', 'like', '%'.$search.'%')
@@ -28,21 +59,25 @@ class AuditDocumentController extends Controller
             ->paginate(15)
             ->withQueryString();
 
-        return view('admin.quality-documents.audit.index', compact('documents', 'search'));
+        return view('admin.quality-documents.audit.index', compact('auditCollection', 'documents', 'search'));
     }
 
-    public function create(): View
+    public function create(AuditCollection $auditCollection): View
     {
-        return view('admin.quality-documents.audit.form', ['document' => new AuditDocument]);
+        return view('admin.quality-documents.audit.form', [
+            'auditCollection' => $auditCollection,
+            'document' => new AuditDocument,
+        ]);
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request, AuditCollection $auditCollection): RedirectResponse
     {
         $validated = $this->validateDocument($request, true);
         $file = $request->file('file');
         $path = $file->store('quality-documents/audit', 'local');
 
         AuditDocument::query()->create([
+            'audit_collection_id' => $auditCollection->id,
             'title' => trim($validated['title']),
             'description' => $validated['description'] ?? null,
             'file_path' => $path,
@@ -53,16 +88,22 @@ class AuditDocumentController extends Controller
             'updated_by' => $request->user()->id,
         ]);
 
-        return to_route('admin.quality-documents.audit.index')->with('success', 'Dokumen audit berhasil ditambahkan.');
+        return to_route('admin.quality-documents.audit.index', $auditCollection)->with('success', 'Dokumen audit berhasil ditambahkan.');
     }
 
-    public function edit(AuditDocument $auditDocument): View
+    public function edit(AuditCollection $auditCollection, AuditDocument $auditDocument): View
     {
-        return view('admin.quality-documents.audit.form', ['document' => $auditDocument]);
+        $this->ensureDocumentBelongsTo($auditCollection, $auditDocument);
+
+        return view('admin.quality-documents.audit.form', [
+            'auditCollection' => $auditCollection,
+            'document' => $auditDocument,
+        ]);
     }
 
-    public function update(Request $request, AuditDocument $auditDocument): RedirectResponse
+    public function update(Request $request, AuditCollection $auditCollection, AuditDocument $auditDocument): RedirectResponse
     {
+        $this->ensureDocumentBelongsTo($auditCollection, $auditDocument);
         $validated = $this->validateDocument($request, false);
         $attributes = [
             'title' => trim($validated['title']),
@@ -87,11 +128,12 @@ class AuditDocumentController extends Controller
             Storage::disk('local')->delete($oldPath);
         }
 
-        return to_route('admin.quality-documents.audit.index')->with('success', 'Dokumen audit berhasil diperbarui.');
+        return to_route('admin.quality-documents.audit.index', $auditCollection)->with('success', 'Dokumen audit berhasil diperbarui.');
     }
 
-    public function destroy(AuditDocument $auditDocument): RedirectResponse
+    public function destroy(AuditCollection $auditCollection, AuditDocument $auditDocument): RedirectResponse
     {
+        $this->ensureDocumentBelongsTo($auditCollection, $auditDocument);
         $path = $auditDocument->file_path;
         $auditDocument->delete();
         Storage::disk('local')->delete($path);
@@ -99,8 +141,9 @@ class AuditDocumentController extends Controller
         return back()->with('success', 'Dokumen audit berhasil dihapus.');
     }
 
-    public function preview(AuditDocument $auditDocument): StreamedResponse
+    public function preview(AuditCollection $auditCollection, AuditDocument $auditDocument): StreamedResponse
     {
+        $this->ensureDocumentBelongsTo($auditCollection, $auditDocument);
         abort_unless($auditDocument->canPreview() && Storage::disk('local')->exists($auditDocument->file_path), 404);
         $contentTypes = [
             'pdf' => 'application/pdf',
@@ -118,8 +161,9 @@ class AuditDocumentController extends Controller
         ]);
     }
 
-    public function download(AuditDocument $auditDocument): StreamedResponse
+    public function download(AuditCollection $auditCollection, AuditDocument $auditDocument): StreamedResponse
     {
+        $this->ensureDocumentBelongsTo($auditCollection, $auditDocument);
         abort_unless(Storage::disk('local')->exists($auditDocument->file_path), 404);
 
         return Storage::disk('local')->download($auditDocument->file_path, $auditDocument->file_name);
@@ -133,5 +177,10 @@ class AuditDocumentController extends Controller
             'description' => ['nullable', 'string', 'max:10000'],
             'file' => [$fileRequired ? 'required' : 'nullable', 'file', 'mimes:'.self::ACCEPTED_EXTENSIONS, 'max:20480'],
         ]);
+    }
+
+    private function ensureDocumentBelongsTo(AuditCollection $auditCollection, AuditDocument $auditDocument): void
+    {
+        abort_unless((int) $auditDocument->audit_collection_id === (int) $auditCollection->id, 404);
     }
 }

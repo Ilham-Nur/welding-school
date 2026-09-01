@@ -2,7 +2,7 @@
 
 @php($editing = $document->exists)
 @section('title', $editing ? 'Edit Data Audit' : 'Tambah Data Audit')
-@section('eyebrow', 'Quality Documents · Data Audit')
+@section('eyebrow', 'Quality Documents · '.$auditCollection->name)
 @section('heading', $editing ? 'Edit Data Audit' : 'Tambah Data Audit')
 
 @section('content')
@@ -11,10 +11,10 @@
             <h1>{{ $editing ? 'Edit '.$document->title : 'Dokumen Audit baru' }}</h1>
             <p>{{ $editing ? 'Perbaiki nama, keterangan, atau ganti file yang tersimpan.' : 'Unggah dokumen pendukung yang akan disiapkan untuk auditor.' }}</p>
         </div>
-        <a class="button button--outline admin-button" href="{{ route('admin.quality-documents.audit.index') }}">Kembali</a>
+        <a class="button button--outline admin-button" href="{{ route('admin.quality-documents.audit.index', $auditCollection) }}">Kembali</a>
     </section>
 
-    <form method="POST" action="{{ $editing ? route('admin.quality-documents.audit.update', $document) : route('admin.quality-documents.audit.store') }}" enctype="multipart/form-data">
+    <form method="POST" action="{{ $editing ? route('admin.quality-documents.audit.update', [$auditCollection, $document]) : route('admin.quality-documents.audit.store', $auditCollection) }}" enctype="multipart/form-data">
         @csrf
         @if ($editing) @method('PUT') @endif
 
@@ -54,7 +54,7 @@
         </div>
 
         <div class="admin-form-actions">
-            <a class="button button--outline admin-button" href="{{ route('admin.quality-documents.audit.index') }}">Batal</a>
+            <a class="button button--outline admin-button" href="{{ route('admin.quality-documents.audit.index', $auditCollection) }}">Batal</a>
             <button class="button button--primary admin-button" type="submit">{{ $editing ? 'Simpan perubahan' : 'Simpan dokumen' }}</button>
         </div>
     </form>

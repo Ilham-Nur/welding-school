@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 #[Fillable([
+    'audit_collection_id',
     'title',
     'description',
     'file_path',
@@ -18,6 +19,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 ])]
 class AuditDocument extends Model
 {
+    public function collection(): BelongsTo
+    {
+        return $this->belongsTo(AuditCollection::class, 'audit_collection_id');
+    }
+
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');

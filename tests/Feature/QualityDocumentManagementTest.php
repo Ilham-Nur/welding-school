@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\AuditCollection;
 use App\Models\AuditDocument;
 use App\Models\Document;
 use App\Models\DocumentCategory;
@@ -70,8 +71,10 @@ class QualityDocumentManagementTest extends TestCase
         $viewer = User::factory()->create();
         $viewer->assignRole($role);
         $standard = DocumentStandard::query()->where('slug', '9001')->firstOrFail();
+        $auditCollection = AuditCollection::query()->firstOrFail();
         $manualCategory = DocumentCategory::query()->where('code', 'MM')->firstOrFail();
         $auditDocument = AuditDocument::query()->create([
+            'audit_collection_id' => $auditCollection->id,
             'title' => 'Dokumen Audit Viewer',
             'file_path' => 'quality-documents/audit/viewer.pdf',
             'file_name' => 'viewer.pdf',
@@ -107,20 +110,57 @@ class QualityDocumentManagementTest extends TestCase
         ]);
 
         $this->actingAs($viewer)->get(route('admin.quality-documents.index'))->assertOk();
-        $this->get(route('admin.quality-documents.audit.index'))
+        $this->get(route('admin.quality-documents.audit.index', $auditCollection))
             ->assertOk()
-            ->assertDontSee(route('admin.quality-documents.audit.download', $auditDocument), false);
+            ->assertDontSee(route('admin.quality-documents.audit.download', [$auditCollection, $auditDocument]), false);
         $this->get(route('admin.quality-documents.documents.show', [$standard, $document]))
             ->assertOk()
             ->assertDontSee('Download asli')
             ->assertDontSee(route('admin.quality-documents.documents.download', [$standard, $document]), false)
             ->assertDontSee(route('admin.quality-documents.revisions.download', $revision), false);
-        $this->get(route('admin.quality-documents.audit.download', $auditDocument))->assertForbidden();
+        $this->get(route('admin.quality-documents.audit.download', [$auditCollection, $auditDocument]))->assertForbidden();
         $this->get(route('admin.quality-documents.documents.download', [$standard, $document]))->assertForbidden();
         $this->get(route('admin.quality-documents.revisions.download', $revision))->assertForbidden();
         $this->post(route('admin.quality-documents.standards.store'), ['name' => 'ISO 3834'])->assertForbidden();
         $this->get(route('admin.quality-documents.documents.create', $standard))->assertForbidden();
-        $this->get(route('admin.quality-documents.audit.create'))->assertForbidden();
+        $this->get(route('admin.quality-documents.audit.create', $auditCollection))->assertForbidden();
+    }
+
+    public function test_admin_can_create_separate_named_audit_cards(): void
+    {
+        Storage::fake('local');
+        $this->seedQualityModule();
+        $admin = User::factory()->create();
+        $admin->assignRole('super-admin');
+        $this->actingAs($admin);
+
+        $this->post(route('admin.quality-documents.audit.collections.store'), [
+            'name' => 'Audit ISO 14001',
+        ])->assertRedirect();
+
+        $defaultCollection = AuditCollection::query()->where('slug', 'data-audit')->firstOrFail();
+        $isoCollection = AuditCollection::query()->where('slug', 'audit-iso-14001')->firstOrFail();
+
+        $this->get(route('admin.quality-documents.index'))
+            ->assertOk()
+            ->assertSee('Audit ISO 14001')
+            ->assertSee(route('admin.quality-documents.audit.index', $isoCollection), false);
+
+        $this->post(route('admin.quality-documents.audit.store', $isoCollection), [
+            'title' => 'Checklist ISO 14001',
+            'file' => UploadedFile::fake()->create('checklist.pdf', 120, 'application/pdf'),
+        ])->assertRedirect(route('admin.quality-documents.audit.index', $isoCollection));
+
+        $auditDocument = AuditDocument::query()->where('title', 'Checklist ISO 14001')->firstOrFail();
+        $this->assertSame($isoCollection->id, $auditDocument->audit_collection_id);
+        $this->get(route('admin.quality-documents.audit.index', $defaultCollection))
+            ->assertOk()
+            ->assertDontSee('Checklist ISO 14001');
+        $this->get(route('admin.quality-documents.audit.index', $isoCollection))
+            ->assertOk()
+            ->assertSee('Checklist ISO 14001');
+        $this->get(route('admin.quality-documents.audit.preview', [$defaultCollection, $auditDocument]))
+            ->assertNotFound();
     }
 
     public function test_admin_can_manage_flexible_audit_documents(): void
@@ -130,16 +170,17 @@ class QualityDocumentManagementTest extends TestCase
         $admin = User::factory()->create();
         $admin->assignRole('super-admin');
         $this->actingAs($admin);
+        $auditCollection = AuditCollection::query()->firstOrFail();
 
-        $this->post(route('admin.quality-documents.audit.store'), [
+        $this->post(route('admin.quality-documents.audit.store', $auditCollection), [
             'title' => 'NIB Perusahaan',
             'description' => 'Dokumen legal untuk auditor.',
             'file' => UploadedFile::fake()->create('nib.pdf', 120, 'application/pdf'),
-        ])->assertRedirect(route('admin.quality-documents.audit.index'));
+        ])->assertRedirect(route('admin.quality-documents.audit.index', $auditCollection));
 
         $auditDocument = AuditDocument::query()->firstOrFail();
         Storage::disk('local')->assertExists($auditDocument->file_path);
-        $this->get(route('admin.quality-documents.audit.index'))
+        $this->get(route('admin.quality-documents.audit.index', $auditCollection))
             ->assertOk()
             ->assertSee('NIB Perusahaan')
             ->assertSee('nib.pdf')
@@ -148,15 +189,15 @@ class QualityDocumentManagementTest extends TestCase
             ->assertSee('id="delete-audit-document-'.$auditDocument->id.'"', false)
             ->assertSee('Hapus dokumen audit?')
             ->assertDontSee('return confirm(', false);
-        $this->get(route('admin.quality-documents.audit.preview', $auditDocument))->assertOk();
-        $this->get(route('admin.quality-documents.audit.download', $auditDocument))->assertOk();
+        $this->get(route('admin.quality-documents.audit.preview', [$auditCollection, $auditDocument]))->assertOk();
+        $this->get(route('admin.quality-documents.audit.download', [$auditCollection, $auditDocument]))->assertOk();
 
         $oldPath = $auditDocument->file_path;
-        $this->put(route('admin.quality-documents.audit.update', $auditDocument), [
+        $this->put(route('admin.quality-documents.audit.update', [$auditCollection, $auditDocument]), [
             'title' => 'NIB Perusahaan Terbaru',
             'description' => 'Dokumen legal terbaru.',
             'file' => UploadedFile::fake()->create('nib-terbaru.pdf', 140, 'application/pdf'),
-        ])->assertRedirect(route('admin.quality-documents.audit.index'));
+        ])->assertRedirect(route('admin.quality-documents.audit.index', $auditCollection));
 
         $auditDocument->refresh();
         $this->assertSame('NIB Perusahaan Terbaru', $auditDocument->title);
@@ -164,7 +205,7 @@ class QualityDocumentManagementTest extends TestCase
         Storage::disk('local')->assertExists($auditDocument->file_path);
 
         $newPath = $auditDocument->file_path;
-        $this->delete(route('admin.quality-documents.audit.destroy', $auditDocument))->assertRedirect();
+        $this->delete(route('admin.quality-documents.audit.destroy', [$auditCollection, $auditDocument]))->assertRedirect();
         $this->assertDatabaseMissing('audit_documents', ['id' => $auditDocument->id]);
         Storage::disk('local')->assertMissing($newPath);
     }

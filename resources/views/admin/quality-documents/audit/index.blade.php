@@ -1,19 +1,19 @@
 @extends('layouts.admin')
 
-@section('title', 'Data Audit')
-@section('eyebrow', 'Quality Documents')
-@section('heading', 'Data Audit')
+@section('title', $auditCollection->name)
+@section('eyebrow', 'Quality Documents · Data Audit')
+@section('heading', $auditCollection->name)
 
 @section('content')
     <section class="admin-page-heading">
         <div>
-            <h1>Data Audit</h1>
-            <p>Kumpulan dokumen pendukung yang disiapkan untuk pemeriksaan auditor.</p>
+            <h1>{{ $auditCollection->name }}</h1>
+            <p>Kumpulan dokumen pendukung khusus untuk kebutuhan audit ini.</p>
         </div>
         <div class="admin-actions">
             <a class="button button--outline admin-button" href="{{ route('admin.quality-documents.index') }}">Kembali</a>
             @can('quality-documents.manage')
-                <a class="button button--primary admin-button" href="{{ route('admin.quality-documents.audit.create') }}">+ Tambah dokumen</a>
+                <a class="button button--primary admin-button" href="{{ route('admin.quality-documents.audit.create', $auditCollection) }}">+ Tambah dokumen</a>
             @endcan
         </div>
     </section>
@@ -24,7 +24,7 @@
             <form method="GET" class="qd-audit-search">
                 <input type="search" name="search" value="{{ $search }}" placeholder="Cari nama atau keterangan...">
                 <button class="button button--outline admin-button" type="submit">Cari</button>
-                @if ($search !== '')<a href="{{ route('admin.quality-documents.audit.index') }}">Reset</a>@endif
+                @if ($search !== '')<a href="{{ route('admin.quality-documents.audit.index', $auditCollection) }}">Reset</a>@endif
             </form>
         </header>
 
@@ -54,12 +54,12 @@
                             <td>
                                 <div class="admin-action-group">
                                     @if ($document->canPreview())
-                                        <a class="admin-action-button admin-action-button--view" href="{{ route('admin.quality-documents.audit.preview', $document) }}" target="_blank" rel="noopener"><x-ui.icon name="eye" size="14" /> Lihat</a>
+                                        <a class="admin-action-button admin-action-button--view" href="{{ route('admin.quality-documents.audit.preview', [$auditCollection, $document]) }}" target="_blank" rel="noopener"><x-ui.icon name="eye" size="14" /> Lihat</a>
                                     @endif
                                     @can('quality-documents.manage')
-                                        <a class="admin-action-button" href="{{ route('admin.quality-documents.audit.download', $document) }}"><x-ui.icon name="download" size="14" /> Unduh</a>
-                                        <a class="admin-action-button admin-action-button--edit" href="{{ route('admin.quality-documents.audit.edit', $document) }}"><x-ui.icon name="edit" size="14" /> Edit</a>
-                                        <form method="POST" action="{{ route('admin.quality-documents.audit.destroy', $document) }}" data-confirm-dialog="delete-audit-document-{{ $document->id }}">
+                                        <a class="admin-action-button" href="{{ route('admin.quality-documents.audit.download', [$auditCollection, $document]) }}"><x-ui.icon name="download" size="14" /> Unduh</a>
+                                        <a class="admin-action-button admin-action-button--edit" href="{{ route('admin.quality-documents.audit.edit', [$auditCollection, $document]) }}"><x-ui.icon name="edit" size="14" /> Edit</a>
+                                        <form method="POST" action="{{ route('admin.quality-documents.audit.destroy', [$auditCollection, $document]) }}" data-confirm-dialog="delete-audit-document-{{ $document->id }}">
                                             @csrf @method('DELETE')
                                             <button class="admin-action-button admin-action-button--delete" type="submit"><x-ui.icon name="trash" size="14" /> Hapus</button>
                                         </form>

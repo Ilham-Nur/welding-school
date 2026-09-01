@@ -811,6 +811,13 @@
   margin-bottom: 12px;
 }
 
+.qd-quality-home-section__header {
+  align-items: flex-end;
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+}
+
 .qd-quality-home-section > header span {
   color: var(--admin-primary);
   font-size: 12px;
@@ -840,11 +847,14 @@
   box-shadow: var(--admin-shadow-sm);
   display: flex;
   gap: 18px;
-  max-width: 680px;
   min-height: 132px;
   padding: 20px;
   text-decoration: none;
   transition: border-color var(--admin-transition), box-shadow var(--admin-transition), transform var(--admin-transition);
+}
+
+.qd-audit-library {
+  grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
 }
 
 .qd-audit-library-card:hover {

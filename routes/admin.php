@@ -140,28 +140,34 @@ Route::prefix('admin')
         Route::get('/quality-documents/quality', [QualityDocumentController::class, 'index'])
             ->middleware('permission:quality-documents.view')
             ->name('quality-documents.index');
-        Route::get('/quality-documents/quality/audit', [AuditDocumentController::class, 'index'])
+        Route::get('/quality-documents/quality/audit', [AuditDocumentController::class, 'legacyIndex'])
+            ->middleware('permission:quality-documents.view')
+            ->name('quality-documents.audit.legacy');
+        Route::post('/quality-documents/quality/audits', [AuditDocumentController::class, 'storeCollection'])
+            ->middleware('permission:quality-documents.structure.manage')
+            ->name('quality-documents.audit.collections.store');
+        Route::get('/quality-documents/quality/audits/{auditCollection}', [AuditDocumentController::class, 'index'])
             ->middleware('permission:quality-documents.view')
             ->name('quality-documents.audit.index');
-        Route::get('/quality-documents/quality/audit/create', [AuditDocumentController::class, 'create'])
+        Route::get('/quality-documents/quality/audits/{auditCollection}/documents/create', [AuditDocumentController::class, 'create'])
             ->middleware('permission:quality-documents.manage')
             ->name('quality-documents.audit.create');
-        Route::post('/quality-documents/quality/audit', [AuditDocumentController::class, 'store'])
+        Route::post('/quality-documents/quality/audits/{auditCollection}/documents', [AuditDocumentController::class, 'store'])
             ->middleware('permission:quality-documents.manage')
             ->name('quality-documents.audit.store');
-        Route::get('/quality-documents/quality/audit/{auditDocument}/edit', [AuditDocumentController::class, 'edit'])
+        Route::get('/quality-documents/quality/audits/{auditCollection}/documents/{auditDocument}/edit', [AuditDocumentController::class, 'edit'])
             ->middleware('permission:quality-documents.manage')
             ->name('quality-documents.audit.edit');
-        Route::put('/quality-documents/quality/audit/{auditDocument}', [AuditDocumentController::class, 'update'])
+        Route::put('/quality-documents/quality/audits/{auditCollection}/documents/{auditDocument}', [AuditDocumentController::class, 'update'])
             ->middleware('permission:quality-documents.manage')
             ->name('quality-documents.audit.update');
-        Route::delete('/quality-documents/quality/audit/{auditDocument}', [AuditDocumentController::class, 'destroy'])
+        Route::delete('/quality-documents/quality/audits/{auditCollection}/documents/{auditDocument}', [AuditDocumentController::class, 'destroy'])
             ->middleware('permission:quality-documents.manage')
             ->name('quality-documents.audit.destroy');
-        Route::get('/quality-documents/quality/audit/{auditDocument}/preview', [AuditDocumentController::class, 'preview'])
+        Route::get('/quality-documents/quality/audits/{auditCollection}/documents/{auditDocument}/preview', [AuditDocumentController::class, 'preview'])
             ->middleware('permission:quality-documents.view')
             ->name('quality-documents.audit.preview');
-        Route::get('/quality-documents/quality/audit/{auditDocument}/download', [AuditDocumentController::class, 'download'])
+        Route::get('/quality-documents/quality/audits/{auditCollection}/documents/{auditDocument}/download', [AuditDocumentController::class, 'download'])
             ->middleware('permission:quality-documents.manage')
             ->name('quality-documents.audit.download');
         Route::post('/quality-documents/quality/standards', [QualityDocumentController::class, 'storeStandard'])
