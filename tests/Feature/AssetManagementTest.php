@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Asset;
+use App\Models\AssetKind;
 use App\Models\Location;
 use App\Models\User;
 use Database\Seeders\RolePermissionSeeder;
@@ -25,6 +26,9 @@ class AssetManagementTest extends TestCase
 
     private Location $location;
 
+    /** @var array<string, AssetKind> */
+    private array $assetKinds = [];
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -37,13 +41,34 @@ class AssetManagementTest extends TestCase
             'name' => 'Workshop Welding Bay 01',
             'is_active' => true,
         ]);
+
+        foreach ([
+            'WLD' => ['WEL', 'Welding Machine'],
+            'MSR' => ['MEA', 'Measuring'],
+            'TOL' => ['TLS', 'General Tools'],
+            'FAC' => ['BLD', 'Building Facility'],
+            'DEV' => ['ELE', 'Electronic Device'],
+        ] as $categoryCode => [$code, $name]) {
+            $kind = AssetKind::query()->create([
+                'category_code' => $categoryCode,
+                'code' => $code,
+                'name' => $name,
+                'is_active' => true,
+            ]);
+            $kind->numberSequence()->create(['last_number' => 0]);
+            $this->assetKinds[$categoryCode] = $kind;
+        }
     }
 
     public function test_asset_id_is_generated_automatically_per_category(): void
     {
         $this->get(route('admin.assets.create'))
             ->assertOk()
-            ->assertSee('ATP-WLD-###')
+            ->assertSee('ATP-WLD-___-001')
+            ->assertSee('data-picker-style="select2"', false)
+            ->assertSee('Buka dropdown, lalu cari berdasarkan nama atau kode jenis aset.')
+            ->assertSee('+ Tambah jenis baru')
+            ->assertSee(route('admin.asset-kinds.create'), false)
             ->assertSee('WLD | Welding Equipment')
             ->assertSee('MSR | Measurement')
             ->assertSee('TOL | Tools')
@@ -82,10 +107,259 @@ class AssetManagementTest extends TestCase
         ]))->assertRedirect(route('admin.assets.index'));
 
         $this->assertSame(
-            ['ATP-MSR-001', 'ATP-WLD-001', 'ATP-WLD-002'],
+            ['ATP-MSR-MEA-001', 'ATP-WLD-WEL-001', 'ATP-WLD-WEL-002'],
             Asset::query()->orderBy('asset_code')->pluck('asset_code')->all(),
         );
-        $this->assertSame(2, Asset::query()->where('asset_code', 'ATP-WLD-001')->firstOrFail()->checklistItems()->count());
+        $this->assertSame(2, Asset::query()->where('asset_code', 'ATP-WLD-WEL-001')->firstOrFail()->checklistItems()->count());
+    }
+
+    public function test_asset_kind_can_be_added_and_numbers_continue_per_kind(): void
+    {
+        $response = $this->postJson(route('admin.asset-kinds.store'), [
+            'category_code' => 'tol',
+            'name' => 'Cutting',
+            'code' => 'cut',
+        ]);
+
+        $response
+            ->assertCreated()
+            ->assertJsonPath('kind.categoryCode', 'TOL')
+            ->assertJsonPath('kind.code', 'CUT')
+            ->assertJsonPath('kind.lastCode', null)
+            ->assertJsonPath('kind.nextCode', 'ATP-TOL-CUT-001');
+
+        $assetKind = AssetKind::query()->where('category_code', 'TOL')->where('code', 'CUT')->firstOrFail();
+
+        $this->post(route('admin.assets.store'), $this->assetPayload([
+            'category_code' => 'TOL',
+            'asset_kind_id' => $assetKind->id,
+            'equipment_name' => 'Cutting Torch A',
+            'serial_number' => 'CUT-A',
+        ]))->assertRedirect(route('admin.assets.index'));
+
+        $this->post(route('admin.assets.store'), $this->assetPayload([
+            'category_code' => 'TOL',
+            'asset_kind_id' => $assetKind->id,
+            'equipment_name' => 'Cutting Torch B',
+            'serial_number' => 'CUT-B',
+        ]))->assertRedirect(route('admin.assets.index'));
+
+        $this->assertSame(
+            ['ATP-TOL-CUT-001', 'ATP-TOL-CUT-002'],
+            Asset::query()->where('asset_kind_id', $assetKind->id)->orderBy('asset_code')->pluck('asset_code')->all(),
+        );
+
+        $this->get(route('admin.assets.create'))
+            ->assertOk()
+            ->assertSee('"code":"CUT"', false)
+            ->assertSee('"name":"Cutting"', false)
+            ->assertSee('ATP-TOL-CUT-002')
+            ->assertSee('ATP-TOL-CUT-003');
+    }
+
+    public function test_asset_kind_must_match_the_selected_category(): void
+    {
+        $assetKind = AssetKind::query()->create([
+            'category_code' => 'TOL',
+            'code' => 'GRD',
+            'name' => 'Grinding',
+            'is_active' => true,
+        ]);
+        $assetKind->numberSequence()->create(['last_number' => 0]);
+
+        $this->from(route('admin.assets.create'))
+            ->post(route('admin.assets.store'), $this->assetPayload([
+                'category_code' => 'WLD',
+                'asset_kind_id' => $assetKind->id,
+            ]))
+            ->assertRedirect(route('admin.assets.create'))
+            ->assertSessionHasErrors('asset_kind_id');
+    }
+
+    public function test_asset_kind_list_and_create_pages_are_separate_and_can_return_to_asset_registration(): void
+    {
+        $createFromListUrl = route('admin.asset-kinds.create', [
+            'from_list' => '1',
+            'redirect_category' => 'TOL',
+            'category' => 'TOL',
+        ]);
+
+        $this->get(route('admin.asset-kinds.index', ['category' => 'TOL']))
+            ->assertOk()
+            ->assertSee('Daftar jenis aset')
+            ->assertSee('Kategori & Jenis', false)
+            ->assertSee('General Tools | TLS')
+            ->assertSee($createFromListUrl)
+            ->assertDontSee('data-asset-kind-master-form', false);
+
+        $this->get(route('admin.asset-kinds.create', [
+            'category' => 'TOL',
+            'return_to' => 'asset-create',
+        ]))
+            ->assertOk()
+            ->assertSee('Tambah jenis aset baru')
+            ->assertSee('data-asset-kind-master-form', false)
+            ->assertSee('TOL | Tools')
+            ->assertSee('dikunci setelah pernah menghasilkan nomor.');
+
+        $this->post(route('admin.asset-kinds.store'), [
+            'category_code' => 'TOL',
+            'name' => 'Cutting',
+            'code' => 'cut',
+            'return_to' => 'asset-create',
+        ])->assertRedirect(route('admin.assets.create', [
+            'category_code' => 'TOL',
+            'asset_kind_id' => AssetKind::query()->where('category_code', 'TOL')->where('code', 'CUT')->value('id'),
+        ]));
+
+        $kind = AssetKind::query()->where('category_code', 'TOL')->where('code', 'CUT')->firstOrFail();
+
+        $this->get(route('admin.assets.create', [
+            'category_code' => 'TOL',
+            'asset_kind_id' => $kind->id,
+        ]))
+            ->assertOk()
+            ->assertSee('Cutting | CUT')
+            ->assertSee('ATP-TOL-CUT-001');
+    }
+
+    public function test_asset_kind_forms_preserve_the_previous_list_filters(): void
+    {
+        $kind = $this->assetKinds['WLD'];
+        $allCategoriesListUrl = route('admin.asset-kinds.index');
+        $createFromAllCategoriesUrl = route('admin.asset-kinds.create', ['from_list' => '1']);
+
+        $this->get($createFromAllCategoriesUrl)
+            ->assertOk()
+            ->assertSee('href="'.$allCategoriesListUrl.'">← Kembali', false);
+
+        $listFilters = [
+            'search' => 'Welding',
+            'category' => 'WLD',
+            'status' => 'active',
+        ];
+        $listContext = [
+            'from_list' => '1',
+            'redirect_search' => 'Welding',
+            'redirect_category' => 'WLD',
+            'redirect_status' => 'active',
+        ];
+        $listUrl = route('admin.asset-kinds.index', $listFilters);
+        $editUrl = route('admin.asset-kinds.edit', ['assetKind' => $kind, ...$listContext]);
+        $createUrl = route('admin.asset-kinds.create', [...$listContext, 'category' => 'WLD']);
+
+        $this->get($listUrl)
+            ->assertOk()
+            ->assertSee($editUrl)
+            ->assertSee($createUrl);
+
+        $this->get($editUrl)
+            ->assertOk()
+            ->assertSee($listUrl)
+            ->assertSee('name="from_list" value="1"', false)
+            ->assertSee('name="redirect_category" value="WLD"', false);
+
+        $this->put(route('admin.asset-kinds.update', $kind), [
+            'name' => 'Welding Equipment',
+            'code' => 'WEL',
+            ...$listContext,
+        ])->assertRedirect($listUrl);
+
+        $this->get($createUrl)
+            ->assertOk()
+            ->assertSee($listUrl);
+
+        $this->post(route('admin.asset-kinds.store'), [
+            'category_code' => 'TOL',
+            'name' => 'Cutting',
+            'code' => 'CUT',
+            ...$listContext,
+        ])->assertRedirect($listUrl);
+    }
+
+    public function test_unused_asset_kind_identity_can_be_edited_and_deleted(): void
+    {
+        $kind = AssetKind::query()->create([
+            'category_code' => 'TOL',
+            'code' => 'CUT',
+            'name' => 'Cutting',
+            'is_active' => true,
+        ]);
+        $kind->numberSequence()->create(['last_number' => 0]);
+
+        $this->put(route('admin.asset-kinds.update', $kind), [
+            'name' => 'Cutting Tools',
+            'code' => 'CTG',
+            'redirect_category' => 'TOL',
+        ])->assertRedirect(route('admin.asset-kinds.index', ['category' => 'TOL']));
+
+        $this->assertDatabaseHas('asset_kinds', [
+            'id' => $kind->id,
+            'name' => 'Cutting Tools',
+            'code' => 'CTG',
+        ]);
+
+        $this->delete(route('admin.asset-kinds.destroy', $kind), [
+            'redirect_category' => 'TOL',
+        ])->assertRedirect(route('admin.asset-kinds.index', ['category' => 'TOL']));
+
+        $this->assertDatabaseMissing('asset_kinds', ['id' => $kind->id]);
+    }
+
+    public function test_used_asset_kind_can_be_renamed_and_toggled_but_cannot_change_code_or_be_deleted(): void
+    {
+        $kind = $this->assetKinds['WLD'];
+        $this->post(route('admin.assets.store'), $this->assetPayload())
+            ->assertRedirect(route('admin.assets.index'));
+
+        $this->get(route('admin.asset-kinds.edit', $kind))
+            ->assertOk()
+            ->assertSee('Edit jenis aset')
+            ->assertSee('Kode dikunci karena jenis ini sudah pernah menghasilkan nomor aset.');
+
+        $this->from(route('admin.asset-kinds.edit', $kind))
+            ->put(route('admin.asset-kinds.update', $kind), [
+                'name' => 'Welding Equipment Updated',
+                'code' => 'NEW',
+            ])
+            ->assertSessionHasErrors('code');
+
+        $this->put(route('admin.asset-kinds.update', $kind), [
+            'name' => 'Welding Equipment Updated',
+            'code' => 'WEL',
+            'redirect_category' => 'WLD',
+        ])->assertRedirect(route('admin.asset-kinds.index', ['category' => 'WLD']));
+
+        $kind->refresh();
+        $this->assertSame('Welding Equipment Updated', $kind->name);
+        $this->assertSame('WEL', $kind->code);
+
+        $this->patch(route('admin.asset-kinds.toggle', $kind), [
+            'redirect_category' => 'WLD',
+        ])->assertRedirect(route('admin.asset-kinds.index', ['category' => 'WLD']));
+
+        $this->assertFalse($kind->refresh()->is_active);
+        $this->assertDatabaseHas('assets', [
+            'asset_kind_id' => $kind->id,
+            'asset_code' => 'ATP-WLD-WEL-001',
+        ]);
+
+        $this->get(route('admin.assets.create'))
+            ->assertOk()
+            ->assertDontSee('Welding Equipment Updated | WEL');
+
+        Asset::query()->where('asset_kind_id', $kind->id)->delete();
+
+        $this->delete(route('admin.asset-kinds.destroy', $kind), [
+            'redirect_category' => 'WLD',
+        ])
+            ->assertRedirect(route('admin.asset-kinds.index', ['category' => 'WLD']))
+            ->assertSessionHas('error');
+
+        $this->assertDatabaseHas('asset_kinds', ['id' => $kind->id]);
+
+        $this->patch(route('admin.asset-kinds.toggle', $kind));
+        $this->assertTrue($kind->refresh()->is_active);
     }
 
     public function test_only_new_inspection_intervals_are_accepted(): void
@@ -270,14 +544,14 @@ class AssetManagementTest extends TestCase
 
         $asset = Asset::query()->firstOrFail();
 
-        $this->assertSame('ATP-WLD-001', $asset->asset_code);
+        $this->assertSame('ATP-WLD-WEL-001', $asset->asset_code);
         $this->assertSame('WLD', $asset->category_code);
         $this->assertNotEmpty($asset->public_id);
         $this->assertSame($this->admin->id, $asset->created_by);
 
         $this->get(route('admin.assets.labels', ['assets' => [$asset->id]]))
             ->assertOk()
-            ->assertSee('ATP-WLD-001')
+            ->assertSee('ATP-WLD-WEL-001')
             ->assertSee('SMAW Welding Machine')
             ->assertSee('Workshop Welding Bay 01')
             ->assertDontSee('SERVICEABLE')
@@ -296,7 +570,7 @@ class AssetManagementTest extends TestCase
 
         $asset = Asset::query()->firstOrFail();
 
-        $this->assertSame('ATP-DEV-001', $asset->asset_code);
+        $this->assertSame('ATP-DEV-ELE-001', $asset->asset_code);
         $this->assertTrue($asset->requires_calibration);
         $this->assertSame('valid', $asset->calibrationStatus());
 
@@ -406,7 +680,7 @@ class AssetManagementTest extends TestCase
         $this->get(route('assets.verify', ['asset' => $asset->public_id]))
             ->assertOk()
             ->assertSee('ASET TERVERIFIKASI')
-            ->assertSee('ATP-WLD-001')
+            ->assertSee('ATP-WLD-WEL-001')
             ->assertSee('Lincoln Electric')
             ->assertSee('Invertec V270-S')
             ->assertSee('Workshop Welding Bay 01')
@@ -456,7 +730,7 @@ class AssetManagementTest extends TestCase
 
         $this->get(route('assets.verify', ['asset' => $asset->public_id]))
             ->assertOk()
-            ->assertSee('ATP-WLD-001')
+            ->assertSee('ATP-WLD-WEL-001')
             ->assertDontSee('QR ini menampilkan identitas dan status alat.')
             ->assertDontSee('asset-inspection-form', false);
 
@@ -486,6 +760,7 @@ class AssetManagementTest extends TestCase
             ->assertSee('Ringkasan aset dan inspeksi')
             ->assertSee('Dashboard Aset')
             ->assertSee('Daftar Aset')
+            ->assertSee('Kategori & Jenis', false)
             ->assertSee('Inspeksi Aset')
             ->assertSee('data-admin-nav-group', false)
             ->assertSee('data-open-asset-scanner', false)
@@ -506,7 +781,7 @@ class AssetManagementTest extends TestCase
             ->assertSee('Aktifkan kamera')
             ->assertSee('Masukkan Asset ID');
 
-        $this->getJson(route('assets.inspections.resolve', ['asset_code' => 'atp-wld-001']))
+        $this->getJson(route('assets.inspections.resolve', ['asset_code' => 'atp-wld-wel-001']))
             ->assertOk()
             ->assertJson([
                 'inspection_url' => route('assets.inspections.create', ['asset' => $asset->public_id]),
@@ -519,7 +794,7 @@ class AssetManagementTest extends TestCase
 
     public function test_scanner_modal_api_shows_error_for_unknown_asset_id(): void
     {
-        $this->getJson(route('assets.inspections.resolve', ['asset_code' => 'ATP-WLD-999']))
+        $this->getJson(route('assets.inspections.resolve', ['asset_code' => 'ATP-WLD-WEL-999']))
             ->assertNotFound()
             ->assertJson([
                 'message' => 'Asset ID tidak ditemukan. Periksa kembali nomor pada label aset.',
@@ -562,7 +837,7 @@ class AssetManagementTest extends TestCase
             $this->assertStringNotContainsString('Kompeten', (string) $sheet->getCell('B2')->getValue());
             $this->assertSame('DAFTAR ASET ALPHA WELDING ACADEMY', $sheet->getCell('A4')->getValue());
             $this->assertStringContainsString('Kategori: MSR', (string) $sheet->getCell('A5')->getValue());
-            $this->assertSame('ATP-MSR-001', $sheet->getCell('A8')->getValue());
+            $this->assertSame('ATP-MSR-MEA-001', $sheet->getCell('A8')->getValue());
             $this->assertSame('Digital Caliper', $sheet->getCell('C8')->getValue());
             $this->assertNull($sheet->getCell('A9')->getValue());
             $this->assertSame('A7:K8', $sheet->getAutoFilter()->getRange());
@@ -583,7 +858,7 @@ class AssetManagementTest extends TestCase
 
             $detailSheet = $workbook->getSheetByName('Data Lengkap');
             $this->assertNotNull($detailSheet);
-            $this->assertSame('ATP-MSR-001', $detailSheet->getCell('A8')->getValue());
+            $this->assertSame('ATP-MSR-MEA-001', $detailSheet->getCell('A8')->getValue());
             $this->assertSame('Digital Caliper', $detailSheet->getCell('C8')->getValue());
             $this->assertSame('00283475', $detailSheet->getCell('F8')->getValue());
             $this->assertSame(DataType::TYPE_STRING, $detailSheet->getCell('F8')->getDataType());
@@ -654,7 +929,7 @@ class AssetManagementTest extends TestCase
             ->get(route('assets.inspections.create', ['asset' => $asset->public_id]))
             ->assertForbidden();
 
-        $this->getJson(route('assets.inspections.resolve', ['asset_code' => 'ATP-WLD-001']))
+        $this->getJson(route('assets.inspections.resolve', ['asset_code' => 'ATP-WLD-WEL-001']))
             ->assertForbidden();
 
         $this->post(route('assets.inspections.store', ['asset' => $asset->public_id]), [])
@@ -679,7 +954,7 @@ class AssetManagementTest extends TestCase
         ]))->assertRedirect(route('admin.assets.index'));
 
         $asset->refresh();
-        $this->assertSame('ATP-WLD-001', $asset->asset_code);
+        $this->assertSame('ATP-WLD-WEL-001', $asset->asset_code);
         $this->assertSame('WLD', $asset->category_code);
         $this->assertSame('Workshop Welding Bay 03', $asset->location);
 
@@ -690,8 +965,8 @@ class AssetManagementTest extends TestCase
             'serial_number' => 'REPLACEMENT-002',
         ]));
 
-        $this->assertDatabaseHas('assets', ['asset_code' => 'ATP-WLD-002']);
-        $this->assertDatabaseMissing('assets', ['asset_code' => 'ATP-WLD-001']);
+        $this->assertDatabaseHas('assets', ['asset_code' => 'ATP-WLD-WEL-002']);
+        $this->assertDatabaseMissing('assets', ['asset_code' => 'ATP-WLD-WEL-001']);
     }
 
     public function test_participant_cannot_access_asset_administration(): void
@@ -707,8 +982,11 @@ class AssetManagementTest extends TestCase
     /** @return array<string, mixed> */
     private function assetPayload(array $overrides = []): array
     {
+        $categoryCode = $overrides['category_code'] ?? 'WLD';
+
         return array_replace([
-            'category_code' => 'WLD',
+            'category_code' => $categoryCode,
+            'asset_kind_id' => $this->assetKinds[$categoryCode]->id,
             'equipment_name' => 'SMAW Welding Machine',
             'brand' => 'Alpha Test',
             'model' => 'SMAW-300',

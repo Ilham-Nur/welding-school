@@ -57,6 +57,7 @@ class Asset extends Model
         'asset_code',
         'asset_type',
         'category_code',
+        'asset_kind_id',
         'equipment_name',
         'photo_path',
         'brand',
@@ -91,8 +92,8 @@ class Asset extends Model
         });
 
         static::updating(function (Asset $asset): void {
-            if ($asset->isDirty(['asset_code', 'category_code'])) {
-                throw new LogicException('Asset ID dan kategori tidak dapat diubah setelah aset dibuat.');
+            if ($asset->isDirty(['asset_code', 'category_code', 'asset_kind_id'])) {
+                throw new LogicException('Asset ID, kategori, dan jenis aset tidak dapat diubah setelah aset dibuat.');
             }
         });
     }
@@ -135,6 +136,11 @@ class Asset extends Model
     public function locationRecord(): BelongsTo
     {
         return $this->belongsTo(Location::class, 'location_id');
+    }
+
+    public function kind(): BelongsTo
+    {
+        return $this->belongsTo(AssetKind::class, 'asset_kind_id');
     }
 
     public function externalLoans(): BelongsToMany

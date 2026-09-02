@@ -8,7 +8,7 @@
     "name": "cropper.esm.raw"
   },
   "resources/css/app.css": {
-    "file": "assets/app-QqTZIdos.css",
+    "file": "assets/app-DGDvxYiX.css",
     "src": "resources/css/app.css",
     "isEntry": true,
     "name": "app",
@@ -50,12 +50,21 @@
     ]
   },
   "resources/js/assets.js": {
-    "file": "assets/assets-jDVOKuEE.js",
+    "file": "assets/assets-CtNnJxkt.js",
     "name": "assets",
     "src": "resources/js/assets.js",
     "isEntry": true,
     "imports": [
       "__commonjsHelpers-Cpj98o6Y.js"
+    ]
+  },
+  "resources/js/employee-photo.js": {
+    "file": "assets/employee-photo-Dv4gIENO.js",
+    "name": "employee-photo",
+    "src": "resources/js/employee-photo.js",
+    "isEntry": true,
+    "imports": [
+      "_cropper.esm.raw-CmZ07mUc.js"
     ]
   },
   "resources/js/locations.js": {
@@ -65,7 +74,7 @@
     "isEntry": true
   },
   "resources/js/storage.js": {
-    "file": "assets/storage-DajSRNjz.js",
+    "file": "assets/storage-QKRL8Byt.js",
     "name": "storage",
     "src": "resources/js/storage.js",
     "isEntry": true

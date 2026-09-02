@@ -72,7 +72,8 @@ class StorageManagementTest extends TestCase
             ->assertOk()
             ->assertDontSee('Berada di dalam')
             ->assertDontSee('Kode lokasi')
-            ->assertDontSee('Jenis');
+            ->assertDontSee('Jenis lokasi')
+            ->assertDontSee('name="type"', false);
 
         $this->get(route('admin.locations.index'))
             ->assertOk()

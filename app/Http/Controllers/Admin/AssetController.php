@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Asset;
+use App\Models\AssetKind;
 use App\Models\Location;
 use App\Services\Assets\AssetCodeGenerator;
 use App\Services\Assets\AssetExcelExporter;
@@ -11,6 +12,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -52,7 +54,11 @@ class AssetController extends Controller
 
     public function create(): View
     {
-        return view('admin.assets.form', ['asset' => new Asset, 'locations' => $this->locations()]);
+        return view('admin.assets.form', [
+            'asset' => new Asset,
+            'locations' => $this->locations(),
+            'assetKinds' => $this->assetKinds(),
+        ]);
     }
 
     public function store(Request $request): RedirectResponse
@@ -76,7 +82,10 @@ class AssetController extends Controller
 
         try {
             $asset = DB::transaction(function () use ($data, $checklistItems, $request): Asset {
-                $data['asset_code'] = $this->codeGenerator->generate($data['category_code']);
+                $assetKind = isset($data['asset_kind_id'])
+                    ? AssetKind::query()->findOrFail($data['asset_kind_id'])
+                    : null;
+                $data['asset_code'] = $this->codeGenerator->generate($data['category_code'], $assetKind);
                 $data['last_inspected_at'] = null;
                 $data['next_inspection_at'] = today()->addMonthsNoOverflow((int) $data['inspection_interval_months']);
                 $data['created_by'] = $request->user()->id;
@@ -107,7 +116,11 @@ class AssetController extends Controller
     {
         $asset->load('checklistItems');
 
-        return view('admin.assets.form', ['asset' => $asset, 'locations' => $this->locations()]);
+        return view('admin.assets.form', [
+            'asset' => $asset,
+            'locations' => $this->locations(),
+            'assetKinds' => $this->assetKinds($asset),
+        ]);
     }
 
     public function update(Request $request, Asset $asset): RedirectResponse
@@ -240,6 +253,13 @@ class AssetController extends Controller
 
         if (! $asset) {
             $rules['category_code'] = ['required', Rule::in(array_keys(Asset::CATEGORIES))];
+            $rules['asset_kind_id'] = [
+                'required',
+                'integer',
+                Rule::exists('asset_kinds', 'id')->where(fn ($query) => $query
+                    ->where('category_code', $request->string('category_code')->toString())
+                    ->where('is_active', true)),
+            ];
         }
 
         $data = $request->validate($rules);
@@ -282,6 +302,7 @@ class AssetController extends Controller
     private function filteredQuery(Request $request): Builder
     {
         return Asset::query()
+            ->with('kind')
             ->when($request->filled('search'), function (Builder $query) use ($request): void {
                 $search = '%'.trim((string) $request->string('search')).'%';
                 $query->where(function (Builder $query) use ($search): void {
@@ -293,6 +314,9 @@ class AssetController extends Controller
                         ->orWhere('serial_number', 'like', $search)
                         ->orWhere('location', 'like', $search);
                     $query->orWhereHas('locationRecord', fn (Builder $location) => $location->where('name', 'like', $search));
+                    $query->orWhereHas('kind', fn (Builder $kind) => $kind
+                        ->where('name', 'like', $search)
+                        ->orWhere('code', 'like', $search));
                 });
             })
             ->when($request->filled('category'), fn (Builder $query) => $query->where('category_code', $request->string('category')))
@@ -302,6 +326,37 @@ class AssetController extends Controller
     private function locations()
     {
         return Location::query()->with('parent')->where('is_active', true)->orderBy('name')->get();
+    }
+
+    /** @return Collection<int, array<string, int|string|null>> */
+    private function assetKinds(?Asset $asset = null): Collection
+    {
+        return AssetKind::query()
+            ->with('numberSequence')
+            ->withCount('assets')
+            ->where(function (Builder $query) use ($asset): void {
+                $query->where('is_active', true);
+                if ($asset?->asset_kind_id) {
+                    $query->orWhere('id', $asset->asset_kind_id);
+                }
+            })
+            ->orderBy('category_code')
+            ->orderBy('name')
+            ->get()
+            ->map(function (AssetKind $kind): array {
+                $lastNumber = (int) ($kind->numberSequence?->last_number ?? 0);
+
+                return [
+                    'id' => $kind->id,
+                    'categoryCode' => $kind->category_code,
+                    'code' => $kind->code,
+                    'name' => $kind->name,
+                    'lastNumber' => $lastNumber,
+                    'lastCode' => $lastNumber > 0 ? $kind->codeFor($lastNumber) : null,
+                    'nextCode' => $kind->codeFor($lastNumber + 1),
+                    'assetCount' => $kind->assets_count,
+                ];
+            });
     }
 
     private function deleteUploadedPhoto(string $path): void

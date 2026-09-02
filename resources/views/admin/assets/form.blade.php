@@ -2,7 +2,13 @@
 
 @php
     $editing = $asset->exists;
-    $selectedCategory = old('category_code', $asset->category_code ?? 'WLD');
+    $requestedCategory = old('category_code', $asset->category_code ?? request('category_code', 'WLD'));
+    $selectedCategory = array_key_exists($requestedCategory, \App\Models\Asset::CATEGORIES) ? $requestedCategory : 'WLD';
+    $selectedKindId = (string) old('asset_kind_id', $asset->asset_kind_id ?? request('asset_kind_id', ''));
+    $selectedKind = collect($assetKinds)->first(fn (array $kind) => (string) $kind['id'] === $selectedKindId);
+    $initialAssetCode = $editing
+        ? $asset->asset_code
+        : ($selectedKind['nextCode'] ?? 'ATP-'.$selectedCategory.'-___-001');
     $requiresCalibration = (string) old('requires_calibration', $asset->exists ? (int) $asset->requires_calibration : 0);
     $checklistItems = old('checklist_items', $editing
         ? $asset->checklistItems->pluck('label')->all()
@@ -17,7 +23,7 @@
     <section class="admin-page-heading">
         <div>
             <h1>{{ $editing ? 'Edit data aset' : 'Registrasi aset baru' }}</h1>
-            <p>Asset ID dibuat otomatis berdasarkan kategori dan tidak dapat diubah setelah tersimpan.</p>
+            <p>Asset ID dibuat otomatis berdasarkan kategori dan jenis aset, lalu dikunci setelah tersimpan.</p>
         </div>
         <a class="button button--outline admin-button" href="{{ route('admin.assets.index') }}">← Kembali</a>
     </section>
@@ -33,14 +39,26 @@
                 <header class="admin-panel__header">
                     <div>
                         <h2>Identitas aset</h2>
-                        <p>Pilih kategori yang paling sesuai. Kategori dan Asset ID akan dikunci setelah registrasi.</p>
+                        <p>Pilih kategori dan jenis aset. Sistem akan melanjutkan nomor urut terakhir pada kelompok tersebut.</p>
                     </div>
                 </header>
                 <div class="admin-panel__body">
-                    <div class="admin-asset-id-preview">
-                        <span>ASSET ID</span>
-                        <strong data-asset-id-preview>{{ $editing ? $asset->asset_code : 'ATP-'.$selectedCategory.'-###' }}</strong>
-                        <small>{{ $editing ? 'Identitas permanen aset ini.' : 'Nomor urut final dibuat otomatis saat data disimpan.' }}</small>
+                    <div class="admin-asset-code-overview">
+                        <div class="admin-asset-id-preview">
+                            <span>ASSET ID BERIKUTNYA</span>
+                            <strong data-asset-id-preview aria-live="polite">{{ $initialAssetCode }}</strong>
+                            <small>{{ $editing ? 'Identitas permanen aset ini.' : 'Kode final dikunci ketika data berhasil disimpan.' }}</small>
+                        </div>
+                        <dl class="asset-sequence-summary" data-asset-sequence-summary @if ($editing || ! $selectedKind) hidden @endif>
+                            <div>
+                                <dt>Kode terakhir</dt>
+                                <dd data-asset-last-code>{{ $selectedKind['lastCode'] ?? 'Belum ada' }}</dd>
+                            </div>
+                            <div>
+                                <dt>Total terdaftar</dt>
+                                <dd><strong data-asset-kind-count>{{ $selectedKind['assetCount'] ?? 0 }}</strong> aset</dd>
+                            </div>
+                        </dl>
                     </div>
 
                     <div class="admin-form-grid">
@@ -50,8 +68,13 @@
                                 <input type="text" value="{{ $asset->category_code }} | {{ $asset->categoryLabel() }}" disabled>
                                 <small>Kategori dikunci agar Asset ID tetap konsisten.</small>
                             </label>
-                        @else
                             <label class="ui-field admin-field">
+                                <span class="ui-field__label">Jenis aset</span>
+                                <input type="text" value="{{ $asset->kind ? $asset->kind->code.' | '.$asset->kind->name : 'Kode lama · belum memiliki jenis aset' }}" disabled>
+                                <small>Jenis aset mengikuti identitas permanen yang dibuat saat registrasi.</small>
+                            </label>
+                        @else
+                            <label class="ui-field admin-field asset-category-field">
                                 <span class="ui-field__label">Kategori <em>Wajib</em></span>
                                 <select name="category_code" required data-asset-category>
                                     @foreach (\App\Models\Asset::CATEGORIES as $code => $label)
@@ -59,6 +82,32 @@
                                     @endforeach
                                 </select>
                             </label>
+                            <div class="ui-field admin-field asset-kind-field">
+                                <div class="asset-kind-field__heading">
+                                    <span class="ui-field__label">Jenis aset <em>Wajib</em></span>
+                                    <a
+                                        class="asset-kind-add-button"
+                                        href="{{ route('admin.asset-kinds.create', ['category' => $selectedCategory, 'return_to' => 'asset-create']) }}"
+                                        data-asset-kind-manage
+                                        data-base-url="{{ route('admin.asset-kinds.create') }}"
+                                    >+ Tambah jenis baru</a>
+                                </div>
+                                <div class="asset-kind-picker" data-asset-kind-picker data-picker-style="select2">
+                                    <select name="asset_kind_id" aria-label="Jenis aset" required data-asset-kind-select>
+                                        <option value="">Pilih jenis aset</option>
+                                        @foreach (collect($assetKinds)->where('categoryCode', $selectedCategory) as $kind)
+                                            <option value="{{ $kind['id'] }}" @selected((string) $kind['id'] === $selectedKindId)>
+                                                {{ $kind['name'] }} | {{ $kind['code'] }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="asset-kind-empty" data-asset-kind-empty @if (collect($assetKinds)->where('categoryCode', $selectedCategory)->isNotEmpty()) hidden @endif>
+                                    Belum ada jenis pada kategori ini. Tambahkan jenis melalui halaman master kategori & jenis aset.
+                                </div>
+                                <small>Buka dropdown, lalu cari berdasarkan nama atau kode jenis aset.</small>
+                                @error('asset_kind_id')<small class="ui-field__error">{{ $message }}</small>@enderror
+                            </div>
                         @endif
                         <x-ui.text-input
                             label="Nama alat / equipment"
@@ -357,6 +406,10 @@
             <button class="button button--primary admin-button" type="submit">{{ $editing ? 'Simpan perubahan' : 'Generate Asset ID & simpan' }}</button>
         </div>
     </form>
+
+    @unless ($editing)
+        <script type="application/json" data-asset-kind-options>@json(collect($assetKinds)->values())</script>
+    @endunless
 
     <x-ui.modal
         id="asset-photo-editor"
