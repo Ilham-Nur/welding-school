@@ -1,11 +1,12 @@
 <?php
 
 use App\Http\Controllers\Admin\ActivityController;
-use App\Http\Controllers\Admin\AuditDocumentController;
 use App\Http\Controllers\Admin\AssetController;
 use App\Http\Controllers\Admin\AssetDashboardController;
 use App\Http\Controllers\Admin\AssetExternalLoanController;
+use App\Http\Controllers\Admin\AssetKindController;
 use App\Http\Controllers\Admin\AssetLabelController;
+use App\Http\Controllers\Admin\AuditDocumentController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EmployeeController;
 use App\Http\Controllers\Admin\EmployeePositionController;
@@ -290,6 +291,20 @@ Route::prefix('admin')
         Route::get('/assets/dashboard', AssetDashboardController::class)
             ->middleware('permission:assets.view')
             ->name('assets.dashboard');
+
+        Route::controller(AssetKindController::class)
+            ->prefix('asset-kinds')
+            ->name('asset-kinds.')
+            ->middleware('permission:assets.manage')
+            ->group(function (): void {
+                Route::get('/', 'index')->name('index');
+                Route::get('/create', 'create')->name('create');
+                Route::post('/', 'store')->name('store');
+                Route::get('/{assetKind}/edit', 'edit')->name('edit');
+                Route::put('/{assetKind}', 'update')->name('update');
+                Route::patch('/{assetKind}/status', 'toggle')->name('toggle');
+                Route::delete('/{assetKind}', 'destroy')->name('destroy');
+            });
 
         Route::resource('assets', AssetController::class)
             ->except(['show'])

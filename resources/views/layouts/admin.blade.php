@@ -14,9 +14,9 @@
         <link rel="stylesheet" href="{{ asset('templates/welding-school/style.css') }}?v={{ filemtime(public_path('templates/welding-school/style.css')) }}">
         <link rel="stylesheet" href="{{ asset('templates/welding-school/components.css') }}?v={{ filemtime(public_path('templates/welding-school/components.css')) }}">
         <link rel="stylesheet" href="{{ asset('templates/welding-school/admin.css') }}?v={{ filemtime(public_path('templates/welding-school/admin.css')) }}">
-        @can('assets.inspect')
+        @canany(['assets.view', 'assets.manage', 'assets.inspect'])
             <link rel="stylesheet" href="{{ asset('templates/welding-school/assets.css') }}?v={{ filemtime(public_path('templates/welding-school/assets.css')) }}">
-        @endcan
+        @endcanany
         @stack('styles')
     </head>
     <body class="admin-page">
@@ -93,8 +93,8 @@
                             </div>
                         </div>
                     @endcan
-                    @canany(['assets.view', 'assets.inspect'])
-                        @php($assetMenuOpen = request()->routeIs('admin.assets.*', 'assets.inspections.*'))
+                    @canany(['assets.view', 'assets.manage', 'assets.inspect'])
+                        @php($assetMenuOpen = request()->routeIs('admin.assets.*', 'admin.asset-kinds.*', 'assets.inspections.*'))
                         <div @class(['admin-nav-group', 'is-open' => $assetMenuOpen]) data-admin-nav-group>
                             <button
                                 type="button"
@@ -116,6 +116,11 @@
                                     </a>
                                     <a class="{{ request()->routeIs('admin.assets.index', 'admin.assets.create', 'admin.assets.edit', 'admin.assets.labels') ? 'is-active' : '' }}" href="{{ route('admin.assets.index') }}" data-label="Daftar Aset" title="Daftar Aset">
                                         <span aria-hidden="true"><x-ui.icon name="list" size="16" /></span><span class="admin-nav-label">Daftar Aset</span>
+                                    </a>
+                                @endcan
+                                @can('assets.manage')
+                                    <a class="{{ request()->routeIs('admin.asset-kinds.*') ? 'is-active' : '' }}" href="{{ route('admin.asset-kinds.index') }}" data-label="Kategori & Jenis" title="Kategori & Jenis Aset">
+                                        <span aria-hidden="true"><x-ui.icon name="asset" size="16" /></span><span class="admin-nav-label">Kategori & Jenis</span>
                                     </a>
                                 @endcan
                                 @can('assets.inspect')
@@ -343,7 +348,7 @@
                         <div class="asset-inspection-message asset-inspection-message--error" data-scanner-lookup-error hidden></div>
                         <form data-scanner-manual data-no-loading>
                             <label for="asset-code-modal">Asset ID</label>
-                            <div><input id="asset-code-modal" name="asset_code" placeholder="ATP-WLD-001" autocomplete="off" required><button type="submit">Buka checklist</button></div>
+                            <div><input id="asset-code-modal" name="asset_code" placeholder="ATP-TOL-CUT-001" autocomplete="off" required><button type="submit">Buka checklist</button></div>
                         </form>
                     </section>
 

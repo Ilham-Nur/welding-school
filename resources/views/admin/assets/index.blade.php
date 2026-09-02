@@ -105,7 +105,10 @@
                                     </span>
                                 </div>
                             </td>
-                            <td><strong>{{ $asset->category_code }}</strong><small>{{ $asset->categoryLabel() }}</small></td>
+                            <td>
+                                <strong>{{ $asset->category_code }}{{ $asset->kind ? ' · '.$asset->kind->code : '' }}</strong>
+                                <small>{{ $asset->kind?->name ?? $asset->categoryLabel() }}</small>
+                            </td>
                             <td><strong>{{ $asset->location }}</strong><small>{{ $asset->inspectionIntervalLabel() }}</small></td>
                             <td>
                                 <strong>{{ $asset->conditionLabel() }}</strong>
