@@ -85,15 +85,25 @@
                     </details>
                 @endcan
             </header>
-            <section class="qd-quality-library qd-audit-library" aria-label="Daftar data audit">
-                @foreach ($auditCollections as $auditCollection)
-                    <a class="qd-audit-library-card" href="{{ route('admin.quality-documents.audit.index', $auditCollection) }}">
-                        <span class="qd-quality-library__icon"><x-ui.icon name="file" size="28" /></span>
-                        <span class="qd-quality-library__copy"><small>Audit document</small><strong>{{ $auditCollection->name }}</strong><span>{{ $auditCollection->documents_count }} dokumen tersedia</span></span>
-                        <span class="qd-quality-library__arrow" aria-hidden="true">→</span>
-                    </a>
-                @endforeach
-            </section>
+            @if ($auditCollections->isEmpty())
+                <section class="admin-panel">
+                    <div class="admin-empty">
+                        <span><x-ui.icon name="file" /></span>
+                        <h2>Belum ada Data Audit</h2>
+                        <p>Tambahkan kartu Data Audit pertama sesuai kebutuhan quality atau standar yang akan diaudit.</p>
+                    </div>
+                </section>
+            @else
+                <section class="qd-quality-library qd-audit-library" aria-label="Daftar data audit">
+                    @foreach ($auditCollections as $auditCollection)
+                        <a class="qd-audit-library-card" href="{{ route('admin.quality-documents.audit.index', $auditCollection) }}">
+                            <span class="qd-quality-library__icon"><x-ui.icon name="file" size="28" /></span>
+                            <span class="qd-quality-library__copy"><small>Audit document</small><strong>{{ $auditCollection->name }}</strong><span>{{ $auditCollection->documents_count }} dokumen tersedia</span></span>
+                            <span class="qd-quality-library__arrow" aria-hidden="true">→</span>
+                        </a>
+                    @endforeach
+                </section>
+            @endif
         </section>
     @else
         <section class="qd-standard-hero">

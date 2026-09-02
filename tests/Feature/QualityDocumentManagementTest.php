@@ -32,12 +32,15 @@ class QualityDocumentManagementTest extends TestCase
             ->assertOk()
             ->assertSee('Quality Documents')
             ->assertSee('Data Audit')
+            ->assertSee('Belum ada Data Audit')
             ->assertSee('ISO 9001')
             ->assertDontSee('ISO 17025')
             ->assertSee('Quality standard')
             ->assertDontSee('class="qd-tabs"', false)
             ->assertSee('Training')
             ->assertDontSee('Coming Soon');
+
+        $this->assertDatabaseCount('audit_collections', 0);
 
         $standard = DocumentStandard::query()->where('slug', '9001')->firstOrFail();
         $this->get(route('admin.quality-documents.standards.show', $standard))
@@ -71,7 +74,11 @@ class QualityDocumentManagementTest extends TestCase
         $viewer = User::factory()->create();
         $viewer->assignRole($role);
         $standard = DocumentStandard::query()->where('slug', '9001')->firstOrFail();
-        $auditCollection = AuditCollection::query()->firstOrFail();
+        $auditCollection = AuditCollection::query()->create([
+            'name' => 'Audit Viewer',
+            'slug' => 'audit-viewer',
+            'order_number' => 1,
+        ]);
         $manualCategory = DocumentCategory::query()->where('code', 'MM')->firstOrFail();
         $auditDocument = AuditDocument::query()->create([
             'audit_collection_id' => $auditCollection->id,
@@ -138,8 +145,12 @@ class QualityDocumentManagementTest extends TestCase
             'name' => 'Audit ISO 14001',
         ])->assertRedirect();
 
-        $defaultCollection = AuditCollection::query()->where('slug', 'data-audit')->firstOrFail();
         $isoCollection = AuditCollection::query()->where('slug', 'audit-iso-14001')->firstOrFail();
+        $otherCollection = AuditCollection::query()->create([
+            'name' => 'Audit ISO 9001',
+            'slug' => 'audit-iso-9001',
+            'order_number' => 2,
+        ]);
 
         $this->get(route('admin.quality-documents.index'))
             ->assertOk()
@@ -153,13 +164,13 @@ class QualityDocumentManagementTest extends TestCase
 
         $auditDocument = AuditDocument::query()->where('title', 'Checklist ISO 14001')->firstOrFail();
         $this->assertSame($isoCollection->id, $auditDocument->audit_collection_id);
-        $this->get(route('admin.quality-documents.audit.index', $defaultCollection))
+        $this->get(route('admin.quality-documents.audit.index', $otherCollection))
             ->assertOk()
             ->assertDontSee('Checklist ISO 14001');
         $this->get(route('admin.quality-documents.audit.index', $isoCollection))
             ->assertOk()
             ->assertSee('Checklist ISO 14001');
-        $this->get(route('admin.quality-documents.audit.preview', [$defaultCollection, $auditDocument]))
+        $this->get(route('admin.quality-documents.audit.preview', [$otherCollection, $auditDocument]))
             ->assertNotFound();
     }
 
@@ -170,7 +181,11 @@ class QualityDocumentManagementTest extends TestCase
         $admin = User::factory()->create();
         $admin->assignRole('super-admin');
         $this->actingAs($admin);
-        $auditCollection = AuditCollection::query()->firstOrFail();
+        $auditCollection = AuditCollection::query()->create([
+            'name' => 'Audit ISO 9001',
+            'slug' => 'audit-iso-9001',
+            'order_number' => 1,
+        ]);
 
         $this->post(route('admin.quality-documents.audit.store', $auditCollection), [
             'title' => 'NIB Perusahaan',

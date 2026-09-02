@@ -18,7 +18,11 @@ class AuditDocumentController extends Controller
 
     public function legacyIndex(): RedirectResponse
     {
-        $collection = AuditCollection::query()->orderBy('order_number')->firstOrFail();
+        $collection = AuditCollection::query()->orderBy('order_number')->first();
+
+        if (! $collection) {
+            return to_route('admin.quality-documents.index');
+        }
 
         return to_route('admin.quality-documents.audit.index', $collection);
     }
