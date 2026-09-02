@@ -81,7 +81,7 @@
             <header class="admin-panel__header">
                 <div>
                     <h2>Daftar barang</h2>
-                    <p>Cari berdasarkan kode, nama, kategori, merek, atau spesifikasi consumable.</p>
+                    <p>Cari berdasarkan kode, nama, satuan, merek, atau spesifikasi consumable.</p>
                 </div>
                 <button class="button button--outline admin-button" type="button" data-storage-line-add>+ Tambah baris</button>
             </header>

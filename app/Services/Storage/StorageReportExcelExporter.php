@@ -92,7 +92,7 @@ class StorageReportExcelExporter
                 $this->textCell("E{$row}", $transaction->location->fullName(), 7),
                 $this->textCell("F{$row}", ucfirst($transaction->type), 7),
                 $this->numberCell("G{$row}", (float) $line->quantity, 8),
-                $this->textCell("H{$row}", $line->item->unit, 7),
+                $this->textCell("H{$row}", $line->item->unit->symbol, 7),
                 $this->textCell("I{$row}", $transaction->purpose ?? $transaction->supplier ?? $transaction->reference ?? 'Tidak dicatat', 9),
             ], 23);
         }

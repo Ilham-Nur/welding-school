@@ -111,7 +111,7 @@ const enhanceItemPicker = (picker) => {
     search.type = 'search';
     search.className = 'storage-item-picker__search';
     search.placeholder = 'Cari consumable...';
-    search.setAttribute('aria-label', 'Cari kode, nama, kategori, merek, atau spesifikasi consumable');
+    search.setAttribute('aria-label', 'Cari kode, nama, satuan, merek, atau spesifikasi consumable');
     search.autocomplete = 'off';
 
     const searchWrap = document.createElement('div');
@@ -492,4 +492,55 @@ const returnDialog = invalidReturnForm?.closest('dialog');
 
 if (returnDialog && !returnDialog.open) {
     returnDialog.showModal();
+}
+
+const unitCreateForm = document.querySelector('[data-storage-unit-create-form]');
+const unitSelect = document.querySelector('[data-storage-unit-select]');
+
+if (unitCreateForm && unitSelect) {
+    const dialog = unitCreateForm.closest('dialog');
+    const submitButton = dialog?.querySelector('[data-storage-unit-create-submit]');
+    const errorMessage = unitCreateForm.querySelector('[data-storage-unit-create-error]');
+
+    unitCreateForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        if (!unitCreateForm.reportValidity()) return;
+
+        if (errorMessage) {
+            errorMessage.hidden = true;
+            errorMessage.textContent = '';
+        }
+        if (submitButton) submitButton.disabled = true;
+
+        try {
+            const response = await fetch(unitCreateForm.action, {
+                method: 'POST',
+                body: new FormData(unitCreateForm),
+                headers: {
+                    Accept: 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+            });
+            const payload = await response.json().catch(() => ({}));
+
+            if (!response.ok) {
+                const validationMessage = Object.values(payload.errors || {}).flat()[0];
+                throw new Error(validationMessage || payload.message || 'Satuan gagal ditambahkan.');
+            }
+
+            const option = new Option(payload.unit.label, String(payload.unit.id), true, true);
+            unitSelect.add(option);
+            unitSelect.dispatchEvent(new Event('change', { bubbles: true }));
+            unitCreateForm.reset();
+            if (dialog?.open) dialog.close();
+            window.AppToast?.show(payload.message, 'success');
+        } catch (error) {
+            if (errorMessage) {
+                errorMessage.textContent = error.message;
+                errorMessage.hidden = false;
+            }
+        } finally {
+            if (submitButton) submitButton.disabled = false;
+        }
+    });
 }

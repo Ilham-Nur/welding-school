@@ -9,6 +9,17 @@
   gap: 18px;
 }
 
+.storage-unit-control {
+  align-items: stretch;
+  display: grid;
+  gap: 8px;
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.storage-unit-control .admin-button { white-space: nowrap; }
+.storage-unit-modal-form { display: grid; gap: 14px; }
+.storage-unit-create-error { margin: 0; }
+
 .storage-item-code-preview {
   align-items: center;
   background: linear-gradient(135deg, #071b32, #123e62);
@@ -245,4 +256,5 @@
   .storage-item-code-preview small { grid-column: 1; grid-row: auto; }
   .storage-return form { left: 0; right: auto; }
   .storage-overdue-list article { align-items: flex-start; flex-direction: column; }
+  .storage-unit-control { grid-template-columns: 1fr; }
 }

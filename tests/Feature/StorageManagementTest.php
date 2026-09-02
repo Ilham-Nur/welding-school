@@ -8,9 +8,11 @@ use App\Models\Location;
 use App\Models\StorageItem;
 use App\Models\StorageStock;
 use App\Models\StorageStockOpname;
+use App\Models\StorageUnit;
 use App\Models\User;
 use Database\Seeders\RolePermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Schema;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
@@ -21,6 +23,11 @@ class StorageManagementTest extends TestCase
     private User $admin;
 
     private Location $storage;
+
+    private function unit(string $symbol): StorageUnit
+    {
+        return StorageUnit::query()->where('symbol', $symbol)->firstOrFail();
+    }
 
     protected function setUp(): void
     {
@@ -93,8 +100,8 @@ class StorageManagementTest extends TestCase
     public function test_receipt_and_issue_update_stock_and_create_ledger(): void
     {
         $item = StorageItem::query()->create([
-            'code' => 'ELC-E7018', 'name' => 'Elektroda E7018', 'category' => 'Welding',
-            'unit' => 'box', 'minimum_stock' => 2, 'is_active' => true, 'notes' => 'Merek Kobelco LB-52U',
+            'code' => 'ELC-E7018', 'name' => 'Elektroda E7018',
+            'storage_unit_id' => $this->unit('box')->id, 'minimum_stock' => 2, 'is_active' => true, 'notes' => 'Merek Kobelco LB-52U',
         ]);
 
         $this->get(route('admin.storage.receipts.create'))
@@ -102,9 +109,9 @@ class StorageManagementTest extends TestCase
             ->assertSee('data-storage-item-picker', false)
             ->assertSee('data-storage-picker-style="select2"', false)
             ->assertSee('data-storage-line', false)
-            ->assertSee('Cari berdasarkan kode, nama, kategori, merek, atau spesifikasi consumable.')
-            ->assertDontSee('Ketik kode, nama, kategori, merek, atau spesifikasi.')
-            ->assertSee('data-search="ELC-E7018 Elektroda E7018 Welding box Merek Kobelco LB-52U"', false);
+            ->assertSee('Cari berdasarkan kode, nama, satuan, merek, atau spesifikasi consumable.')
+            ->assertDontSee('Ketik kode, nama, satuan, merek, atau spesifikasi.')
+            ->assertSee('data-search="ELC-E7018 Elektroda E7018 box Merek Kobelco LB-52U"', false);
 
         $this->post(route('admin.storage.receipts.store'), [
             'transaction_date' => '2026-08-13', 'location_id' => $this->storage->id,
@@ -148,12 +155,14 @@ class StorageManagementTest extends TestCase
             ->assertOk()
             ->assertSee('ATP-CNS-######')
             ->assertSee('Generate kode &amp; simpan', false)
-            ->assertDontSee('name="code"', false);
+            ->assertDontSee('name="code"', false)
+            ->assertDontSee('name="category"', false)
+            ->assertSee('name="storage_unit_id"', false)
+            ->assertSee('data-modal-open="create-storage-unit"', false);
 
         $this->post(route('admin.storage-items.store'), [
             'name' => 'Kawat Las ER70S-6',
-            'category' => 'Welding',
-            'unit' => 'roll',
+            'storage_unit_id' => $this->unit('roll')->id,
             'minimum_stock' => 2,
             'is_active' => '1',
         ])->assertRedirect(route('admin.storage-items.index'));
@@ -165,8 +174,7 @@ class StorageManagementTest extends TestCase
         $this->put(route('admin.storage-items.update', $item), [
             'code' => 'KODE-DARI-USER',
             'name' => 'Kawat Las ER70S-6 Revisi',
-            'category' => 'Welding',
-            'unit' => 'roll',
+            'storage_unit_id' => $this->unit('roll')->id,
             'minimum_stock' => 3,
             'is_active' => '1',
         ])->assertRedirect(route('admin.storage-items.index'));
@@ -174,11 +182,71 @@ class StorageManagementTest extends TestCase
         $this->assertSame(StorageItem::internalCode($item->id), $item->fresh()->code);
     }
 
+    public function test_consumable_units_can_be_added_inline_deactivated_and_are_locked_after_use(): void
+    {
+        $response = $this->postJson(route('admin.storage.units.store'), [
+            'unit_symbol' => 'pack',
+            'unit_name' => 'Paket',
+        ]);
+
+        $response->assertCreated()
+            ->assertJsonPath('unit.symbol', 'pack')
+            ->assertJsonPath('unit.label', 'pack | Paket');
+
+        $unit = StorageUnit::query()->where('symbol', 'pack')->firstOrFail();
+        $this->assertFalse(Schema::hasColumn('storage_items', 'category'));
+        $this->assertFalse(Schema::hasColumn('storage_items', 'unit'));
+        $this->get(route('admin.storage.units.index'))
+            ->assertOk()
+            ->assertSee('Master satuan consumable')
+            ->assertSee('pack');
+
+        $this->post(route('admin.storage-items.store'), [
+            'name' => 'Elektroda Paket',
+            'storage_unit_id' => $unit->id,
+            'minimum_stock' => 1,
+            'is_active' => '1',
+        ])->assertRedirect(route('admin.storage-items.index'));
+
+        $item = StorageItem::query()->where('name', 'Elektroda Paket')->firstOrFail();
+        $this->patch(route('admin.storage.units.toggle', $unit))->assertRedirect();
+        $this->assertFalse($unit->fresh()->is_active);
+
+        $this->get(route('admin.storage-items.create'))
+            ->assertOk()
+            ->assertDontSee('pack | Paket');
+        $this->get(route('admin.storage-items.edit', $item))
+            ->assertOk()
+            ->assertSee('pack | Paket (nonaktif)');
+
+        $this->post(route('admin.storage-items.store'), [
+            'name' => 'Tidak Boleh Memakai Satuan Nonaktif',
+            'storage_unit_id' => $unit->id,
+            'minimum_stock' => 0,
+            'is_active' => '1',
+        ])->assertSessionHasErrors('storage_unit_id');
+
+        $this->post(route('admin.storage.receipts.store'), [
+            'transaction_date' => '2026-09-02',
+            'location_id' => $this->storage->id,
+            'lines' => [['storage_item_id' => $item->id, 'quantity' => 2]],
+        ])->assertRedirect(route('admin.storage.receipts.index'));
+
+        $this->put(route('admin.storage-items.update', $item), [
+            'name' => $item->name,
+            'storage_unit_id' => $this->unit('pcs')->id,
+            'minimum_stock' => 1,
+            'is_active' => '1',
+        ])->assertSessionHasErrors('storage_unit_id');
+
+        $this->assertSame($unit->id, $item->fresh()->storage_unit_id);
+    }
+
     public function test_issue_is_rejected_when_stock_is_not_enough(): void
     {
         $item = StorageItem::query()->create([
-            'code' => 'GRD-001', 'name' => 'Mata Gerinda', 'category' => 'Grinding',
-            'unit' => 'pcs', 'minimum_stock' => 5, 'is_active' => true,
+            'code' => 'GRD-001', 'name' => 'Mata Gerinda',
+            'storage_unit_id' => $this->unit('pcs')->id, 'minimum_stock' => 5, 'is_active' => true,
         ]);
 
         $this->from(route('admin.storage.issues.create'))->post(route('admin.storage.issues.store'), [
@@ -272,15 +340,15 @@ class StorageManagementTest extends TestCase
     public function test_storage_accepts_indonesian_thousand_separator_in_numeric_inputs(): void
     {
         $this->post(route('admin.storage-items.store'), [
-            'name' => 'Kawat Uji', 'category' => 'Welding', 'unit' => 'pcs',
+            'name' => 'Kawat Uji', 'storage_unit_id' => $this->unit('pcs')->id,
             'minimum_stock' => '1.000', 'is_active' => '1',
         ])->assertRedirect(route('admin.storage-items.index'));
         $item = StorageItem::query()->where('name', 'Kawat Uji')->firstOrFail();
         $this->assertSame(1000.0, (float) $item->minimum_stock);
         $this->get(route('admin.storage.receipts.create'))->assertOk()->assertSee('data-number-format', false);
         $decimalItem = StorageItem::query()->create([
-            'code' => 'DEC-001', 'name' => 'Flux Uji', 'category' => 'Welding',
-            'unit' => 'kg', 'minimum_stock' => 0, 'is_active' => true,
+            'code' => 'DEC-001', 'name' => 'Flux Uji',
+            'storage_unit_id' => $this->unit('kg')->id, 'minimum_stock' => 0, 'is_active' => true,
         ]);
 
         $this->post(route('admin.storage.receipts.store'), [
@@ -314,8 +382,8 @@ class StorageManagementTest extends TestCase
     public function test_storage_report_can_export_excel_and_pdf_with_company_identity(): void
     {
         $item = StorageItem::query()->create([
-            'code' => 'EXP-001', 'name' => 'Elektroda Export', 'category' => 'Welding',
-            'unit' => 'box', 'minimum_stock' => 1, 'is_active' => true,
+            'code' => 'EXP-001', 'name' => 'Elektroda Export',
+            'storage_unit_id' => $this->unit('box')->id, 'minimum_stock' => 1, 'is_active' => true,
         ]);
         $this->post(route('admin.storage.receipts.store'), [
             'transaction_date' => '2026-08-13', 'location_id' => $this->storage->id,
@@ -351,8 +419,8 @@ class StorageManagementTest extends TestCase
     public function test_stock_opname_updates_balance_and_records_adjustment(): void
     {
         $item = StorageItem::query()->create([
-            'code' => 'WIRE-ER70S', 'name' => 'Kawat Las ER70S', 'category' => 'Welding',
-            'unit' => 'kg', 'minimum_stock' => 5, 'is_active' => true,
+            'code' => 'WIRE-ER70S', 'name' => 'Kawat Las ER70S',
+            'storage_unit_id' => $this->unit('kg')->id, 'minimum_stock' => 5, 'is_active' => true,
         ]);
         StorageStock::query()->create([
             'storage_item_id' => $item->id, 'location_id' => $this->storage->id, 'quantity' => 10,
@@ -384,6 +452,8 @@ class StorageManagementTest extends TestCase
         $this->actingAs($viewer)
             ->get(route('admin.storage.dashboard'))
             ->assertOk();
+        $this->get(route('admin.storage.units.index'))
+            ->assertForbidden();
         $this->post(route('admin.storage.receipts.store'), [])
             ->assertForbidden();
         $this->get(route('admin.locations.create'))

@@ -18,6 +18,7 @@ use App\Http\Controllers\Admin\StorageItemController;
 use App\Http\Controllers\Admin\StorageReportController;
 use App\Http\Controllers\Admin\StorageStockOpnameController;
 use App\Http\Controllers\Admin\StorageTransactionController;
+use App\Http\Controllers\Admin\StorageUnitController;
 use App\Http\Controllers\Admin\TrainingApplicationController;
 use App\Http\Controllers\Admin\TrainingBatchController;
 use App\Http\Controllers\Admin\TrainingProgramController;
@@ -246,6 +247,14 @@ Route::prefix('admin')
             ->except(['destroy'])
             ->middlewareFor(['index', 'show'], 'permission:storage.view')
             ->middlewareFor(['create', 'store', 'edit', 'update'], 'permission:storage.items.manage');
+        Route::get('/storage/units', [StorageUnitController::class, 'index'])
+            ->middleware('permission:storage.items.manage')->name('storage.units.index');
+        Route::post('/storage/units', [StorageUnitController::class, 'store'])
+            ->middleware('permission:storage.items.manage')->name('storage.units.store');
+        Route::put('/storage/units/{storageUnit}', [StorageUnitController::class, 'update'])
+            ->middleware('permission:storage.items.manage')->name('storage.units.update');
+        Route::patch('/storage/units/{storageUnit}/toggle', [StorageUnitController::class, 'toggle'])
+            ->middleware('permission:storage.items.manage')->name('storage.units.toggle');
 
         Route::get('/storage/receipts', [StorageTransactionController::class, 'receipts'])
             ->middleware('permission:storage.view')->name('storage.receipts.index');

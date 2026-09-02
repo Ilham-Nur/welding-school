@@ -8,10 +8,10 @@
                     value="{{ $item->id }}"
                     data-code="{{ $item->code }}"
                     data-name="{{ $item->name }}"
-                    data-meta="{{ collect([$item->category, $item->unit, $item->notes ? \Illuminate\Support\Str::limit($item->notes, 70) : null])->filter()->join(' · ') }}"
-                    data-search="{{ collect([$item->code, $item->name, $item->category, $item->unit, $item->notes])->filter()->join(' ') }}"
+                    data-meta="{{ collect([$item->unit->label(), $item->notes ? \Illuminate\Support\Str::limit($item->notes, 70) : null])->filter()->join(' · ') }}"
+                    data-search="{{ collect([$item->code, $item->name, $item->unit->symbol, $item->unit->name, $item->notes])->filter()->join(' ') }}"
                     @selected((string) $selected === (string) $item->id)
-                >{{ $item->code }} · {{ $item->name }} · {{ $item->category }} ({{ $item->unit }})</option>
+                >{{ $item->code }} · {{ $item->name }} ({{ $item->unit->symbol }})</option>
             @endforeach
         </select>
     </div>

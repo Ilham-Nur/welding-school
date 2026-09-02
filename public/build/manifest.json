@@ -8,7 +8,7 @@
     "name": "cropper.esm.raw"
   },
   "resources/css/app.css": {
-    "file": "assets/app-DGDvxYiX.css",
+    "file": "assets/app-CCazJHFu.css",
     "src": "resources/css/app.css",
     "isEntry": true,
     "name": "app",
@@ -74,7 +74,7 @@
     "isEntry": true
   },
   "resources/js/storage.js": {
-    "file": "assets/storage-QKRL8Byt.js",
+    "file": "assets/storage-B7sVKPl9.js",
     "name": "storage",
     "src": "resources/js/storage.js",
     "isEntry": true

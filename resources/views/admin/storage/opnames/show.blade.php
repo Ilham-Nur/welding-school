@@ -10,7 +10,7 @@
     @endif
     <section class="admin-panel"><header class="admin-panel__header"><div><h2>Hasil per barang</h2><p>{{ $opname->lines->count() }} consumable dalam sesi ini.</p></div><x-admin.status-badge :status="$opname->status" /></header>
         <x-ui.table class="admin-table-wrap"><thead><tr><th>Barang</th><th>Stok sistem</th><th>Hitung fisik</th><th>Selisih</th><th>Catatan</th></tr></thead><tbody>@foreach($opname->lines as $line)<tr>
-            <td><strong>{{ $line->item->name }}</strong><small>{{ $line->item->code }} · {{ $line->item->unit }}</small></td><td>{{ format_quantity($line->system_quantity) }}</td>
+            <td><strong>{{ $line->item->name }}</strong><small>{{ $line->item->code }} · {{ $line->item->unit->symbol }}</small></td><td>{{ format_quantity($line->system_quantity) }}</td>
             @if($opname->status==='counting')<td><input class="storage-count-input" type="text" inputmode="decimal" data-number-format data-number-decimals="3" name="counts[{{ $line->id }}]" value="{{ format_quantity(old('counts.'.$line->id, $line->system_quantity)) }}" required></td><td><span data-opname-difference>Otomatis</span></td><td><input type="text" name="line_notes[{{ $line->id }}]" value="{{ old('line_notes.'.$line->id) }}" maxlength="255" placeholder="Alasan jika selisih"></td>
             @else<td>{{ format_quantity($line->counted_quantity) }}</td><td><strong class="{{ (float)$line->difference!==0.0 ? 'storage-difference' : '' }}">{{ (float)$line->difference>0?'+':'' }}{{ format_quantity($line->difference) }}</strong></td><td>{{ $line->notes ?: 'Tanpa catatan' }}</td>@endif
         </tr>@endforeach</tbody></x-ui.table>

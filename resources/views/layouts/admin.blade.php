@@ -156,6 +156,11 @@
                                     <a class="{{ request()->routeIs('admin.storage-items.*') ? 'is-active' : '' }}" href="{{ route('admin.storage-items.index') }}" data-label="Stok Consumable" title="Stok Consumable">
                                         <span aria-hidden="true"><x-ui.icon name="list" size="16" /></span><span class="admin-nav-label">Stok Consumable</span>
                                     </a>
+                                    @can('storage.items.manage')
+                                        <a class="{{ request()->routeIs('admin.storage.units.*') ? 'is-active' : '' }}" href="{{ route('admin.storage.units.index') }}" data-label="Satuan Consumable" title="Satuan Consumable">
+                                            <span aria-hidden="true"><x-ui.icon name="list" size="16" /></span><span class="admin-nav-label">Satuan Consumable</span>
+                                        </a>
+                                    @endcan
                                     <a class="{{ request()->routeIs('admin.storage.receipts.*') ? 'is-active' : '' }}" href="{{ route('admin.storage.receipts.index') }}" data-label="Penerimaan Barang" title="Penerimaan Barang">
                                         <span aria-hidden="true"><x-ui.icon name="upload" size="16" /></span><span class="admin-nav-label">Penerimaan Barang</span>
                                     </a>
