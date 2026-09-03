@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\EmployeeController;
 use App\Http\Controllers\Admin\EmployeePositionController;
 use App\Http\Controllers\Admin\LocationController;
 use App\Http\Controllers\Admin\QualityDocumentController;
+use App\Http\Controllers\Admin\QualityRecordController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\StorageDashboardController;
 use App\Http\Controllers\Admin\StorageItemController;
@@ -142,6 +143,49 @@ Route::prefix('admin')
         Route::get('/quality-documents/quality', [QualityDocumentController::class, 'index'])
             ->middleware('permission:quality-documents.view')
             ->name('quality-documents.index');
+
+        Route::get('/quality-documents/quality-records', [QualityRecordController::class, 'index'])
+            ->middleware('permission:quality-documents.view')
+            ->name('quality-records.index');
+        Route::get('/quality-documents/quality-records/create', [QualityRecordController::class, 'create'])
+            ->middleware('permission:quality-documents.structure.manage')
+            ->name('quality-records.create');
+        Route::post('/quality-documents/quality-records', [QualityRecordController::class, 'store'])
+            ->middleware('permission:quality-documents.structure.manage')
+            ->name('quality-records.store');
+        Route::get('/quality-documents/quality-records/{record}', [QualityRecordController::class, 'show'])
+            ->middleware('permission:quality-documents.view')
+            ->name('quality-records.show');
+        Route::get('/quality-documents/quality-records/{record}/edit', [QualityRecordController::class, 'edit'])
+            ->middleware('permission:quality-documents.structure.manage')
+            ->name('quality-records.edit');
+        Route::put('/quality-documents/quality-records/{record}', [QualityRecordController::class, 'update'])
+            ->middleware('permission:quality-documents.structure.manage')
+            ->name('quality-records.update');
+        Route::delete('/quality-documents/quality-records/{record}', [QualityRecordController::class, 'destroy'])
+            ->middleware('permission:quality-documents.structure.manage')
+            ->name('quality-records.destroy');
+        Route::get('/quality-documents/quality-records/{record}/files/create', [QualityRecordController::class, 'createFile'])
+            ->middleware('permission:quality-documents.manage')
+            ->name('quality-records.files.create');
+        Route::post('/quality-documents/quality-records/{record}/files', [QualityRecordController::class, 'storeFile'])
+            ->middleware('permission:quality-documents.manage')
+            ->name('quality-records.files.store');
+        Route::get('/quality-documents/quality-records/{record}/files/{file}/edit', [QualityRecordController::class, 'editFile'])
+            ->middleware('permission:quality-documents.manage')
+            ->name('quality-records.files.edit');
+        Route::put('/quality-documents/quality-records/{record}/files/{file}', [QualityRecordController::class, 'updateFile'])
+            ->middleware('permission:quality-documents.manage')
+            ->name('quality-records.files.update');
+        Route::delete('/quality-documents/quality-records/{record}/files/{file}', [QualityRecordController::class, 'destroyFile'])
+            ->middleware('permission:quality-documents.manage')
+            ->name('quality-records.files.destroy');
+        Route::get('/quality-documents/quality-records/{record}/files/{file}/preview', [QualityRecordController::class, 'previewFile'])
+            ->middleware('permission:quality-documents.view')
+            ->name('quality-records.files.preview');
+        Route::get('/quality-documents/quality-records/{record}/files/{file}/download', [QualityRecordController::class, 'downloadFile'])
+            ->middleware('permission:quality-documents.manage')
+            ->name('quality-records.files.download');
         Route::get('/quality-documents/quality/audit', [AuditDocumentController::class, 'legacyIndex'])
             ->middleware('permission:quality-documents.view')
             ->name('quality-documents.audit.legacy');

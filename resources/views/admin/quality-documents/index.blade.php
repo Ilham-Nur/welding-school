@@ -19,7 +19,7 @@
     <section class="admin-page-heading">
         <div>
             <h1>{{ $standard ? 'Dokumen '.$standard->name : 'Dokumen Quality' }}</h1>
-            <p>{{ $standard ? 'Review relasi bab, dokumen, dan revisi '.$standard->name.' dari Manual Mutu sampai Form.' : 'Siapkan Data Audit atau pilih standar ISO untuk membuka dokumen terkendali.' }}</p>
+            <p>{{ $standard ? 'Review relasi bab, dokumen, dan revisi '.$standard->name.' dari Manual Mutu sampai Form.' : 'Pilih standar ISO untuk membuka dan mengelola dokumen terkendali.' }}</p>
         </div>
         @if ($standard)
             <a class="button button--outline admin-button" href="{{ route('admin.quality-documents.index') }}">← Semua standar</a>
@@ -68,43 +68,6 @@
         @endif
         </section>
 
-        <section class="qd-quality-home-section">
-            <header class="qd-quality-home-section__header">
-                <div><span>Persiapan auditor</span><h2>Data Audit</h2><p>Buat kartu terpisah agar setiap kebutuhan audit memiliki dokumennya sendiri.</p></div>
-                @can('quality-documents.structure.manage')
-                    <details class="qd-add-standard">
-                        <summary class="button button--outline admin-button">+ Data Audit</summary>
-                        <form method="POST" action="{{ route('admin.quality-documents.audit.collections.store') }}">
-                            @csrf
-                            <label class="admin-field">
-                                <span>Nama data audit</span>
-                                <input name="name" value="{{ old('name') }}" placeholder="Contoh: Audit ISO 9001" required>
-                            </label>
-                            <button class="button button--primary admin-button" type="submit">Simpan</button>
-                        </form>
-                    </details>
-                @endcan
-            </header>
-            @if ($auditCollections->isEmpty())
-                <section class="admin-panel">
-                    <div class="admin-empty">
-                        <span><x-ui.icon name="file" /></span>
-                        <h2>Belum ada Data Audit</h2>
-                        <p>Tambahkan kartu Data Audit pertama sesuai kebutuhan quality atau standar yang akan diaudit.</p>
-                    </div>
-                </section>
-            @else
-                <section class="qd-quality-library qd-audit-library" aria-label="Daftar data audit">
-                    @foreach ($auditCollections as $auditCollection)
-                        <a class="qd-audit-library-card" href="{{ route('admin.quality-documents.audit.index', $auditCollection) }}">
-                            <span class="qd-quality-library__icon"><x-ui.icon name="file" size="28" /></span>
-                            <span class="qd-quality-library__copy"><small>Audit document</small><strong>{{ $auditCollection->name }}</strong><span>{{ $auditCollection->documents_count }} dokumen tersedia</span></span>
-                            <span class="qd-quality-library__arrow" aria-hidden="true">→</span>
-                        </a>
-                    @endforeach
-                </section>
-            @endif
-        </section>
     @else
         <section class="qd-standard-hero">
             <div>

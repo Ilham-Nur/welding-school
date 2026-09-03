@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\AuditCollection;
 use App\Models\Document;
 use App\Models\DocumentCategory;
 use App\Models\DocumentRevision;
@@ -528,11 +527,6 @@ class QualityDocumentController extends Controller
             return view('admin.quality-documents.index', [
                 'standard' => null,
                 'standards' => $standards,
-                'auditCollections' => AuditCollection::query()
-                    ->withCount('documents')
-                    ->orderBy('order_number')
-                    ->orderBy('name')
-                    ->get(),
                 'categories' => $categories,
                 'activeTab' => 'review',
                 'activeCategory' => null,

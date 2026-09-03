@@ -66,7 +66,7 @@
                         </a>
                     @endcan
                     @can('quality-documents.view')
-                        @php($qualityDocumentsMenuOpen = request()->routeIs('admin.quality-documents.*'))
+                        @php($qualityDocumentsMenuOpen = request()->routeIs('admin.quality-documents.*', 'admin.quality-records.*'))
                         <div @class(['admin-nav-group', 'is-open' => $qualityDocumentsMenuOpen]) data-admin-nav-group>
                             <button
                                 type="button"
@@ -85,6 +85,10 @@
                                 <a class="{{ request()->routeIs('admin.quality-documents.*') ? 'is-active' : '' }}" href="{{ route('admin.quality-documents.index') }}" data-label="Quality" title="Quality">
                                     <span aria-hidden="true"><x-ui.icon name="shield" size="16" /></span>
                                     <span class="admin-nav-label">Quality</span>
+                                </a>
+                                <a class="{{ request()->routeIs('admin.quality-records.*') ? 'is-active' : '' }}" href="{{ route('admin.quality-records.index') }}" data-label="Quality Record" title="Quality Record">
+                                    <span aria-hidden="true"><x-ui.icon name="list" size="16" /></span>
+                                    <span class="admin-nav-label">Quality Record</span>
                                 </a>
                                 <span class="admin-nav-submenu-item is-disabled" aria-disabled="true" data-label="Training" title="Training belum tersedia">
                                     <span aria-hidden="true"><x-ui.icon name="book-open" size="16" /></span>

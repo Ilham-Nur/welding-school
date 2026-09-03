@@ -21,7 +21,7 @@ class QualityDocumentManagementTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_quality_landing_shows_audit_data_and_iso_standard_cards(): void
+    public function test_quality_landing_shows_iso_standard_cards_and_separate_quality_record_menu(): void
     {
         $this->seedQualityModule();
         $admin = User::factory()->create();
@@ -31,8 +31,8 @@ class QualityDocumentManagementTest extends TestCase
             ->get(route('admin.quality-documents.index'))
             ->assertOk()
             ->assertSee('Quality Documents')
-            ->assertSee('Data Audit')
-            ->assertSee('Belum ada Data Audit')
+            ->assertSee('Quality Record')
+            ->assertDontSee('Belum ada Data Audit')
             ->assertSee('ISO 9001')
             ->assertDontSee('ISO 17025')
             ->assertSee('Quality standard')
@@ -152,10 +152,14 @@ class QualityDocumentManagementTest extends TestCase
             'order_number' => 2,
         ]);
 
-        $this->get(route('admin.quality-documents.index'))
+        $this->get(route('admin.quality-records.index'))
             ->assertOk()
-            ->assertSee('Audit ISO 14001')
-            ->assertSee(route('admin.quality-documents.audit.index', $isoCollection), false);
+            ->assertSee('0 record terdaftar.');
+        $this->assertDatabaseCount('quality_records', 0);
+
+        $this->get(route('admin.quality-documents.audit.index', $isoCollection))
+            ->assertOk()
+            ->assertSee('Audit ISO 14001');
 
         $this->post(route('admin.quality-documents.audit.store', $isoCollection), [
             'title' => 'Checklist ISO 14001',
