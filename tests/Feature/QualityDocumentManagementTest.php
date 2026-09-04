@@ -32,7 +32,8 @@ class QualityDocumentManagementTest extends TestCase
             ->assertOk()
             ->assertSee('Quality Documents')
             ->assertSee('Quality Record')
-            ->assertDontSee('Belum ada Data Audit')
+            ->assertSee('Data Audit')
+            ->assertSee('Belum ada Data Audit')
             ->assertSee('ISO 9001')
             ->assertDontSee('ISO 17025')
             ->assertSee('Quality standard')
@@ -157,9 +158,10 @@ class QualityDocumentManagementTest extends TestCase
             ->assertSee('0 record terdaftar.');
         $this->assertDatabaseCount('quality_records', 0);
 
-        $this->get(route('admin.quality-documents.audit.index', $isoCollection))
+        $this->get(route('admin.quality-documents.index'))
             ->assertOk()
-            ->assertSee('Audit ISO 14001');
+            ->assertSee('Audit ISO 14001')
+            ->assertSee(route('admin.quality-documents.audit.index', $isoCollection), false);
 
         $this->post(route('admin.quality-documents.audit.store', $isoCollection), [
             'title' => 'Checklist ISO 14001',
