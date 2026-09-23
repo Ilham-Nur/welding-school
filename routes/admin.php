@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\AuditDocumentController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EmployeeController;
 use App\Http\Controllers\Admin\EmployeePositionController;
+use App\Http\Controllers\Admin\EmployeeRequirementController;
 use App\Http\Controllers\Admin\LocationController;
 use App\Http\Controllers\Admin\QualityDocumentController;
 use App\Http\Controllers\Admin\QualityRecordController;
@@ -103,6 +104,19 @@ Route::prefix('admin')
         Route::resource('employees', EmployeeController::class)
             ->middlewareFor(['index', 'show'], 'permission:employees.view')
             ->middlewareFor(['create', 'store', 'edit', 'update', 'destroy'], 'permission:employees.manage');
+
+        Route::put('/employees/{employee}/documents/{document}/requirement', [EmployeeController::class, 'updateDocumentRequirement'])
+            ->middleware('permission:employees.manage')->name('employees.documents.requirement');
+        Route::patch('/employees/{employee}/documents/{document}/verify', [EmployeeController::class, 'verifyDocument'])
+            ->middleware('permission:employees.verify')->name('employees.documents.verify');
+        Route::get('/employee-positions/{employeePosition}/requirements', [EmployeeRequirementController::class, 'index'])
+            ->middleware('permission:employees.view')->name('employee-positions.requirements.index');
+        Route::post('/employee-positions/{employeePosition}/requirements', [EmployeeRequirementController::class, 'store'])
+            ->middleware('permission:employees.manage')->name('employee-positions.requirements.store');
+        Route::put('/employee-positions/{employeePosition}/requirements/{requirement}', [EmployeeRequirementController::class, 'update'])
+            ->middleware('permission:employees.manage')->name('employee-positions.requirements.update');
+        Route::delete('/employee-positions/{employeePosition}/requirements/{requirement}', [EmployeeRequirementController::class, 'destroy'])
+            ->middleware('permission:employees.manage')->name('employee-positions.requirements.destroy');
 
         Route::resource('employee-positions', EmployeePositionController::class)
             ->except(['create', 'show', 'edit'])

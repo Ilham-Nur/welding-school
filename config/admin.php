@@ -37,6 +37,7 @@ return [
         'storage.reports.view' => 'Melihat laporan Storage',
         'employees.view' => 'Melihat data karyawan',
         'employees.manage' => 'Mengelola data karyawan',
+        'employees.verify' => 'Memverifikasi dokumen persyaratan karyawan',
     ],
 
     'permission_groups' => [
@@ -65,6 +66,7 @@ return [
             'permissions' => [
                 'employees.view',
                 'employees.manage',
+                'employees.verify',
             ],
         ],
         'applications' => [

@@ -1,14 +1,14 @@
 @extends('layouts.admin')
 
 @section('title', 'Master Data Jabatan & Posisi')
-@section('eyebrow', 'Kepegawaian & SDM')
+@section('eyebrow', 'HR Management')
 @section('heading', 'Master Jabatan Karyawan')
 
 @section('content')
     <section class="admin-page-heading">
         <div>
             <h1>Master Jabatan / Posisi</h1>
-            <p>Kelola daftar jabatan dan posisi resmi untuk penempatan karyawan pada sistem.</p>
+            <p>Kelola jabatan, departemen, tanggung jawab, dan persyaratan dokumen karyawan.</p>
         </div>
         <div class="admin-actions">
             <a class="button button--outline admin-button" href="{{ route('admin.employees.index') }}">← Kembali ke Data Karyawan</a>
@@ -96,6 +96,8 @@
                             </td>
                             <td>
                                 <strong style="color: #0f172a; font-size: 14px">{{ $pos->name }}</strong>
+                                <small style="display: block">{{ $pos->department ?: 'Departemen belum diisi' }}</small>
+                                <a href="{{ route('admin.employee-positions.requirements.index', $pos) }}" style="display: block; margin-top: 6px">{{ $pos->requirements_count }} Persyaratan · Lihat / Kelola</a>
                             </td>
                             <td>
                                 @if ($pos->code)
@@ -161,6 +163,7 @@
                                             @csrf
                                             @method('PUT')
                                             <div style="display: grid; gap: 14px">
+                                                <x-ui.text-input label="Departemen" name="department" :value="old('department', $pos->department)" maxlength="255" placeholder="Contoh: Pelatihan" />
                                                 <x-ui.text-input
                                                     label="Nama Jabatan / Posisi"
                                                     name="name"
@@ -230,6 +233,7 @@
             <form method="POST" action="{{ route('admin.employee-positions.store') }}" id="form-create-position">
                 @csrf
                 <div style="display: grid; gap: 14px">
+                    <x-ui.text-input label="Departemen" name="department" :value="old('department')" maxlength="255" placeholder="Contoh: Pelatihan" />
                     <x-ui.text-input
                         label="Nama Jabatan / Posisi"
                         name="name"

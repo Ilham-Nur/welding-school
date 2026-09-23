@@ -187,17 +187,35 @@
                         </div>
                     @endcanany
 
-                    @canany(['users.view', 'roles.view', 'locations.view', 'employees.view'])
+                    @can('employees.view')
+                        @php($hrMenuOpen = request()->routeIs('admin.employees.*', 'admin.employee-positions.*'))
+                        <div @class(['admin-nav-group', 'is-open' => $hrMenuOpen]) data-admin-nav-group>
+                            <button
+                                type="button"
+                                class="admin-nav-group__toggle {{ $hrMenuOpen ? 'is-active' : '' }}"
+                                data-admin-nav-toggle
+                                aria-expanded="{{ $hrMenuOpen ? 'true' : 'false' }}"
+                                aria-controls="admin-hr-submenu"
+                                data-label="HR Management"
+                                title="HR Management"
+                            >
+                                <span aria-hidden="true"><x-ui.icon name="users" /></span>
+                                <span class="admin-nav-label">HR Management</span>
+                                <span class="admin-nav-group__chevron" aria-hidden="true"><x-ui.icon name="chevron-down" size="14" /></span>
+                            </button>
+                            <div class="admin-nav-group__items" id="admin-hr-submenu" data-admin-nav-items @if (! $hrMenuOpen) hidden @endif>
+                                <a class="{{ request()->routeIs('admin.employees.*') ? 'is-active' : '' }}" href="{{ route('admin.employees.index') }}" data-label="Data Karyawan" title="Data Karyawan">
+                                    <span aria-hidden="true"><x-ui.icon name="users" size="16" /></span><span class="admin-nav-label">Data Karyawan</span>
+                                </a>
+                                <a class="{{ request()->routeIs('admin.employee-positions.*') ? 'is-active' : '' }}" href="{{ route('admin.employee-positions.index') }}" data-label="Master Jabatan" title="Master Jabatan">
+                                    <span aria-hidden="true"><x-ui.icon name="shield" size="16" /></span><span class="admin-nav-label">Master Jabatan</span>
+                                </a>
+                            </div>
+                        </div>
+                    @endcan
+                    @canany(['users.view', 'roles.view', 'locations.view'])
                         <div class="admin-sidebar__label">Master data</div>
                     @endcanany
-                    @can('employees.view')
-                        <a class="{{ request()->routeIs('admin.employees.*') ? 'is-active' : '' }}" href="{{ route('admin.employees.index') }}" data-label="Data Karyawan" title="Data Karyawan">
-                            <span aria-hidden="true"><x-ui.icon name="users" /></span><span class="admin-nav-label">Data Karyawan</span>
-                        </a>
-                        <a class="{{ request()->routeIs('admin.employee-positions.*') ? 'is-active' : '' }}" href="{{ route('admin.employee-positions.index') }}" data-label="Master Jabatan" title="Master Jabatan">
-                            <span aria-hidden="true"><x-ui.icon name="shield" /></span><span class="admin-nav-label">Master Jabatan</span>
-                        </a>
-                    @endcan
                     @can('roles.view')
                         <a class="{{ request()->routeIs('admin.roles.*') ? 'is-active' : '' }}" href="{{ route('admin.roles.index') }}" data-label="Role Management" title="Role Management">
                             <span aria-hidden="true"><x-ui.icon name="shield" /></span><span class="admin-nav-label">Role Management</span>

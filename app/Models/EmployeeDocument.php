@@ -18,12 +18,25 @@ class EmployeeDocument extends Model
     {
         return [
             'file_size' => 'integer',
+            'expires_at' => 'date',
+            'verified_at' => 'datetime',
+            'requirement_version' => 'integer',
         ];
     }
 
     public function employee(): BelongsTo
     {
         return $this->belongsTo(Employee::class);
+    }
+
+    public function requirement(): BelongsTo
+    {
+        return $this->belongsTo(EmployeePositionRequirement::class, 'requirement_id');
+    }
+
+    public function verifier(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'verified_by');
     }
 
     public function formattedFileSize(): string
@@ -42,5 +55,10 @@ class EmployeeDocument extends Model
         }
 
         return round($bytes, 2).' '.$units[$unitIndex];
+    }
+
+    public function reviewToken(): string
+    {
+        return hash('sha256', json_encode([$this->id, $this->file_path, $this->expires_at?->format('Y-m-d'), $this->verification_status, $this->updated_at?->toJSON(), $this->requirement?->version]));
     }
 }

@@ -7,27 +7,27 @@ use App\Models\Employee;
 use App\Models\EmployeeDocument;
 use App\Models\EmployeeEducation;
 use App\Models\EmployeePosition;
+use App\Models\EmployeePositionRequirement;
 use App\Models\User;
 use App\Services\Employees\EmployeeCodeGenerator;
+use App\Services\Employees\EmployeeRequirementUploads;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 use Throwable;
 
 class EmployeeController extends Controller
 {
-    public function __construct(private readonly EmployeeCodeGenerator $codeGenerator) {}
+    public function __construct(private readonly EmployeeCodeGenerator $codeGenerator, private readonly EmployeeRequirementUploads $requirementUploads) {}
+
     public function index(Request $request): View
     {
         $query = Employee::query()
-            ->with(['user'])
+            ->with(['user', 'positionRelation.requirements', 'documents'])
             ->withCount(['educations', 'documents'])
             ->when($request->filled('search'), function ($query) use ($request): void {
                 $search = '%'.trim((string) $request->string('search')).'%';
@@ -79,7 +79,7 @@ class EmployeeController extends Controller
         return view('admin.employees.create', [
             'employee' => new Employee,
             'users' => $users,
-            'positions' => EmployeePosition::query()->active()->orderBy('display_order')->orderBy('name')->get(),
+            'positions' => EmployeePosition::query()->with('requirements')->active()->orderBy('display_order')->orderBy('name')->get(),
         ]);
     }
 
@@ -95,6 +95,7 @@ class EmployeeController extends Controller
         $photoPath = null;
         $originalPhotoPath = null;
         $lastEduPath = null;
+        $requirementPaths = [];
 
         if ($request->hasFile('original_photo')) {
             $originalPhotoPath = 'storage/'.$request->file('original_photo')->store('employees/photos/originals', 'public');
@@ -119,7 +120,7 @@ class EmployeeController extends Controller
         unset($validated['photo'], $validated['original_photo'], $validated['last_education_file'], $validated['documents'], $validated['educations']);
 
         try {
-            $employee = DB::transaction(function () use ($validated, $request): Employee {
+            $employee = DB::transaction(function () use ($validated, $request, &$requirementPaths): Employee {
                 $employee = Employee::query()->create($validated);
 
                 // Handle repeatable educations array
@@ -202,9 +203,12 @@ class EmployeeController extends Controller
                     ]);
                 }
 
+                $this->requirementUploads->save($request, $employee, $requirementPaths);
+
                 return $employee;
             });
         } catch (Throwable $exception) {
+            Storage::disk('public')->delete($requirementPaths);
             if ($photoPath) {
                 $this->deleteFile($photoPath);
             }
@@ -222,8 +226,9 @@ class EmployeeController extends Controller
     {
         $employee->load([
             'user',
+            'positionRelation.requirements',
             'educations' => fn ($q) => $q->latest('id'),
-            'documents' => fn ($q) => $q->latest('id'),
+            'documents' => fn ($q) => $q->with(['requirement', 'verifier'])->latest('id'),
         ]);
 
         return view('admin.employees.show', [
@@ -233,6 +238,7 @@ class EmployeeController extends Controller
 
     public function edit(Employee $employee): View
     {
+        $employee->load(['documents.requirement', 'educations', 'positionRelation.requirements']);
         $users = User::query()
             ->where(function ($q) use ($employee): void {
                 $q->whereDoesntHave('employee')
@@ -244,7 +250,7 @@ class EmployeeController extends Controller
         return view('admin.employees.edit', [
             'employee' => $employee,
             'users' => $users,
-            'positions' => EmployeePosition::query()->orderBy('display_order')->orderBy('name')->get(),
+            'positions' => EmployeePosition::query()->with('requirements')->orderBy('display_order')->orderBy('name')->get(),
         ]);
     }
 
@@ -264,6 +270,7 @@ class EmployeeController extends Controller
         $newPhotoPath = null;
         $newOriginalPhotoPath = null;
         $newLastEduPath = null;
+        $requirementPaths = [];
 
         if ($request->boolean('remove_photo')) {
             $validated['photo_path'] = null;
@@ -296,8 +303,44 @@ class EmployeeController extends Controller
         unset($validated['photo'], $validated['original_photo'], $validated['last_education_file'], $validated['documents'], $validated['educations']);
 
         try {
-            DB::transaction(function () use ($employee, $validated): void {
+            DB::transaction(function () use ($employee, $validated, $request, &$requirementPaths): void {
                 $employee->update($validated);
+                $employee->unsetRelation('positionRelation');
+                $this->requirementUploads->syncLastEducation($employee);
+                $this->requirementUploads->save($request, $employee, $requirementPaths);
+                foreach (($request->input('documents') ?? []) as $index => $input) {
+                    if ($request->hasFile("documents.$index.file")) {
+                        $file = $request->file("documents.$index.file");
+                        $path = $file->store('employees/documents', 'public');
+                        if (! $path) {
+                            throw new \RuntimeException('Berkas dokumen gagal disimpan.');
+                        }
+                        $requirementPaths[] = $path;
+                        $employee->documents()->create([
+                            'document_label' => ($input['label'] ?? null) ?: $file->getClientOriginalName(),
+                            'file_path' => 'storage/'.$path,
+                            'file_name' => $file->getClientOriginalName(),
+                            'mime_type' => $file->getMimeType(),
+                            'file_size' => $file->getSize(),
+                        ]);
+                    }
+                }
+                foreach (($request->input('educations') ?? []) as $index => $input) {
+                    if (empty($input['institution_name'])) {
+                        continue;
+                    }
+                    $data = array_intersect_key($input, array_flip(['institution_name', 'education_level', 'major', 'start_year', 'end_year', 'grade', 'description']));
+                    if ($request->hasFile("educations.$index.file")) {
+                        $file = $request->file("educations.$index.file");
+                        $path = $file->store('employees/educations', 'public');
+                        if (! $path) {
+                            throw new \RuntimeException('Berkas pendidikan gagal disimpan.');
+                        }
+                        $requirementPaths[] = $path;
+                        $data += ['file_path' => 'storage/'.$path, 'file_name' => $file->getClientOriginalName(), 'mime_type' => $file->getMimeType()];
+                    }
+                    $employee->educations()->create($data);
+                }
             });
 
             if (($request->boolean('remove_photo') || $newPhotoPath) && $oldPhoto) {
@@ -312,6 +355,7 @@ class EmployeeController extends Controller
                 $this->deleteFile($oldLastEdu);
             }
         } catch (Throwable $exception) {
+            Storage::disk('public')->delete($requirementPaths);
             if ($newPhotoPath) {
                 $this->deleteFile($newPhotoPath);
             }
@@ -387,7 +431,10 @@ class EmployeeController extends Controller
         abort_unless($education->employee_id === $employee->id, 404);
 
         $filePath = $education->file_path;
-        $education->delete();
+        DB::transaction(function () use ($employee, $education): void {
+            $employee->documents()->where('source_key', 'education:'.$education->id)->delete();
+            $education->delete();
+        });
 
         if ($filePath) {
             $this->deleteFile($filePath);
@@ -398,6 +445,7 @@ class EmployeeController extends Controller
 
     public function storeDocument(Request $request, Employee $employee): RedirectResponse
     {
+        $requirementData = $this->validateDocumentRequirement($request, $employee);
         $validated = $request->validate([
             'document_label' => ['required', 'string', 'max:255'],
             'document_file' => ['required', 'file', 'mimes:pdf,jpg,jpeg,png,doc,docx,xls,xlsx,zip', 'max:10240'],
@@ -407,6 +455,7 @@ class EmployeeController extends Controller
         $filePath = 'storage/'.$file->store('employees/documents', 'public');
 
         $employee->documents()->create([
+            ...$requirementData,
             'document_label' => $validated['document_label'],
             'file_path' => $filePath,
             'file_name' => $file->getClientOriginalName(),
@@ -415,6 +464,73 @@ class EmployeeController extends Controller
         ]);
 
         return back()->with('success', 'Dokumen kepegawaian berhasil diunggah.');
+    }
+
+    public function updateDocumentRequirement(Request $request, Employee $employee, EmployeeDocument $document): RedirectResponse
+    {
+        abort_unless($document->employee_id === $employee->id, 404);
+        $document->update([
+            ...$this->validateDocumentRequirement($request, $employee),
+            'verification_status' => 'pending',
+            'verification_notes' => null,
+            'verified_by' => null,
+            'verified_at' => null,
+            'requirement_version' => null,
+        ]);
+
+        return back()->with('success', 'Persyaratan dan masa berlaku dokumen diperbarui. Verifikasi sebelumnya direset.');
+    }
+
+    public function verifyDocument(Request $request, Employee $employee, EmployeeDocument $document): RedirectResponse
+    {
+        abort_unless($document->employee_id === $employee->id, 404);
+        $requirement = $document->requirement;
+        abort_unless($requirement && $requirement->employee_position_id === $employee->position_id, 404);
+        $validated = $request->validate([
+            'verification_status' => ['required', Rule::in(['approved', 'rejected'])],
+            'verification_notes' => ['nullable', 'required_if:verification_status,rejected', 'string', 'max:2000'],
+            'review_token' => ['nullable', 'string'],
+        ]);
+        if ($request->filled('review_token') && ! hash_equals($document->reviewToken(), $validated['review_token'])) {
+            return back()->withErrors(['review_token' => 'Dokumen atau persyaratan berubah. Muat ulang halaman dan periksa kembali.'])->withInput();
+        }
+        unset($validated['review_token']);
+        if ($validated['verification_status'] === 'approved') {
+            if (! Storage::disk('public')->exists(preg_replace('/^storage\//', '', $document->file_path))) {
+                return back()->withErrors(['document' => 'Berkas tidak ditemukan. Minta pengelola mengunggah ulang melalui Edit Karyawan.'])->withInput();
+            }
+            if ($requirement->has_expiry && ! $document->expires_at) {
+                return back()->withErrors(['expires_at' => 'Isi tanggal kedaluwarsa sebelum menyetujui dokumen.'])->withInput();
+            }
+            if ($document->expires_at && $document->expires_at->lt(today())) {
+                return back()->withErrors(['expires_at' => 'Dokumen kedaluwarsa tidak dapat disetujui. Unggah dokumen yang diperpanjang.'])->withInput();
+            }
+        }
+        $document->update([
+            ...$validated,
+            'verification_notes' => $validated['verification_notes'] ?? null,
+            'verified_by' => $request->user()->id,
+            'verified_at' => now(),
+            'requirement_version' => $requirement->version,
+        ]);
+
+        return back()->with('success', 'Hasil verifikasi dokumen berhasil disimpan.');
+    }
+
+    private function validateDocumentRequirement(Request $request, Employee $employee): array
+    {
+        $validated = $request->validate([
+            'requirement_id' => ['nullable', 'integer', Rule::exists('employee_position_requirements', 'id')->where('employee_position_id', $employee->position_id)],
+            'expires_at' => ['nullable', 'date_format:Y-m-d'],
+        ]);
+        $requirement = isset($validated['requirement_id']) ? EmployeePositionRequirement::find($validated['requirement_id']) : null;
+        if ($requirement?->has_expiry) {
+            $request->validate(['expires_at' => ['required', 'date_format:Y-m-d']], [
+                'expires_at.required' => 'Persyaratan ini membutuhkan tanggal kedaluwarsa.',
+            ]);
+        }
+
+        return ['requirement_id' => $requirement?->id, 'expires_at' => $validated['expires_at'] ?? null];
     }
 
     public function destroyDocument(Employee $employee, EmployeeDocument $document): RedirectResponse
@@ -477,6 +593,7 @@ class EmployeeController extends Controller
 
     private function validateEmployee(Request $request, ?Employee $employee = null): array
     {
+        $this->requirementUploads->validate($request, $employee);
         $employeeId = $employee?->id;
 
         return $request->validate([
@@ -509,7 +626,7 @@ class EmployeeController extends Controller
             'original_photo' => ['nullable', 'image', 'mimes:jpeg,jpg,png,webp', 'max:10240'],
             'last_education_file' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:10240'],
             'educations' => ['nullable', 'array'],
-            'educations.*.institution_name' => ['nullable', 'string', 'max:255'],
+            'educations.*.institution_name' => ['nullable', 'required_with:educations.*.file', 'string', 'max:255'],
             'educations.*.education_level' => ['nullable', 'string', 'max:100'],
             'educations.*.major' => ['nullable', 'string', 'max:255'],
             'educations.*.start_year' => ['nullable', 'string', 'max:10'],
@@ -530,6 +647,12 @@ class EmployeeController extends Controller
         }
 
         $cleanPath = preg_replace('/^storage\//', '', $relativePath);
+        // Evidence can reference a file already used by education or another requirement.
+        if (EmployeeDocument::where('file_path', $relativePath)->exists()
+            || EmployeeEducation::where('file_path', $relativePath)->exists()
+            || Employee::where('last_education_file_path', $relativePath)->exists()) {
+            return;
+        }
         if (Storage::disk('public')->exists($cleanPath)) {
             Storage::disk('public')->delete($cleanPath);
         }

@@ -15,7 +15,7 @@ class EmployeePositionController extends Controller
     public function index(Request $request): View
     {
         $positions = EmployeePosition::query()
-            ->withCount('employees')
+            ->withCount(['employees', 'requirements'])
             ->when($request->filled('search'), function ($query) use ($request): void {
                 $term = '%'.trim((string) $request->string('search')).'%';
                 $query->where(function ($q) use ($term): void {
@@ -48,6 +48,7 @@ class EmployeePositionController extends Controller
             'name' => ['required', 'string', 'max:255', Rule::unique('employee_positions', 'name')],
             'code' => ['nullable', 'string', 'max:50', Rule::unique('employee_positions', 'code')],
             'description' => ['nullable', 'string', 'max:1000'],
+            'department' => ['nullable', 'string', 'max:255'],
             'is_active' => ['nullable', 'boolean'],
             'display_order' => ['nullable', 'integer', 'min:0', 'max:9999'],
         ]);
@@ -69,6 +70,7 @@ class EmployeePositionController extends Controller
             'name' => ['required', 'string', 'max:255', Rule::unique('employee_positions', 'name')->ignore($employeePosition->id)],
             'code' => ['nullable', 'string', 'max:50', Rule::unique('employee_positions', 'code')->ignore($employeePosition->id)],
             'description' => ['nullable', 'string', 'max:1000'],
+            'department' => ['nullable', 'string', 'max:255'],
             'is_active' => ['nullable', 'boolean'],
             'display_order' => ['nullable', 'integer', 'min:0', 'max:9999'],
         ]);

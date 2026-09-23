@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
 @section('title', 'Data Karyawan')
-@section('eyebrow', 'Kepegawaian & SDM')
+@section('eyebrow', 'HR Management')
 @section('heading', 'Data Karyawan')
 
 @section('content')
@@ -108,6 +108,7 @@
                         <th>Status</th>
                         <th>Tgl Masuk</th>
                         <th>Arsip & Berkas</th>
+                        <th>Persyaratan Jabatan</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
@@ -169,6 +170,11 @@
                                     <span class="admin-badge admin-badge--neutral" style="font-size: 12px; padding: 2px 6px; border-radius: 4px; background: #f1f5f9; color: #475569;">
                                         {{ $employee->documents_count }} Dokumen
                                     </span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="admin-action-group">
+                                    <a href="{{ route('admin.employees.show', $employee) }}#persyaratan-jabatan">{{ $employee->requirementSummary() }}</a>
                                 </div>
                             </td>
                             <td>

@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
 @section('title', 'Profil Karyawan: ' . $employee->full_name)
-@section('eyebrow', 'Kepegawaian & SDM')
+@section('eyebrow', 'HR Management')
 @section('heading', $employee->full_name)
 
 @section('content')
@@ -14,6 +14,14 @@
             <a class="button button--outline admin-button" href="{{ route('admin.employees.index') }}">← Kembali ke daftar</a>
         </div>
     </section>
+
+    @if ($errors->any())
+        <div class="admin-panel" style="padding: 20px; margin-bottom: 20px" role="alert">
+            @foreach ($errors->all() as $error)<p>{{ $error }}</p>@endforeach
+            <p>Periksa pesan di atas sebelum melanjutkan.</p>
+        </div>
+    @endif
+    @include('admin.employees.requirements')
 
     <div class="admin-detail-grid">
         <!-- Kolom Kiri: Biodata Lengkap, Pendidikan, dan Dokumen -->
@@ -131,9 +139,7 @@
                         <p>Daftar seluruh jenjang sekolah, universitas, atau kursus yang pernah ditempuh.</p>
                     </div>
                     @can('employees.manage')
-                        <button class="button button--outline admin-button" type="button" data-modal-open="create-education">
-                            + Tambah Pendidikan
-                        </button>
+                        <a class="button button--outline admin-button" href="{{ route('admin.employees.edit', $employee) }}#riwayat-pendidikan">Kelola di Edit Karyawan</a>
                     @endcan
                 </header>
 
@@ -190,7 +196,7 @@
                                     </td>
                                     @can('employees.manage')
                                         <td>
-                                            <form method="POST" action="{{ route('admin.employees.educations.destroy', [$employee, $edu]) }}" onsubmit="return confirm('Hapus riwayat pendidikan ini?')">
+                                            <form method="POST" action="{{ route('admin.employees.educations.destroy', [$employee, $edu]) }}" data-confirm-dialog="delete-employee-education-{{ $edu->id }}">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button class="admin-action-button admin-action-button--delete" type="submit" title="Hapus">
@@ -214,9 +220,7 @@
                         <p>KTP, NPWP, Kontrak Kerja, Sertifikat Welder / BNSP, SKCK, dan berkas lainnya.</p>
                     </div>
                     @can('employees.manage')
-                        <button class="button button--outline admin-button" type="button" data-modal-open="create-document">
-                            + Unggah Dokumen
-                        </button>
+                        <a class="button button--outline admin-button" href="{{ route('admin.employees.edit', $employee) }}#dokumen-tambahan">Kelola di Edit Karyawan</a>
                     @endcan
                 </header>
 
@@ -242,6 +246,7 @@
                                 <tr>
                                     <td>
                                         <strong style="color: #0f172a">{{ $doc->document_label }}</strong>
+                                        @include('admin.employees.document-review')
                                     </td>
                                     <td>
                                         <div style="display: flex; align-items: center; gap: 8px">
@@ -260,7 +265,7 @@
                                                 <x-ui.icon name="download" size="12" /> Unduh
                                             </a>
                                             @can('employees.manage')
-                                                <form method="POST" action="{{ route('admin.employees.documents.destroy', [$employee, $doc]) }}" onsubmit="return confirm('Hapus dokumen {{ $doc->document_label }}?')">
+                                                <form method="POST" action="{{ route('admin.employees.documents.destroy', [$employee, $doc]) }}" data-confirm-dialog="delete-employee-document-{{ $doc->id }}">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button class="admin-action-button admin-action-button--delete" type="submit" title="Hapus">
@@ -376,108 +381,17 @@
         </div>
     </div>
 
+
     @can('employees.manage')
-        <!-- Modal Tambah Pendidikan -->
-        <x-ui.modal id="create-education" title="Tambah Riwayat Pendidikan">
-            <form method="POST" action="{{ route('admin.employees.educations.store', $employee) }}" enctype="multipart/form-data">
-                @csrf
-                <div style="display: grid; gap: 14px">
-                    <x-ui.text-input
-                        label="Nama Institusi / Universitas / Sekolah"
-                        name="institution_name"
-                        placeholder="Contoh: Universitas Sriwijaya"
-                        required
-                    />
-
-                    <x-ui.text-input
-                        label="Jenjang Pendidikan"
-                        name="education_level"
-                        placeholder="Contoh: S1, D3, SMA, SMK, Sertifikasi"
-                    />
-
-                    <x-ui.text-input
-                        label="Jurusan / Program Studi"
-                        name="major"
-                        placeholder="Contoh: Teknik Mesin"
-                    />
-
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px">
-                        <x-ui.text-input
-                            label="Tahun Mulai"
-                            name="start_year"
-                            placeholder="2018"
-                            maxlength="10"
-                        />
-
-                        <x-ui.text-input
-                            label="Tahun Selesai"
-                            name="end_year"
-                            placeholder="2022"
-                            maxlength="10"
-                        />
-                    </div>
-
-                    <label class="ui-field admin-field">
-                        <span class="ui-field__label">Status Pendidikan</span>
-                        <select name="is_current">
-                            <option value="0">Telah Selesai / Lulus</option>
-                            <option value="1">Masih Berjalan (Sedang Menempuh)</option>
-                        </select>
-                    </label>
-
-                    <x-ui.text-input
-                        label="Nilai / IPK (Opsional)"
-                        name="grade"
-                        placeholder="Contoh: 3.75"
-                        maxlength="30"
-                    />
-
-                    <x-ui.file-input
-                        label="Upload Berkas Ijazah / Sertifikat"
-                        name="education_file"
-                        accept=".pdf,.jpg,.jpeg,.png"
-                        hint="Format PDF atau Gambar (Maks 10 MB)."
-                    />
-
-                    <label class="ui-field admin-field">
-                        <span class="ui-field__label">Catatan Tambahan (Opsional)</span>
-                        <textarea name="description" rows="2" placeholder="Catatan singkat"></textarea>
-                    </label>
-                </div>
-
-                <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px">
-                    <button class="button button--outline admin-button" type="button" data-modal-close>Batal</button>
-                    <button class="button button--primary admin-button" type="submit">Simpan Pendidikan</button>
-                </div>
-            </form>
-        </x-ui.modal>
-
-        <!-- Modal Unggah Dokumen -->
-        <x-ui.modal id="create-document" title="Unggah Dokumen Kepegawaian">
-            <form method="POST" action="{{ route('admin.employees.documents.store', $employee) }}" enctype="multipart/form-data">
-                @csrf
-                <div style="display: grid; gap: 14px">
-                    <x-ui.text-input
-                        label="Label / Jenis Dokumen"
-                        name="document_label"
-                        placeholder="Contoh: KTP, NPWP, Kontrak Kerja 2026, Sertifikat Welder 6G, SKCK"
-                        required
-                    />
-
-                    <x-ui.file-input
-                        label="Pilih Berkas Dokumen"
-                        name="document_file"
-                        accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx,.zip"
-                        hint="Format file PDF, Gambar, Dokumen Word/Excel, atau ZIP (Maks 10 MB)."
-                        required
-                    />
-                </div>
-
-                <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px">
-                    <button class="button button--outline admin-button" type="button" data-modal-close>Batal</button>
-                    <button class="button button--primary admin-button" type="submit">Unggah Dokumen</button>
-                </div>
-            </form>
-        </x-ui.modal>
+        @foreach ($employee->educations as $education)
+            <x-ui.confirmation :id="'delete-employee-education-'.$education->id" title="Hapus riwayat pendidikan?" confirm-label="Ya, hapus riwayat">
+                Riwayat pendidikan <strong>{{ $education->institution_name }}</strong> beserta berkasnya akan dihapus. Jika digunakan sebagai bukti persyaratan, bukti tersebut perlu dilengkapi kembali.
+            </x-ui.confirmation>
+        @endforeach
+        @foreach ($employee->documents as $document)
+            <x-ui.confirmation :id="'delete-employee-document-'.$document->id" title="Hapus dokumen karyawan?" confirm-label="Ya, hapus dokumen">
+                Dokumen <strong>{{ $document->document_label }}</strong> ({{ $document->file_name }}) akan dihapus dari daftar ini. Salinan referensi yang masih digunakan di bagian lain tetap disimpan.
+            </x-ui.confirmation>
+        @endforeach
     @endcan
 @endsection

@@ -52,6 +52,7 @@ class RolePermissionSeeder extends Seeder
             'storage.reports.view',
             'employees.view',
             'employees.manage',
+            'employees.verify',
         ]);
         $participant->syncPermissions([]);
 
