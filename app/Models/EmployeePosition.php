@@ -26,6 +26,11 @@ class EmployeePosition extends Model
         return $this->hasMany(Employee::class, 'position_id');
     }
 
+    public function requirements(): HasMany
+    {
+        return $this->hasMany(EmployeePositionRequirement::class)->orderBy('id');
+    }
+
     public function scopeActive(Builder $query): Builder
     {
         return $query->where('is_active', true);

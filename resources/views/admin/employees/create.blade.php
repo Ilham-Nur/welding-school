@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
 @section('title', 'Tambah Karyawan Baru')
-@section('eyebrow', 'Kepegawaian & SDM')
+@section('eyebrow', 'HR Management')
 @section('heading', 'Tambah Karyawan')
 
 @section('content')
@@ -13,6 +13,7 @@
         <a class="button button--outline admin-button" href="{{ route('admin.employees.index') }}">← Kembali ke daftar</a>
     </section>
 
+    @include('admin.employees.form-errors')
     <form method="POST" action="{{ route('admin.employees.store') }}" enctype="multipart/form-data" id="form-create-employee">
         @csrf
 
@@ -37,6 +38,7 @@
                                     </option>
                                 @endforeach
                             </select>
+                            <small><a href="#dokumen-persyaratan">Lengkapi dokumen persyaratan jabatan di form ini ↓</a></small>
                             <small>Pilih dari Master Data Jabatan. <a href="{{ route('admin.employee-positions.index') }}" target="_blank" style="color: var(--admin-primary, #0284c7)">+ Kelola Master Jabatan</a></small>
                         </label>
 
@@ -171,6 +173,7 @@
                                     <x-ui.file-input
                                         label="Pilih Berkas Foto Karyawan"
                                         name="original_photo"
+                                        :max-size-mb="10"
                                         id="employee-original-photo-input"
                                         accept=".jpg,.jpeg,.png,.webp"
                                         hint="Format gambar JPG, PNG, atau WebP. Maksimal 10 MB."
@@ -305,6 +308,7 @@
                         <x-ui.file-input
                             label="Berkas Ijazah Pendidikan Terakhir"
                             name="last_education_file"
+                            :max-size-mb="10"
                             accept=".pdf,.jpg,.jpeg,.png"
                             hint="PDF atau scan ijazah (Maks 10 MB)."
                         />
@@ -349,6 +353,8 @@
                     </p>
                 </div>
             </section>
+
+            @include('admin.employees.requirement-upload-form')
 
             <div class="admin-actions" style="margin-bottom: 30px">
                 <button class="button button--primary admin-button" type="submit">Simpan Data Karyawan</button>
@@ -647,11 +653,7 @@
                                 <span class="ui-field__label">Nilai Akhir / IPK</span>
                                 <input type="text" name="educations[${idx}][grade]" placeholder="Contoh: 3.75">
                             </label>
-                            <label class="ui-field admin-field">
-                                <span class="ui-field__label">Upload Berkas Ijazah</span>
-                                <input type="file" name="educations[${idx}][file]" accept=".pdf,.jpg,.jpeg,.png">
-                                <small>PDF atau Gambar (Maks 10 MB).</small>
-                            </label>
+                            <x-ui.file-input label="Berkas Ijazah" name="educations[${idx}][file]" id="education-file-${idx}" accept=".pdf,.jpg,.jpeg,.png" :max-size-mb="10" hint="PDF atau gambar. Maksimum 10 MB." />
                         </div>
                     `;
 
@@ -660,6 +662,7 @@
                     });
 
                     educationsContainer.appendChild(card);
+                    window.WeldingSchoolUI.initFileDrops(card);
                 });
             }
 
@@ -683,10 +686,7 @@
                         <span class="ui-field__label">Label Dokumen <em>Wajib</em></span>
                         <input type="text" name="documents[${idx}][label]" placeholder="Contoh: KTP / NPWP / Sertifikat Welder 6G / SKCK" required>
                     </label>
-                    <label class="ui-field admin-field" style="margin: 0">
-                        <span class="ui-field__label">Berkas Dokumen <em>Wajib</em></span>
-                        <input type="file" name="documents[${idx}][file]" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx,.zip" required>
-                    </label>
+                    <x-ui.file-input label="Berkas Dokumen" name="documents[${idx}][file]" id="document-file-${idx}" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx,.zip" :max-size-mb="10" hint="PDF, gambar, Word, Excel, atau ZIP. Maksimum 10 MB." required />
                     <div>
                         <button type="button" class="btn-remove-doc button button--danger admin-button" style="padding: 10px 14px; font-size: 12px; height: 44px;">
                             Hapus
@@ -702,6 +702,7 @@
                 });
 
                 documentsContainer.appendChild(row);
+                window.WeldingSchoolUI.initFileDrops(row);
             }
 
             if (btnAddDocument && documentsContainer) {

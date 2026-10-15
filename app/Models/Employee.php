@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Collection;
 
 class Employee extends Model
 {
@@ -82,6 +82,34 @@ class Employee extends Model
         }
 
         return asset($this->photo_path);
+    }
+
+    public function requirementChecklist(): Collection
+    {
+        $this->loadMissing(['positionRelation.requirements', 'documents']);
+
+        return ($this->positionRelation?->requirements ?? collect())->map(function (EmployeePositionRequirement $requirement): array {
+            $documents = $this->documents->where('requirement_id', $requirement->id)->sortByDesc('id');
+            // A pending renewal does not invalidate an existing valid certificate.
+            $document = $documents->first(fn ($document) => $requirement->documentStatus($document) === 'valid') ?? $documents->first();
+
+            return ['requirement' => $requirement, 'document' => $document, 'status' => $requirement->documentStatus($document)];
+        });
+    }
+
+    public function requirementSummary(): string
+    {
+        $checklist = $this->requirementChecklist();
+        if (! $this->positionRelation) {
+            return 'Jabatan belum terhubung';
+        }
+        if ($checklist->isEmpty()) {
+            return 'Belum ada persyaratan';
+        }
+        $required = $checklist->filter(fn ($row) => $row['requirement']->is_required);
+        $valid = $required->where('status', 'valid')->count();
+
+        return ($valid === $required->count() ? 'Lengkap' : 'Belum lengkap').' · '.$valid.'/'.$required->count().' wajib';
     }
 
     public function originalPhotoUrl(): ?string

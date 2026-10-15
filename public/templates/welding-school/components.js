@@ -152,63 +152,72 @@
     });
   });
 
-  document.querySelectorAll("[data-file-drop]").forEach((dropZone) => {
-    const input = dropZone.querySelector('input[type="file"]');
-    const label = dropZone.querySelector("[data-file-label]");
-    const defaultLabel = label.textContent;
-    const maxSizeMb = Number.parseFloat(dropZone.dataset.maxSizeMb) || 5;
+  const initializedFileDrops = new WeakSet();
+  function initFileDrops(root = document) {
+    root.querySelectorAll("[data-file-drop]").forEach((dropZone) => {
+      if (initializedFileDrops.has(dropZone)) return;
+      initializedFileDrops.add(dropZone);
+      const input = dropZone.querySelector('input[type="file"]');
+      const label = dropZone.querySelector("[data-file-label]");
+      const defaultLabel = label.textContent;
+      const maxSizeMb = Number.parseFloat(dropZone.dataset.maxSizeMb) || 5;
 
-    function updateFile(file) {
-      if (!file) {
-        dropZone.classList.remove("has-file");
-        label.textContent = defaultLabel;
-        return;
+      function updateFile(file) {
+        if (!file) {
+          dropZone.classList.remove("has-file");
+          label.textContent = defaultLabel;
+          return;
+        }
+
+        if (file.size > maxSizeMb * 1024 * 1024) {
+          input.value = "";
+          dropZone.classList.remove("has-file");
+          label.textContent = defaultLabel;
+          showToast(`Ukuran file melebihi batas maksimal ${maxSizeMb} MB.`, "danger");
+          return;
+        }
+
+        dropZone.classList.add("has-file");
+        label.textContent = `${file.name} · ${(file.size / 1024 / 1024).toFixed(2)} MB`;
+        showToast(`File ${file.name} siap diunggah.`, "success");
       }
 
-      if (file.size > maxSizeMb * 1024 * 1024) {
-        input.value = "";
-        dropZone.classList.remove("has-file");
-        label.textContent = defaultLabel;
-        showToast(`Ukuran file melebihi batas maksimal ${maxSizeMb} MB.`, "danger");
-        return;
-      }
+      input.addEventListener("change", () => updateFile(input.files[0]));
 
-      dropZone.classList.add("has-file");
-      label.textContent = `${file.name} · ${(file.size / 1024 / 1024).toFixed(2)} MB`;
-      showToast(`File ${file.name} siap diunggah.`, "success");
-    }
+      ["dragenter", "dragover"].forEach((name) => {
+        dropZone.addEventListener(name, (event) => {
+          event.preventDefault();
+          if (input.matches(":disabled")) return;
+          dropZone.classList.add("is-dragging");
+        });
+      });
 
-    input.addEventListener("change", () => updateFile(input.files[0]));
+      ["dragleave", "drop"].forEach((name) => {
+        dropZone.addEventListener(name, (event) => {
+          event.preventDefault();
+          dropZone.classList.remove("is-dragging");
+        });
+      });
 
-    ["dragenter", "dragover"].forEach((name) => {
-      dropZone.addEventListener(name, (event) => {
-        event.preventDefault();
-        dropZone.classList.add("is-dragging");
+      dropZone.addEventListener("drop", (event) => {
+        if (input.matches(":disabled")) return;
+        const file = event.dataTransfer.files[0];
+        if (!file) return;
+
+        try {
+          const transfer = new DataTransfer();
+          transfer.items.add(file);
+          input.files = transfer.files;
+        } catch (_error) {
+          // Some older browsers do not allow assigning FileList.
+        }
+
+        updateFile(file);
       });
     });
-
-    ["dragleave", "drop"].forEach((name) => {
-      dropZone.addEventListener(name, (event) => {
-        event.preventDefault();
-        dropZone.classList.remove("is-dragging");
-      });
-    });
-
-    dropZone.addEventListener("drop", (event) => {
-      const file = event.dataTransfer.files[0];
-      if (!file) return;
-
-      try {
-        const transfer = new DataTransfer();
-        transfer.items.add(file);
-        input.files = transfer.files;
-      } catch (_error) {
-        // Some older browsers do not allow assigning FileList.
-      }
-
-      updateFile(file);
-    });
-  });
+  }
+  window.WeldingSchoolUI = { ...window.WeldingSchoolUI, initFileDrops };
+  initFileDrops();
 
   document.querySelectorAll("[data-demo-form]").forEach((form) => {
     form.addEventListener("submit", (event) => {

@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
 @section('title', 'Edit Karyawan: ' . $employee->full_name)
-@section('eyebrow', 'Kepegawaian & SDM')
+@section('eyebrow', 'HR Management')
 @section('heading', 'Edit Data Karyawan')
 
 @section('content')
@@ -16,6 +16,7 @@
         </div>
     </section>
 
+    @include('admin.employees.form-errors')
     <form method="POST" action="{{ route('admin.employees.update', $employee) }}" enctype="multipart/form-data" id="form-edit-employee">
         @csrf
         @method('PUT')
@@ -41,6 +42,7 @@
                                     </option>
                                 @endforeach
                             </select>
+                            <small><a href="#dokumen-persyaratan">Lengkapi dokumen persyaratan jabatan di form ini ↓</a></small>
                             <small>Pilih dari Master Data Jabatan. <a href="{{ route('admin.employee-positions.index') }}" target="_blank" style="color: var(--admin-primary, #0284c7)">+ Kelola Master Jabatan</a></small>
                         </label>
 
@@ -182,6 +184,7 @@
                                     <x-ui.file-input
                                         label="{{ $employee->photo_path ? 'Ganti Berkas Foto Karyawan' : 'Pilih Berkas Foto Karyawan' }}"
                                         name="original_photo"
+                                        :max-size-mb="10"
                                         id="employee-original-photo-input"
                                         accept=".jpg,.jpeg,.png,.webp"
                                         hint="Format gambar JPG, PNG, atau WebP. Maksimal 10 MB."
@@ -335,6 +338,7 @@
                             <x-ui.file-input
                                 label="{{ $employee->last_education_file_path ? 'Ganti Berkas Ijazah Terakhir' : 'Berkas Ijazah Pendidikan Terakhir' }}"
                                 name="last_education_file"
+                                :max-size-mb="10"
                                 accept=".pdf,.jpg,.jpeg,.png"
                                 hint="PDF atau scan ijazah (Maks 10 MB)."
                             />
@@ -342,6 +346,10 @@
                     </div>
                 </div>
             </section>
+
+            @include('admin.employees.education-edit-form')
+            @include('admin.employees.requirement-upload-form')
+            @include('admin.employees.additional-document-form')
 
             <div class="admin-actions" style="margin-bottom: 30px">
                 <button class="button button--primary admin-button" type="submit">Perbarui Data Karyawan</button>
