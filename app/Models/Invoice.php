@@ -48,4 +48,21 @@ class Invoice extends Model
     {
         return $this->hasMany(Payment::class);
     }
+
+    public function receiptPayment(): ?Payment
+    {
+        if ($this->status !== 'paid' || ! $this->paid_at) {
+            return null;
+        }
+
+        if ($this->relationLoaded('payments')) {
+            return $this->payments->filter(fn (Payment $payment) => $payment->status === 'paid'
+                && $payment->paid_at && $payment->amount === $this->total_amount && $payment->currency === $this->currency)
+                ->sortByDesc('paid_at')->first();
+        }
+
+        return $this->payments()->where('status', 'paid')->whereNotNull('paid_at')
+            ->where('amount', $this->total_amount)->where('currency', $this->currency)
+            ->orderByDesc('paid_at')->orderByDesc('id')->first();
+    }
 }

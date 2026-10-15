@@ -1013,6 +1013,35 @@ a.is-loading::before {
 
 /* Toasts */
 
+.ui-feedback-summary {
+  background: #fff7f7; border: 1px solid #d8828a; border-left: 4px solid #b52d40;
+  border-radius: 12px; color: #6b2230; padding: 18px 20px; margin-bottom: 20px;
+  overflow-wrap: anywhere;
+}
+.ui-prerequisite-issues { font-size: 13px; line-height: 1.5; margin: 10px 0 0; padding-left: 18px; color: #865407; }
+.ui-prerequisite-issues li + li { margin-top: 8px; }
+.ui-prerequisites { border: 1px solid #ccdce7; border-radius: 12px; background: #f6f9fb; padding: 18px; }
+.ui-prerequisites > ul { padding: 0; list-style: none; margin: 14px 0; display: grid; gap: 12px; }
+.ui-prerequisites li { display: flex; gap: 10px; align-items: flex-start; }
+.ui-prerequisites li [data-check-mark] { color: #94610e; font-weight: 700; }
+.ui-prerequisites li[data-ready="true"] [data-check-mark] { color: #087c56; }
+.ui-prerequisites small { display: block; margin-top: 4px; color: #865407; line-height: 1.5; }
+.ui-prerequisites [hidden] { display: none !important; }
+.ui-feedback-summary:focus { outline: 3px solid #e9aa31; outline-offset: 3px; }
+.ui-feedback-summary p { margin: 6px 0 10px; }
+.ui-feedback-summary ul { padding-left: 22px; margin: 0; }
+.ui-feedback-summary li + li { margin-top: 7px; }
+.ui-feedback-summary a { color: inherit; text-decoration: underline; text-underline-offset: 3px; }
+.ui-feedback-summary[hidden] { display: none !important; }
+.ui-feedback-noscript { background: #edf6f1; padding: 12px 18px; border-radius: 10px; }
+.ui-field__error { color: #a82030; display: block; font-size: 13px; font-weight: 500; line-height: 1.5; margin-top: 6px; }
+.admin-field .ui-field__error, .ui-field .ui-field__error, .practice-field .ui-field__error, .auth-form .ui-field__error { color: #a82030; }
+.admin-form-grid:has(.ui-field__error) { align-items: start; }
+input.is-invalid, select.is-invalid, textarea.is-invalid { border-color: #bc3043 !important; box-shadow: 0 0 0 1px #bc3043; }
+.upload-row.has-validation-error { border-color: #bc3043; background: #fff7f7; }
+.admin-field:not(.ui-field):has(> input[required]) > span:first-child::after,
+.admin-field:not(.ui-field):has(> select[required]) > span:first-child::after,
+.admin-field:not(.ui-field):has(> textarea[required]) > span:first-child::after { content: ' *'; color: #a82030; }
 .ui-toast-stack {
   bottom: auto;
   display: flex;

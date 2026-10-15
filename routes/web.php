@@ -103,6 +103,23 @@ Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
     ->name('logout');
 
 Route::middleware(['auth', 'verified.when_required'])->group(function (): void {
+    Route::prefix('my-training/{batch}/practice')->name('participant.practice.')->group(function () {
+        $controller = \App\Http\Controllers\Participant\PracticeController::class;
+        Route::get('/', [$controller, 'index'])->name('index');
+        Route::get('/{task}', [$controller, 'show'])->name('show');
+        Route::post('/{task}', [$controller, 'store'])->middleware('throttle:60,1')->name('store');
+        Route::get('/{task}/photo', [$controller, 'photo'])->name('photo');
+    });
+    Route::prefix('my-training/{batch}/attendance')->name('participant.attendance.')->group(function () {
+        $controller = \App\Http\Controllers\Participant\AttendanceController::class;
+        Route::get('/', [$controller, 'index'])->name('index');
+        Route::get('/{session}', [$controller, 'show'])->name('show');
+        Route::post('/{session}/challenge', [$controller, 'challenge'])->middleware('throttle:10,1')->name('challenge');
+        Route::post('/{session}', [$controller, 'store'])->middleware('throttle:10,1')->name('store');
+        Route::get('/{session}/photo/{record}/{kind}', [$controller, 'photo'])->where('kind', 'in|out')->name('photo');
+    });
+    Route::get('/my-training/{batch}/materials', [\App\Http\Controllers\Participant\TrainingMaterialController::class, 'index'])->name('participant.materials.index');
+    Route::get('/my-training/{batch}/materials/{item}/files/{file}', [\App\Http\Controllers\Participant\TrainingMaterialController::class, 'file'])->name('participant.materials.file');
     Route::get('/profile', [ParticipantProfileController::class, 'show'])
         ->name('profile.show');
     Route::post('/profile', [ParticipantProfileController::class, 'update'])
@@ -115,6 +132,10 @@ Route::middleware(['auth', 'verified.when_required'])->group(function (): void {
     Route::post('/invoices', [ParticipantInvoiceController::class, 'store'])
         ->middleware('throttle:5,1')
         ->name('invoices.store');
+    Route::get('/invoices/{invoice}/pdf', [ParticipantInvoiceController::class, 'download'])
+        ->middleware('throttle:30,1')->name('invoices.pdf');
+    Route::get('/invoices/{invoice}/receipt', [ParticipantInvoiceController::class, 'receipt'])
+        ->middleware('throttle:30,1')->name('invoices.receipt');
     Route::post('/payments', [ParticipantPaymentController::class, 'store'])
         ->middleware('throttle:5,1')
         ->name('payments.store');

@@ -367,9 +367,4 @@
         <p>Data yang dihapus tidak akan ditampilkan lagi pada katalog program. Tindakan ini tidak dapat dibatalkan.</p>
     </x-ui.confirmation>
 
-    <x-ui.toast-stack />
 @endsection
-
-@push('scripts')
-    <script src="{{ asset('templates/welding-school/components.js') }}" defer></script>
-@endpush

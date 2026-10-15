@@ -31,7 +31,11 @@
     const tone = ["success", "warning", "danger"].includes(type)
       ? type
       : "info";
+    const duplicate = [...toastStack.children].find((item) => item.dataset.message === String(message) && item.dataset.tone === tone && !item.classList.contains('is-leaving'));
+    if (duplicate) return;
     const toast = document.createElement("div");
+    toast.dataset.message = String(message);
+    toast.dataset.tone = tone;
     toast.className = `ui-toast ui-toast--${tone}`;
     toast.setAttribute("role", tone === "danger" ? "alert" : "status");
 
@@ -73,10 +77,14 @@
       toastStack.lastElementChild.remove();
     }
 
-    window.setTimeout(
-      () => removeToast(toast),
-      toastDuration(message, tone),
-    );
+    let dismissTimer;
+    const scheduleDismiss = () => { window.clearTimeout(dismissTimer); dismissTimer = window.setTimeout(() => removeToast(toast), toastDuration(message, tone)); };
+    const pauseDismiss = () => window.clearTimeout(dismissTimer);
+    toast.addEventListener('mouseenter', pauseDismiss);
+    toast.addEventListener('focusin', pauseDismiss);
+    toast.addEventListener('mouseleave', scheduleDismiss);
+    toast.addEventListener('focusout', scheduleDismiss);
+    scheduleDismiss();
   }
 
   window.AppToast = { show: showToast };
@@ -179,7 +187,7 @@
 
         dropZone.classList.add("has-file");
         label.textContent = `${file.name} · ${(file.size / 1024 / 1024).toFixed(2)} MB`;
-        showToast(`File ${file.name} siap diunggah.`, "success");
+        showToast(`File ${file.name} siap diunggah. Tekan Simpan untuk mengirimnya.`, "info");
       }
 
       input.addEventListener("change", () => updateFile(input.files[0]));

@@ -8849,7 +8849,7 @@ a {
   gap: 3px;
 }
 
-.dashboard-sidebar nav button,
+.dashboard-sidebar nav :is(button, a),
 .dashboard-sidebar > button {
   align-items: center;
   background: transparent;
@@ -8865,18 +8865,18 @@ a {
   text-align: left;
 }
 
-.dashboard-sidebar nav button > span:first-child {
+.dashboard-sidebar nav :is(button, a) > span:first-child {
   flex: 0 0 20px;
   font-size: 16px;
   text-align: center;
 }
 
-.dashboard-sidebar nav button.is-active {
+.dashboard-sidebar nav :is(button, a).is-active {
   background: linear-gradient(90deg, var(--orange-600), #20b87c);
   color: white;
 }
 
-.dashboard-sidebar nav button.is-active-secondary {
+.dashboard-sidebar nav :is(button, a).is-active-secondary {
   background: rgba(255, 255, 255, 0.08);
   color: white;
 }
@@ -8891,6 +8891,23 @@ a {
 .dashboard-body {
   min-width: 0;
 }
+
+.participant-checkout-content .page-shell {
+  margin-inline: 0;
+  width: 100%;
+}
+
+.participant-checkout-content .page-heading {
+  padding-top: 8px;
+}
+
+.billing-document-actions {
+  display: grid;
+  gap: 10px;
+  margin: 14px 0;
+}
+
+.billing-document-actions a { text-decoration: none; }
 
 .dashboard-header-actions {
   align-items: center;
@@ -8945,7 +8962,7 @@ a {
   padding-inline: 0;
 }
 
-.dashboard-preview.is-sidebar-collapsed .dashboard-sidebar nav button {
+.dashboard-preview.is-sidebar-collapsed .dashboard-sidebar nav :is(button, a) {
   justify-content: center;
   padding-inline: 0;
   width: 50px;
@@ -10263,7 +10280,7 @@ a {
     padding-inline: 0;
   }
 
-  .dashboard-sidebar nav button,
+  .dashboard-sidebar nav :is(button, a),
   .dashboard-sidebar > button {
     justify-content: center;
     padding-inline: 0;
@@ -10599,7 +10616,7 @@ a {
     padding-inline: 7px;
   }
 
-  .dashboard-preview .dashboard-sidebar nav button {
+  .dashboard-preview .dashboard-sidebar nav :is(button, a) {
     justify-content: flex-start;
     padding-inline: 12px;
     width: 100%;
@@ -10795,7 +10812,7 @@ a {
   padding: 4px 10px 14px;
 }
 
-.dashboard-sidebar nav button,
+.dashboard-sidebar nav :is(button, a),
 .dashboard-sidebar > button {
   border-radius: 7px;
   font-size: 14px;
@@ -10804,11 +10821,11 @@ a {
   padding: 8px 10px;
 }
 
-.dashboard-sidebar nav button > span:first-child {
+.dashboard-sidebar nav :is(button, a) > span:first-child {
   flex-basis: 20px;
 }
 
-.dashboard-sidebar nav button.is-active {
+.dashboard-sidebar nav :is(button, a).is-active {
   background: rgba(20, 140, 97, 0.2);
   box-shadow: inset 3px 0 var(--orange-600);
 }
@@ -10844,7 +10861,7 @@ a {
   padding-inline: 9px;
 }
 
-.dashboard-preview.is-sidebar-collapsed .dashboard-sidebar nav button {
+.dashboard-preview.is-sidebar-collapsed .dashboard-sidebar nav :is(button, a) {
   padding-inline: 8px;
   width: 50px;
 }
@@ -10926,9 +10943,36 @@ a {
   .dashboard-sidebar,
   .dashboard-preview.is-sidebar-collapsed .dashboard-sidebar {
     align-items: stretch;
+    left: 0;
     max-width: calc(100vw - 54px);
     padding: 0;
+    position: fixed;
+    top: 0;
+    transform: translateX(-105%);
+    transition: transform 180ms ease;
     width: 260px;
+    z-index: 120;
+  }
+
+  .dashboard-preview.is-sidebar-open .dashboard-sidebar {
+    transform: translateX(0);
+  }
+
+  .dashboard-sidebar-backdrop {
+    background: rgba(4, 17, 26, 0.58);
+    border: 0;
+    display: block;
+    inset: 0;
+    opacity: 0;
+    pointer-events: none;
+    position: fixed;
+    transition: opacity 180ms ease;
+    z-index: 110;
+  }
+
+  .dashboard-preview.is-sidebar-open .dashboard-sidebar-backdrop {
+    opacity: 1;
+    pointer-events: auto;
   }
 
   .dashboard-preview .dashboard-sidebar > .brand,
@@ -10937,6 +10981,9 @@ a {
     padding-inline: 15px;
   }
 
+  .dashboard-preview .dashboard-sidebar .brand__copy,
+  .dashboard-preview .participant-profile div,
+  .dashboard-preview .dashboard-nav-label,
   .dashboard-preview.is-sidebar-collapsed .dashboard-sidebar .brand__copy,
   .dashboard-preview.is-sidebar-collapsed .participant-profile div,
   .dashboard-preview.is-sidebar-collapsed .dashboard-nav-label {
@@ -10955,8 +11002,8 @@ a {
     padding-inline: 10px;
   }
 
-  .dashboard-preview .dashboard-sidebar nav button,
-  .dashboard-preview.is-sidebar-collapsed .dashboard-sidebar nav button {
+  .dashboard-preview .dashboard-sidebar nav :is(button, a),
+  .dashboard-preview.is-sidebar-collapsed .dashboard-sidebar nav :is(button, a) {
     justify-content: flex-start;
     padding-inline: 10px;
     width: 100%;
@@ -11130,7 +11177,7 @@ a {
   overflow-x: auto;
 }
 
-.training-access-tabs button {
+.training-access-tabs :is(button, a) {
   background: transparent;
   border: 0;
   border-bottom: 2px solid transparent;
@@ -11142,7 +11189,7 @@ a {
   white-space: nowrap;
 }
 
-.training-access-tabs button.is-active {
+.training-access-tabs :is(button, a).is-active {
   border-color: var(--orange-500);
   color: var(--orange-600);
 }
@@ -11212,7 +11259,7 @@ a {
   scrollbar-width: thin;
 }
 
-.training-access-tabs button {
+.training-access-tabs :is(button, a) {
   min-height: 44px;
 }
 
@@ -11297,8 +11344,8 @@ a {
     padding-inline: 9px;
   }
 
-  .dashboard-sidebar nav button,
-  .dashboard-preview.is-sidebar-collapsed .dashboard-sidebar nav button {
+  .dashboard-sidebar nav :is(button, a),
+  .dashboard-preview.is-sidebar-collapsed .dashboard-sidebar nav :is(button, a) {
     justify-content: center;
     padding-inline: 8px;
     width: 50px;
@@ -11354,7 +11401,7 @@ a {
     padding-bottom: 2px;
   }
 
-  .training-access-tabs button {
+  .training-access-tabs :is(button, a) {
     padding-inline: 14px;
   }
 }
@@ -11517,3 +11564,7 @@ a {
   content: "\00d7";
   font-size: 28px;
 }
+
+/* Keep the participant session table readable on narrow screens. */
+.training-access-content .table-scroll { overflow-x: auto; }
+.training-access-content .invoice-table { min-width: 640px; }

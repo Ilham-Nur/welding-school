@@ -203,13 +203,14 @@ class AdminFlowTest extends TestCase
             'start_date' => '2026-10-01',
             'end_date' => '2026-10-12',
             'capacity' => 12,
-            'status' => 'open',
-        ])->assertRedirect(route('admin.batches.index'));
+            'status' => 'draft',
+        ])->assertSessionHasErrors('batch');
 
-        $this->assertDatabaseHas('training_batches', [
+        $this->assertDatabaseMissing('training_batches', [
             'training_program_id' => $program->id,
             'code' => 'SMAW4G-2610',
-            'status' => 'open',
+            'status' => 'draft',
+            'budget_required' => true,
         ]);
     }
 

@@ -1,0 +1,19 @@
+@extends('layouts.admin')
+@section('title','Atur materi batch')
+@section('heading','Operasional Batch · Materi')
+@include('admin.training-materials.style')
+@section('content')
+<section class="admin-page-heading"><div><h1>Atur materi batch</h1><p>{{ $batch->name }} · {{ $item->revision->title }} · Revisi {{ $item->revision->number }}</p></div><a class="button button--outline admin-button" href="{{ route('admin.operations.show',[$batch,'tab'=>'materials']) }}">Kembali</a></section>
+@include('admin.training-materials.errors')
+<section class="admin-panel"><div class="admin-panel__body tm-stack">
+@php($publicationChecks = app(\App\Services\Training\MaterialAccess::class)->publicationChecks($item, $item->session))
+<form method="POST" action="{{ route('admin.operations.materials.update',[$batch,$item]) }}" class="tm-stack" data-material-publication data-publication-checks="{{ json_encode($publicationChecks) }}">@csrf @method('PUT')
+<label class="admin-field"><span>Sesi</span><select name="batch_session_id"><option value="">Pilih sesi yang menggunakan materi ini</option>@foreach($sessions as $session)<option value="{{ $session->id }}" data-session-status="{{ $session->status }}" @selected((string)old('batch_session_id',$item->batch_session_id)===(string)$session->id)>{{ $session->title }} · {{ $session->starts_at->format('d M H:i') }} · {{ \App\Models\BatchSession::STATUSES[$session->status] }}</option>@endforeach</select><small>Untuk dibagikan, sesi harus berstatus Terbit. <a href="{{ route('admin.operations.show', [$batch, 'tab' => 'schedule']) }}">Buka Jadwal</a>.</small></label>
+<label class="admin-field"><span>Urutan</span><input type="number" name="position" value="{{ old('position',$item->position) }}" min="1" max="9999" required></label><dl class="tm-meta"><div><dt>Metode</dt><dd>{{ \App\Models\TrainingMaterialRevision::METHODS[$item->revision->method] }}</dd></div><div><dt>Durasi</dt><dd>{{ $item->revision->duration_minutes }} menit</dd></div></dl>
+<p class="tm-notice">Metode dan durasi mengikuti revisi materi yang digunakan pada batch ini.</p>
+<section class="ui-prerequisites" aria-label="Syarat pembagian materi"><strong>Syarat agar materi bisa dibagikan</strong><ul data-publication-list>@foreach($publicationChecks as $check)<li data-publication-key="{{ $check['key'] }}" data-ready="{{ $check['done'] ? 'true' : 'false' }}"><span data-check-mark aria-hidden="true">{{ $check['done'] ? '✓' : '○' }}</span><div><strong>{{ $check['label'] }}</strong><small data-check-message @if($check['done']) hidden @endif>{{ $check['message'] }}</small></div></li>@endforeach</ul>
+@can('training-materials.view')<a href="{{ route('admin.training-materials.show', $item->revision) }}">Buka file dan revisi di library →</a>@else<p>Minta pengelola materi untuk menambahkan file peserta atau menerbitkan revisi.</p>@endcan
+</section>
+<label class="admin-field"><span>Publikasi ke peserta</span><select name="participant_visible" aria-describedby="material-publication-help"><option value="0" @selected(!old('participant_visible',$item->participant_visible))>Belum dibagikan</option><option value="1" @selected(old('participant_visible',$item->participant_visible))>Bagikan file peserta</option></select><small id="material-publication-help">File internal tetap untuk instruktur. Semua syarat di atas harus terpenuhi jika memilih Bagikan.</small></label><button class="button button--primary admin-button">Simpan pengaturan</button></form><form method="POST" action="{{ route('admin.operations.materials.destroy',[$batch,$item]) }}">@csrf @method('DELETE')<button class="button button--outline admin-button">Lepas dari batch</button></form></div></section>
+@push('scripts')<script src="{{ asset('templates/welding-school/material-publication.js') }}?v={{ filemtime(public_path('templates/welding-school/material-publication.js')) }}" defer></script>@endpush
+@endsection

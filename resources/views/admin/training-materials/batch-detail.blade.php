@@ -1,0 +1,9 @@
+@extends('layouts.admin')
+@section('title',$item->revision->title)
+@section('heading','Materi batch')
+@include('admin.training-materials.style')
+@section('content')
+<section class="admin-page-heading"><div><h1>{{ $item->revision->title }}</h1><p>{{ $batch->name }} · {{ $item->revision->material->code }} · Rev. {{ $item->revision->number }}</p></div><a class="button button--outline admin-button" href="{{ route('admin.operations.show',[$batch,'tab'=>'materials']) }}">Kembali ke materi batch</a></section>
+<section class="admin-panel"><div class="admin-panel__body tm-stack"><dl class="tm-meta"><div><dt>Sesi</dt><dd>{{ $item->session?->title ?? 'Belum dipilih' }}</dd></div><div><dt>Metode / durasi</dt><dd>{{ \App\Models\TrainingMaterialRevision::METHODS[$item->revision->method] }} · {{ $item->revision->duration_minutes }} menit</dd></div></dl><div><h3>Tujuan pembelajaran</h3><p class="tm-prewrap">{{ $item->revision->objectives }}</p></div><div><h3>Topik</h3><p class="tm-prewrap">{{ $item->revision->topics ?: '—' }}</p></div><div class="tm-notice"><h3>Panduan trainer · Internal</h3><p class="tm-prewrap">{{ $item->revision->guidance ?: 'Belum ada panduan tambahan.' }}</p></div></div>
+<x-ui.table class="admin-table-wrap tm-table"><thead><tr><th>Dokumen</th><th>Akses</th><th>Aksi</th></tr></thead><tbody>@foreach($item->revision->files as $file)<tr><td>{{ $file->label }}<small>{{ $file->original_name }}</small></td><td>{{ $file->audience==='participant'?'Peserta':'Internal trainer' }}</td><td>@if($file->canPreview())<a class="button button--outline admin-button" target="_blank" rel="noopener" href="{{ route('admin.operations.materials.file',[$batch,$item,$file,'preview'=>1]) }}">Preview</a>@endif <a class="button button--outline admin-button" href="{{ route('admin.operations.materials.file',[$batch,$item,$file]) }}">Unduh</a></td></tr>@endforeach</tbody></x-ui.table></section>
+@endsection

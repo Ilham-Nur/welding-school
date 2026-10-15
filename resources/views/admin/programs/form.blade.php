@@ -72,10 +72,11 @@
                         required
                     />
                     <x-ui.text-input
-                        label="Biaya program (Rp)"
+                        label="Harga untuk batch lama (Rp)"
                         name="price"
                         type="number"
-                        :value="$program->price"
+                        :value="$program->price ?? 0"
+                        hint="Dipakai oleh batch lama yang belum menggunakan RAB. Harga batch baru ditentukan dari RAB yang disetujui."
                         min="0"
                         step="1000"
                         required

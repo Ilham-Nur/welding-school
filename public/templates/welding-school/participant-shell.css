@@ -1,0 +1,19 @@
+.participant-portal .participant-detail-back,
+.participant-portal .profile-dropdown__item,
+.participant-portal .dashboard-sidebar nav a,
+.participant-portal .training-access-tabs a { text-decoration: none; }
+.participant-portal .training-content,
+.participant-portal .attendance-shell { max-width: none; margin: 0; padding: 0; overflow-wrap: anywhere; }
+.participant-portal .training-content h1,
+.participant-portal .attendance-shell h1 { font-size: clamp(24px, 4vw, 30px); margin: 0 0 12px; }
+.participant-portal .attendance-shell > a { display: inline-block; margin-bottom: 18px; }
+.participant-portal .profile-dropdown form { margin: 0; }
+.participant-portal .profile-dropdown__logout { width: 100%; }
+.participant-portal .participant-profile div { min-width: 0; overflow-wrap: anywhere; }
+@media (max-width: 720px) {
+    .participant-portal .training-access-content { padding: 14px; }
+    .participant-portal .attendance-stats,
+    .participant-portal .attendance-evidence { grid-template-columns: minmax(0, 1fr); }
+    .participant-portal .attendance-card,
+    .participant-portal .training-content .tm-material { padding: 16px; }
+}

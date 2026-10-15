@@ -13,7 +13,7 @@
 @endphp
 
 <div class="ui-field ui-field--file">
-    <span class="ui-field__label">
+    <span class="ui-field__label" id="{{ $fieldId }}-label">
         {{ $label }}
         @if ($required)<em>Wajib</em>@endif
     </span>
@@ -23,13 +23,15 @@
             type="file"
             name="{{ $name }}"
             accept="{{ $accept }}"
-            @if ($hasError) aria-invalid="true" aria-describedby="{{ $fieldId }}-error" @endif
+            aria-labelledby="{{ $fieldId }}-label"
+            aria-describedby="{{ $fieldId }}-hint{{ $hasError ? ' '.$fieldId.'-error' : '' }}"
+            @if ($hasError) aria-invalid="true" @endif
             @required($required)
-            {{ $attributes->except('id') }}
+            {{ $attributes->except(['id', 'aria-describedby', 'aria-labelledby']) }}
         >
         <span class="ui-file-drop__icon" aria-hidden="true"><x-ui.icon name="upload" size="22" /></span>
         <strong>Pilih file atau tarik ke area ini</strong>
-        <small data-file-label>{{ $hint }}</small>
+        <small id="{{ $fieldId }}-hint" data-file-label>{{ $hint }}</small>
     </label>
     @error($name)
         <small id="{{ $fieldId }}-error" class="ui-field__error">{{ $message }}</small>

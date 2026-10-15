@@ -367,7 +367,7 @@ class TemplateComponentsTest extends TestCase
 
         $this->assertIsString($script);
         $this->assertStringContainsString(
-            'if (!Array.isArray(program?.databaseBatches)) return fallbackBatches;',
+            'if (!Array.isArray(program?.databaseBatches)) return [];',
             $script,
         );
         $this->assertStringContainsString(

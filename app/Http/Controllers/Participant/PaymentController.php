@@ -57,6 +57,12 @@ class PaymentController extends Controller
             ]);
         }
 
+        if (in_array($invoice->trainingApplication?->trainingBatch?->operational_status, ['cancelled', 'completed'], true)) {
+            throw ValidationException::withMessages([
+                'invoice' => 'Pembayaran baru tidak tersedia untuk batch yang dibatalkan atau selesai. Hubungi admin.',
+            ]);
+        }
+
         if (! $invoice->due_at || $invoice->due_at->lte(now()->addMinutes(5))) {
             $invoice->update(['status' => 'expired']);
 
@@ -141,6 +147,8 @@ class PaymentController extends Controller
         }
 
         return redirect(route('home').'#member-programs')
+            ->with('payment_application_id', $payment && $request->user() && (int) $payment->invoice->user_id === (int) $request->user()->id
+                ? $payment->invoice->training_application_id : null)
             ->with(
                 'auth_status',
                 $message,

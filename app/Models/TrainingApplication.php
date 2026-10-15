@@ -20,6 +20,9 @@ class TrainingApplication extends Model
         'verified_by',
         'verified_at',
         'verification_notes',
+        'quoted_price',
+        'quoted_administration_fee',
+        'pricing_snapshot',
     ];
 
     protected function casts(): array
@@ -28,6 +31,9 @@ class TrainingApplication extends Model
             'personal_data_snapshot' => 'array',
             'submitted_at' => 'datetime',
             'verified_at' => 'datetime',
+            'quoted_price' => 'integer',
+            'quoted_administration_fee' => 'integer',
+            'pricing_snapshot' => 'array',
         ];
     }
 
