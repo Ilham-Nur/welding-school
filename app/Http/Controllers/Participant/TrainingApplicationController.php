@@ -42,13 +42,15 @@ class TrainingApplicationController extends Controller
         }
 
         return response()->json([
+            'profile' => $request->user()->loadMissing('participantProfile')->participantProfileData(),
+            'catalog' => ['programs' => app(\App\Services\Training\RegistrationCatalog::class)->programs()],
             'application' => $applications->first()
                 ? $this->payload($applications->first())
                 : null,
             'applications' => $applications
                 ->map(fn (TrainingApplication $application): array => $this->payload($application))
                 ->values(),
-        ]);
+        ])->header('Cache-Control', 'private, no-store');
     }
 
     public function store(Request $request): JsonResponse
@@ -64,6 +66,7 @@ class TrainingApplicationController extends Controller
         $validated = $request->validate([
             'training_program_id' => ['required', 'integer', 'exists:training_programs,id'],
             'training_batch_id' => ['required', 'integer', 'exists:training_batches,id'],
+            'expected_price' => ['nullable', 'integer', 'min:0'],
             'full_name' => ['required', 'string', 'min:3', 'max:255'],
             'phone' => ['required', 'string', 'max:30'],
             'birth_place' => ['required', 'string', 'max:100'],
@@ -95,6 +98,7 @@ class TrainingApplicationController extends Controller
             ->whereKey($validated['training_batch_id'])
             ->where('training_program_id', $validated['training_program_id'])
             ->where('status', 'open')
+            ->whereIn('operational_status', ['preparation', 'ready'])
             ->first();
 
         if (! $program || ! $batch) {
@@ -132,6 +136,15 @@ class TrainingApplicationController extends Controller
         }
 
         $application = DB::transaction(function () use ($batch, $program, $request, $validated): TrainingApplication {
+            $batch = TrainingBatch::query()->lockForUpdate()->findOrFail($batch->id);
+            if ($batch->status !== 'open' || ! in_array($batch->operational_status, ['preparation', 'ready'])
+                || $batch->applications()->whereIn('status', ['submitted', 'under_review', 'approved'])->count() >= $batch->capacity) {
+                throw ValidationException::withMessages(['training_batch_id' => 'Batch sudah tidak tersedia atau kuotanya penuh.']);
+            }
+            $quote = app(\App\Services\Training\TrainingPricing::class)->quote($batch);
+            if ($batch->training_budget_id && (! isset($validated['expected_price']) || (int) $validated['expected_price'] !== $quote['quoted_price'])) {
+                throw ValidationException::withMessages(['expected_price' => 'Harga batch telah berubah. Muat ulang halaman dan periksa harga sebelum mendaftar.']);
+            }
             $request->user()->update(['name' => trim($validated['full_name'])]);
             $request->user()->participantProfile()->updateOrCreate(
                 ['user_id' => $request->user()->id],
@@ -162,6 +175,7 @@ class TrainingApplicationController extends Controller
             ];
 
             $application = TrainingApplication::query()->create([
+                ...$quote,
                 'registration_number' => $this->registrationNumber(),
                 'user_id' => $request->user()->id,
                 'training_program_id' => $program->id,
@@ -210,7 +224,29 @@ class TrainingApplicationController extends Controller
      */
     private function payload(TrainingApplication $application): array
     {
+        $batch = $application->trainingBatch;
+        $canAccess = $application->user->status === 'active'
+            && $application->enrollment?->status === 'active'
+            && $application->invoice?->status === 'paid'
+            && $batch && $batch->operational_status !== 'cancelled';
+        $sessions = $canAccess ? $batch->sessions()->where('status', 'published')
+            ->with(['trainer', 'location'])->orderBy('starts_at')->get() : collect();
+
         return [
+            'training_access' => (bool) $canAccess,
+            'attendance_url' => $canAccess ? route('participant.attendance.index', $batch) : null,
+            'practice_url' => $canAccess ? route('participant.practice.index', $batch) : null,
+            'sessions' => $sessions->map(fn ($session) => [
+                'id' => $session->id,
+                'title' => $session->title,
+                'type' => \App\Models\BatchSession::TYPES[$session->type] ?? $session->type,
+                'starts_at' => $session->starts_at->toIso8601String(),
+                'ends_at' => $session->ends_at->toIso8601String(),
+                'trainer' => $session->trainer?->name,
+                'location' => $session->location?->name,
+                'execution_label' => \App\Models\BatchSession::EXECUTION_STATUSES[$session->execution_status],
+            ])->values(),
+            'participant' => $application->personal_data_snapshot,
             'id' => $application->id,
             'registration_number' => $application->registration_number,
             'status' => $application->status,
@@ -218,8 +254,16 @@ class TrainingApplicationController extends Controller
             'verification_notes' => $application->verification_notes,
             'training_program_id' => $application->training_program_id,
             'training_batch_id' => $application->training_batch_id,
-            'program' => $application->trainingProgram?->only(['id', 'code', 'title']),
-            'batch' => $application->trainingBatch?->only(['id', 'code', 'name']),
+            'quoted_price' => $application->quoted_price,
+            'quoted_administration_fee' => $application->quoted_administration_fee,
+            'program' => $application->trainingProgram?->only(['id', 'code', 'title', 'category', 'duration_hours', 'price']),
+            'batch' => $application->trainingBatch ? [
+                ...$application->trainingBatch->only(['id', 'code', 'name', 'operational_status', 'capacity']),
+                'operational_label' => TrainingBatch::OPERATIONAL_STATUSES[$batch->operational_status] ?? $batch->operational_status,
+                'locations' => $batch->sessions()->where('status', 'published')->with('location')->get()->pluck('location.name')->filter()->unique()->values(),
+                'start_date' => $application->trainingBatch->start_date?->format('Y-m-d'),
+                'end_date' => $application->trainingBatch->end_date?->format('Y-m-d'),
+            ] : null,
             'invoice' => $application->invoice
                 ? InvoiceResource::make($application->invoice)->resolve()
                 : null,

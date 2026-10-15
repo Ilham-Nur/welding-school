@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\BatchAssignment;
+use App\Models\BatchSession;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -113,6 +115,14 @@ class UserController extends Controller
         }
 
         $user->loadCount(['trainingApplications', 'invoices', 'enrollments']);
+
+        if (BatchAssignment::where('user_id', $user->id)->exists()
+            || \App\Models\SessionAttendance::where('reviewed_by', $user->id)->exists()
+            || BatchSession::where('trainer_id', $user->id)->exists()) {
+            throw ValidationException::withMessages([
+                'user' => 'Pengguna memiliki penugasan atau riwayat sesi pelatihan. Nonaktifkan akun untuk menjaga riwayat operasional.',
+            ]);
+        }
 
         if (
             $user->training_applications_count > 0

@@ -19,10 +19,17 @@ tmp/
 work/
 outputs/
 
-# Panduan cetak lokal (dibuat sekali, tidak dikirim ke GitHub)
-/output/guides/
-/output/guides-detailed/
-/output/pdf/panduan-*.pdf
+# Pengaturan agen dan hosting alat bantu (hanya lokal)
+/.codex/
+/.codex_tmp/
+/.agents/
+/.openai/
+/.open-ai/
+/AGENTS.md
+
+# Dokumentasi dan hasil pengembangan (hanya lokal)
+/docs/
+/output/
 /tools/build_print_guides.py
 
 # Dependensi dan hasil build

@@ -126,6 +126,7 @@
                 'applicationStore' => route('applications.store'),
                 'profileCurrent' => route('profile.show'),
                 'profileStore' => route('profile.update'),
+                'trainingMaterials' => route('participant.materials.index', ['batch' => '__BATCH__']),
                 'invoiceStore' => route('invoices.store'),
                 'paymentStore' => route('payments.store'),
             ],
@@ -147,6 +148,7 @@
             ],
             'flash' => [
                 'status' => session('auth_status'),
+                'paymentApplicationId' => session('payment_application_id'),
                 'error' => session('auth_error'),
             ],
         ]) }};

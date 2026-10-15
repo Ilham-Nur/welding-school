@@ -25,6 +25,11 @@ class RolePermissionSeeder extends Seeder
 
         $superAdmin->syncPermissions($permissions);
         $admin->syncPermissions([
+            ...array_keys(config('practice.permissions')),
+            ...array_keys(config('attendance.permissions')),
+            ...array_keys(config('training_materials.permissions')),
+            'budgets.view', 'budgets.manage', 'budgets.approve',
+            ...array_keys(config('batch_operations.permissions')),
             'admin.access',
             'users.view',
             'roles.view',
@@ -55,6 +60,12 @@ class RolePermissionSeeder extends Seeder
             'employees.verify',
         ]);
         $participant->syncPermissions([]);
+
+        foreach (config('batch_operations.roles') as $name => $grants) {
+            if (! Role::where('name', $name)->where('guard_name', 'web')->exists()) {
+                Role::findOrCreate($name, 'web')->givePermissionTo($grants);
+            }
+        }
 
         app(PermissionRegistrar::class)->forgetCachedPermissions();
     }

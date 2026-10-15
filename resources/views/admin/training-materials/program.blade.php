@@ -1,0 +1,11 @@
+@extends('layouts.admin')
+@section('title','Materi · '.$program->title)
+@section('heading','Quality Documents · Training')
+@include('admin.training-materials.style')
+@section('content')
+<section class="admin-page-heading"><div><h1>{{ $program->title }}</h1><p>Susunan materi · {{ $items->count() }} materi · {{ $items->sum('duration_minutes') }} menit</p></div><a class="button button--outline admin-button" href="{{ route('admin.training-materials.programs') }}">Semua program</a></section>
+@include('admin.training-materials.errors')
+<p class="tm-notice">Perubahan susunan berlaku saat pengambilan materi berikutnya. Materi yang sudah dipasang pada batch tetap tersimpan. Ganti revisi arsip dengan revisi terbit sebelum mengambil susunan ke batch baru.</p>
+<section class="admin-panel"><x-ui.table class="admin-table-wrap tm-table"><thead><tr><th>Urutan</th><th>Materi / revisi</th><th>Metode</th><th>Durasi</th><th>Aksi</th></tr></thead><tbody>@forelse($items as $item)<tr><td>{{ $item->position }}</td><td><strong>{{ $item->revision->title }}</strong><small>{{ $item->revision->material->code }} · Rev. {{ $item->revision->number }} · {{ \App\Models\TrainingMaterialRevision::STATUSES[$item->revision->status] }}</small></td><td>{{ \App\Models\TrainingMaterialRevision::METHODS[$item->method] }}</td><td>{{ $item->duration_minutes }} menit</td><td><a href="{{ route('admin.training-materials.show',$item->revision) }}">Detail materi</a>@can('training-materials.manage') <a class="button button--outline admin-button" href="{{ route('admin.training-materials.program.edit',[$program,$item]) }}">Edit</a>@endcan</td></tr>@empty<tr><td colspan="5">Belum ada susunan materi. Tambahkan materi terbit dari library.</td></tr>@endforelse</tbody></x-ui.table></section>
+@can('training-materials.manage')<section class="admin-panel"><header class="admin-panel__header"><h2>Tambahkan materi ke program</h2></header><form method="POST" action="{{ route('admin.training-materials.program.add',$program) }}" class="admin-panel__body tm-stack">@csrf @include('admin.training-materials.plan-fields',['item'=>null])<div><button class="button button--primary admin-button">Tambah ke susunan</button></div></form></section>@endcan
+@endsection

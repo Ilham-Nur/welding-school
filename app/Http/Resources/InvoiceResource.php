@@ -29,6 +29,8 @@ class InvoiceResource extends JsonResource
             'issued_at' => $this->issued_at?->toIso8601String(),
             'due_at' => $this->due_at?->toIso8601String(),
             'paid_at' => $this->paid_at?->toIso8601String(),
+            'invoice_pdf_url' => route('invoices.pdf', $this->resource),
+            'receipt_pdf_url' => $this->resource->receiptPayment() ? route('invoices.receipt', $this->resource) : null,
         ];
     }
 }

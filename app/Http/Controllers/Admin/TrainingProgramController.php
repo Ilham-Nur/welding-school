@@ -62,6 +62,9 @@ class TrainingProgramController extends Controller
 
     public function destroy(TrainingProgram $program): RedirectResponse
     {
+        if (\App\Models\TrainingBudget::where('training_program_id', $program->id)->exists()) {
+            throw ValidationException::withMessages(['program' => 'Program memiliki RAB. Tutup program untuk menjaga riwayat.']);
+        }
         $program->loadCount(['batches', 'applications', 'enrollments']);
 
         if (

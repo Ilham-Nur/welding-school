@@ -26,6 +26,11 @@ class TrainingProgram extends Model
         ];
     }
 
+    public function materialPlan(): HasMany
+    {
+        return $this->hasMany(ProgramTrainingMaterial::class);
+    }
+
     public function batches(): HasMany
     {
         return $this->hasMany(TrainingBatch::class);

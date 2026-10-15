@@ -1,0 +1,38 @@
+.practice-shell { max-width: 940px; margin-inline: auto; display: grid; gap: 18px; }
+.practice-shell > h1, .practice-shell > p { margin: 0; }
+.practice-card { background: var(--white, #fff); border: 1px solid var(--line, #dce4eb); border-radius: 18px; padding: clamp(18px, 3vw, 28px); }
+.practice-card h1, .practice-card h2, .practice-card h3 { margin: 0 0 10px; }
+.practice-card-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.practice-badge { border-radius: 999px; background: #e9f0f6; color: #15364d; padding: 6px 12px; font-size: .85rem; }
+.practice-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.practice-stats > div { background: #eef4f8; border-radius: 14px; padding: 18px; display: grid; gap: 8px; }
+.practice-stats strong { font-size: 1.4rem; }
+.practice-stats span, .practice-muted, .practice-stats small { color: #526779; }
+.practice-form { display: grid; gap: 16px; }
+.practice-form fieldset { padding: 0; margin: 0; border: 0; min-width: 0; }
+.practice-form legend { font-weight: 700; margin-bottom: 10px; }
+.practice-form small { font-weight: 400; }
+.practice-choices { display: flex; flex-wrap: wrap; gap: 10px; }
+.practice-choices label { cursor: pointer; display: flex; align-items: center; gap: 8px; padding: 12px 16px; border: 1px solid #b8c8d6; border-radius: 12px; min-height: 46px; }
+.practice-choices label:has(input:checked) { border-color: #19677c; background: #e8f6f8; }
+.practice-choices label:focus-within { outline: 3px solid #f6a637; outline-offset: 2px; }
+.practice-field { display: grid; gap: 8px; }
+.practice-field > span { font-weight: 700; }
+.practice-field textarea, .practice-field input { width: 100%; padding: 12px; border: 1px solid #b8c8d6; border-radius: 10px; font: inherit; }
+.practice-field textarea:focus, .practice-field input:focus { outline: 3px solid #f6a637; outline-offset: 2px; }
+.practice-file-button { display: block; position: relative; cursor: pointer; border: 1px dashed #819cad; border-radius: 12px; padding: 16px; text-align: center; background: #f0f7fa; color: #18475c; }
+.practice-file-button input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+.practice-file-button:focus-within { outline: 3px solid #f6a637; outline-offset: 2px; }
+.practice-photo { display: block; max-width: 100%; width: 300px; max-height: 320px; object-fit: contain; border-radius: 12px; margin-block: 14px; background: #eef3f7; }
+.practice-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.practice-feedback { background: #fff3dd; border-left: 4px solid #d99624; padding: 14px 18px; border-radius: 8px; overflow-wrap: anywhere; }
+.practice-feedback p { margin-bottom: 0; }
+.practice-prewrap { white-space: pre-wrap; overflow-wrap: anywhere; }
+.practice-errors, .practice-field-error { color: #a82030; }
+.practice-errors { border: 1px solid #cf6973; background: #fff4f5; padding: 16px; border-radius: 12px; }
+.practice-field-error:empty { display: none; }
+.practice-review + .practice-review { border-top: 1px solid #dce4eb; }
+.practice-shell [hidden] { display: none !important; }
+.practice-card summary { cursor: pointer; font-weight: 700; }
+.practice-card li { margin-block: 12px; }
+@media (max-width: 650px) { .practice-stats { grid-template-columns: repeat(2, 1fr); } .practice-actions .button { flex: 1 1 200px; } .practice-choices label { flex: 1 1 120px; } .practice-card h1 { font-size: 24px; line-height: 1.4; } }

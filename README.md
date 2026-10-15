@@ -139,7 +139,15 @@ Invoice hanya menjadi lunas setelah webhook memiliki signature yang valid,
 nominalnya sesuai, dan referensi transaksinya ditemukan. Webhook pembayaran
 yang valid juga membuat enrollment peserta secara otomatis.
 
+Peserta dapat mengunduh invoice PDF sebelum pembayaran, serta invoice LUNAS dan
+kuitansi setelah transaksi terverifikasi melalui detail pembayaran di dashboard.
+Dokumen hanya dapat diunduh oleh pemilik transaksi.
+
 ## Komponen Blade
+
+Notifikasi admin dan peserta memakai toast bersama. Detail kesalahan tetap berada
+di dekat kolom dan ringkasan formulir; prasyarat proses dilengkapi petunjuk tindak
+lanjut.
 
 Komponen reusable berada di `resources/views/components/ui`:
 
@@ -154,3 +162,26 @@ Komponen reusable berada di `resources/views/components/ui`:
 
 Pengujian dapat dijalankan dengan `php artisan test`. Lingkungan pengujian
 menggunakan SQLite in-memory agar tidak mengubah data MySQL lokal.
+
+## Pelaksanaan sesi dan absensi selfie
+
+Trainer membuka **Operasional Batch → Jadwal → Pelaksanaan & absensi**, menentukan
+titik/radius area, lalu memulai sesi. Peserta melakukan selfie langsung dari kamera
+untuk absen masuk dan keluar melalui **Pelatihan Saya → Kehadiran**. Server memeriksa
+area dan akurasi lokasi; hasil baru masuk rekap setelah diperiksa dan difinalisasi trainer.
+
+Kamera dan lokasi memerlukan HTTPS pada perangkat peserta. Tidak tersedia pilihan
+unggah foto/galeri. Uji kamera dan GPS pada perangkat nyata melalui HTTPS sebelum
+digunakan dalam pelatihan.
+Pengujian alur kamera dengan API tiruan: `node --test tests/Frontend/attendance-camera.test.mjs`.
+
+## Tugas dan logbook praktik
+
+Instruktur menyiapkan satu aktivitas per sesi melalui **Operasional Batch → Jadwal →
+Tugas & logbook**. Peserta membuka tab **Tugas & Logbook**, memilih hasil, menambahkan
+foto jika diminta, dan mengirim sekali untuk tugas sekaligus logbook. Catatan opsional,
+draf tersimpan otomatis, dan perbaikan menggunakan pengiriman yang sama.
+
+Jam praktik hanya berasal dari verifikasi instruktur, bukan otomatis dari absensi.
+Terapkan migrasi aplikasi dan uji pengisian serta pengiriman foto pada ponsel
+sebelum digunakan dalam pelatihan.

@@ -15,12 +15,6 @@
         </div>
     </section>
 
-    @if ($errors->any())
-        <div class="admin-panel" style="padding: 20px; margin-bottom: 20px" role="alert">
-            @foreach ($errors->all() as $error)<p>{{ $error }}</p>@endforeach
-            <p>Periksa pesan di atas sebelum melanjutkan.</p>
-        </div>
-    @endif
     @include('admin.employees.requirements')
 
     <div class="admin-detail-grid">

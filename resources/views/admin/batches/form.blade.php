@@ -10,7 +10,7 @@
     <section class="admin-page-heading">
         <div>
             <h1>{{ $editing ? 'Edit batch pelatihan' : 'Tambah batch pelatihan' }}</h1>
-            <p>Hubungkan batch ke program, lalu tentukan periode, kapasitas, dan status pendaftarannya.</p>
+            <p>Batch terbentuk dari RAB yang disetujui. Lengkapi jadwal dan buka pendaftaran saat siap.</p>
         </div>
         <a class="button button--outline admin-button" href="{{ route('admin.batches.index') }}">← Kembali</a>
     </section>
@@ -23,6 +23,12 @@
             </div>
         </header>
         <div class="admin-panel__body">
+            @if($batch->training_budget_id)
+                <p>RAB: {{ $batch->trainingBudget->name }} · {{ \App\Models\TrainingBudget::STATUSES[$batch->trainingBudget->status] }}.
+                Harga final: {{ $batch->trainingBudget->approved_price !== null ? 'Rp '.number_format($batch->trainingBudget->approved_price, 0, ',', '.') : 'Belum disetujui' }}.</p>
+            @elseif($editing && ! $batch->budget_required)
+                <p>Batch lama masih memakai harga program dan biaya administrasi lama sampai dialihkan ke RAB.</p>
+            @endif
             <form method="POST" action="{{ $editing ? route('admin.batches.update', $batch) : route('admin.batches.store') }}">
                 @csrf
                 @if ($editing)
@@ -50,12 +56,14 @@
                         required
                     />
                     <label class="ui-field admin-field">
-                        <span class="ui-field__label">Status batch <em>Wajib</em></span>
+                        <span class="ui-field__label">Status pendaftaran <em>Wajib</em></span>
                         <select name="status" required>
                             <option value="draft" @selected(old('status', $batch->status ?? 'draft') === 'draft')>Draft</option>
                             <option value="open" @selected(old('status', $batch->status) === 'open')>Dibuka</option>
                             <option value="closed" @selected(old('status', $batch->status) === 'closed')>Ditutup</option>
-                            <option value="completed" @selected(old('status', $batch->status) === 'completed')>Selesai</option>
+                            @if ($batch->status === 'completed')
+                                <option value="completed" @selected(old('status', $batch->status) === 'completed')>Selesai (data lama)</option>
+                            @endif
                         </select>
                     </label>
                     <x-ui.text-input

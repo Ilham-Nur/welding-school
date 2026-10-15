@@ -88,6 +88,7 @@
             >☰</button>
         </header>
 
+        <x-ui.feedback />
         @yield('content')
 
         <footer class="site-footer">
@@ -138,6 +139,9 @@
         </a>
 
         <x-ui.loading />
+        <x-ui.toast-stack />
+        <script src="{{ asset('templates/welding-school/components.js') }}?v={{ filemtime(public_path('templates/welding-school/components.js')) }}" defer></script>
+        <script src="{{ asset('templates/welding-school/form-feedback.js') }}?v={{ filemtime(public_path('templates/welding-school/form-feedback.js')) }}" defer></script>
         @stack('scripts')
         <script src="{{ asset('templates/welding-school/loading.js') }}?v={{ filemtime(public_path('templates/welding-school/loading.js')) }}" defer></script>
     </body>

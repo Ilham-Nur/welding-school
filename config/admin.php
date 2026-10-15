@@ -8,6 +8,13 @@ return [
     ],
 
     'permission_labels' => [
+        ...(require __DIR__.'/practice.php')['permissions'],
+        ...(require __DIR__.'/attendance.php')['permissions'],
+        ...(require __DIR__.'/training_materials.php')['permissions'],
+        'budgets.view' => 'Melihat RAB dan harga pelatihan',
+        'budgets.manage' => 'Menyusun dan mengajukan revisi RAB',
+        'budgets.approve' => 'Menyetujui RAB dan harga final',
+        ...(require __DIR__.'/batch_operations.php')['permissions'],
         'admin.access' => 'Akses dashboard admin',
         'users.view' => 'Melihat pengguna',
         'users.manage' => 'Mengelola pengguna',
@@ -41,6 +48,31 @@ return [
     ],
 
     'permission_groups' => [
+        'practice' => [
+            'label' => 'Tugas dan logbook',
+            'description' => 'Aktivitas per sesi, pemeriksaan hasil, dan jam praktik terverifikasi.',
+            'permissions' => array_keys((require __DIR__.'/practice.php')['permissions']),
+        ],
+        'attendance' => [
+            'label' => 'Pelaksanaan dan absensi',
+            'description' => 'Pelaksanaan sesi, area selfie, pemeriksaan dan koreksi absensi.',
+            'permissions' => array_keys((require __DIR__.'/attendance.php')['permissions']),
+        ],
+        'training-materials' => [
+            'label' => 'Materi pelatihan',
+            'description' => 'Library, revisi, susunan program, dan publikasi materi batch.',
+            'permissions' => array_keys((require __DIR__.'/training_materials.php')['permissions']),
+        ],
+        'budgets' => [
+            'label' => 'Anggaran / RAB',
+            'description' => 'Anggaran satu atau beberapa batch dan penetapan harga final.',
+            'permissions' => ['budgets.view', 'budgets.manage', 'budgets.approve'],
+        ],
+        'operations' => [
+            'label' => 'Operasional Batch',
+            'description' => 'Tim pelaksana, jadwal sesi, checklist kesiapan, dan status operasional.',
+            'permissions' => array_keys((require __DIR__.'/batch_operations.php')['permissions']),
+        ],
         'system' => [
             'label' => 'Akses internal',
             'description' => 'Izin dasar untuk masuk ke portal dan dashboard internal.',

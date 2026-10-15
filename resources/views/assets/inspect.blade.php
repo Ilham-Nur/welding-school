@@ -37,13 +37,7 @@
                 </dl>
             </section>
 
-            @if (session('success'))
-                <button type="button" hidden data-flash-toast data-toast="{{ session('success') }}" data-toast-type="success"></button>
-            @endif
-
-            @if ($errors->any())
-                <button type="button" hidden data-flash-toast data-toast="{{ implode(' • ', $errors->all()) }}" data-toast-type="danger"></button>
-            @endif
+            <x-ui.feedback />
 
             <form class="asset-inspection-form" method="POST" action="{{ route('assets.inspections.store', ['asset' => $asset->public_id]) }}">
                 @csrf
@@ -144,6 +138,7 @@
         <x-ui.loading />
         <x-ui.toast-stack />
         <script src="{{ asset('templates/welding-school/components.js') }}?v={{ filemtime(public_path('templates/welding-school/components.js')) }}" defer></script>
+        <script src="{{ asset('templates/welding-school/form-feedback.js') }}?v={{ filemtime(public_path('templates/welding-school/form-feedback.js')) }}" defer></script>
         <script src="{{ asset('templates/welding-school/loading.js') }}?v={{ filemtime(public_path('templates/welding-school/loading.js')) }}" defer></script>
     </body>
 </html>

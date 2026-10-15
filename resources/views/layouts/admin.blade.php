@@ -37,36 +37,68 @@
                     <a class="{{ request()->routeIs('admin.dashboard') ? 'is-active' : '' }}" href="{{ route('admin.dashboard') }}" data-label="Ringkasan" title="Ringkasan">
                         <span aria-hidden="true"><x-ui.icon name="home" /></span><span class="admin-nav-label">Ringkasan</span>
                     </a>
-                    @can('applications.view')
-                        <a class="{{ request()->routeIs('admin.applications.*') ? 'is-active' : '' }}" href="{{ route('admin.applications.index') }}" data-label="Approval Pendaftaran" title="Approval Pendaftaran">
-                            <span aria-hidden="true"><x-ui.icon name="clipboard-check" /></span><span class="admin-nav-label">Approval Pendaftaran</span>
-                            @php
-                                $pendingApplicationCount = \App\Models\TrainingApplication::query()
-                                    ->whereIn('status', ['submitted', 'under_review'])
-                                    ->count();
-                            @endphp
-                            @if ($pendingApplicationCount)
-                                <b>{{ $pendingApplicationCount }}</b>
-                            @endif
-                        </a>
-                    @endcan
-                    @can('programs.view')
-                        <a class="{{ request()->routeIs('admin.programs.*') ? 'is-active' : '' }}" href="{{ route('admin.programs.index') }}" data-label="Program Pelatihan" title="Program Pelatihan">
-                            <span aria-hidden="true"><x-ui.icon name="book-open" /></span><span class="admin-nav-label">Program Pelatihan</span>
-                        </a>
-                    @endcan
-                    @can('batches.view')
-                        <a class="{{ request()->routeIs('admin.batches.*') ? 'is-active' : '' }}" href="{{ route('admin.batches.index') }}" data-label="Batch Pelatihan" title="Batch Pelatihan">
-                            <span aria-hidden="true"><x-ui.icon name="calendar" /></span><span class="admin-nav-label">Batch Pelatihan</span>
-                        </a>
-                    @endcan
+                    @canany(['programs.view', 'budgets.view', 'batches.view', 'applications.view', 'operations.view'])
+                        @php
+                            $trainingMenuOpen = request()->routeIs('admin.programs.*', 'admin.budgets.*', 'admin.batches.*', 'admin.applications.*', 'admin.operations.*');
+                        @endphp
+                        <div @class(['admin-nav-group', 'is-open' => $trainingMenuOpen]) data-admin-nav-group>
+                            <button
+                                type="button"
+                                class="admin-nav-group__toggle {{ $trainingMenuOpen ? 'is-active' : '' }}"
+                                data-admin-nav-toggle
+                                aria-expanded="{{ $trainingMenuOpen ? 'true' : 'false' }}"
+                                aria-controls="admin-training-submenu"
+                                data-label="Pelatihan"
+                                title="Pelatihan"
+                            >
+                                <span aria-hidden="true"><x-ui.icon name="book-open" /></span>
+                                <span class="admin-nav-label">Pelatihan</span>
+                                <span class="admin-nav-group__chevron" aria-hidden="true"><x-ui.icon name="chevron-down" size="14" /></span>
+                            </button>
+                            <div class="admin-nav-group__items" id="admin-training-submenu" data-admin-nav-items @if (! $trainingMenuOpen) hidden @endif>
+                                @can('programs.view')
+                                    <a class="{{ request()->routeIs('admin.programs.*') ? 'is-active' : '' }}" href="{{ route('admin.programs.index') }}" data-label="Program Pelatihan" title="Program Pelatihan">
+                                        <span aria-hidden="true"><x-ui.icon name="book-open" size="16" /></span><span class="admin-nav-label">Program Pelatihan</span>
+                                    </a>
+                                @endcan
+                                @can('budgets.view')
+                                    <a class="{{ request()->routeIs('admin.budgets.*') ? 'is-active' : '' }}" href="{{ route('admin.budgets.index') }}" data-label="Anggaran / RAB" title="Anggaran / RAB">
+                                        <span aria-hidden="true"><x-ui.icon name="file" size="16" /></span><span class="admin-nav-label">Anggaran / RAB</span>
+                                    </a>
+                                @endcan
+                                @can('batches.view')
+                                    <a class="{{ request()->routeIs('admin.batches.*') ? 'is-active' : '' }}" href="{{ route('admin.batches.index') }}" data-label="Batch Pelatihan" title="Batch Pelatihan">
+                                        <span aria-hidden="true"><x-ui.icon name="calendar" size="16" /></span><span class="admin-nav-label">Batch Pelatihan</span>
+                                    </a>
+                                @endcan
+                                @can('applications.view')
+                                    <a class="{{ request()->routeIs('admin.applications.*') ? 'is-active' : '' }}" href="{{ route('admin.applications.index') }}" data-label="Approval Pendaftaran" title="Approval Pendaftaran">
+                                        <span aria-hidden="true"><x-ui.icon name="clipboard-check" size="16" /></span><span class="admin-nav-label">Approval Pendaftaran</span>
+                                        @php
+                                            $pendingApplicationCount = \App\Models\TrainingApplication::query()
+                                                ->whereIn('status', ['submitted', 'under_review'])
+                                                ->count();
+                                        @endphp
+                                        @if ($pendingApplicationCount)
+                                            <b>{{ $pendingApplicationCount }}</b>
+                                        @endif
+                                    </a>
+                                @endcan
+                                @can('operations.view')
+                                    <a class="{{ request()->routeIs('admin.operations.*') ? 'is-active' : '' }}" href="{{ route('admin.operations.index') }}" data-label="Operasional Batch" title="Operasional Batch">
+                                        <span aria-hidden="true"><x-ui.icon name="clipboard-check" size="16" /></span><span class="admin-nav-label">Operasional Batch</span>
+                                    </a>
+                                @endcan
+                            </div>
+                        </div>
+                    @endcanany
                     @can('activities.view')
                         <a class="{{ request()->routeIs('admin.activities.*') ? 'is-active' : '' }}" href="{{ route('admin.activities.index') }}" data-label="Aktivitas" title="Aktivitas">
                             <span aria-hidden="true"><x-ui.icon name="file" /></span><span class="admin-nav-label">Aktivitas</span>
                         </a>
                     @endcan
-                    @can('quality-documents.view')
-                        @php($qualityDocumentsMenuOpen = request()->routeIs('admin.quality-documents.*', 'admin.quality-records.*'))
+                    @canany(['quality-documents.view', 'training-materials.view'])
+                        @php($qualityDocumentsMenuOpen = request()->routeIs('admin.quality-documents.*', 'admin.quality-records.*', 'admin.training-materials.*'))
                         <div @class(['admin-nav-group', 'is-open' => $qualityDocumentsMenuOpen]) data-admin-nav-group>
                             <button
                                 type="button"
@@ -82,6 +114,7 @@
                                 <span class="admin-nav-group__chevron" aria-hidden="true"><x-ui.icon name="chevron-down" size="14" /></span>
                             </button>
                             <div class="admin-nav-group__items" id="admin-quality-documents-submenu" data-admin-nav-items @if (! $qualityDocumentsMenuOpen) hidden @endif>
+                                @can('quality-documents.view')
                                 <a class="{{ request()->routeIs('admin.quality-documents.*') ? 'is-active' : '' }}" href="{{ route('admin.quality-documents.index') }}" data-label="Quality" title="Quality">
                                     <span aria-hidden="true"><x-ui.icon name="shield" size="16" /></span>
                                     <span class="admin-nav-label">Quality</span>
@@ -90,13 +123,16 @@
                                     <span aria-hidden="true"><x-ui.icon name="list" size="16" /></span>
                                     <span class="admin-nav-label">Quality Record</span>
                                 </a>
-                                <span class="admin-nav-submenu-item is-disabled" aria-disabled="true" data-label="Training" title="Training belum tersedia">
+                                @endcan
+                                @can('training-materials.view')
+                                <a class="{{ request()->routeIs('admin.training-materials.*') ? 'is-active' : '' }}" href="{{ route('admin.training-materials.index') }}" data-label="Training" title="Training">
                                     <span aria-hidden="true"><x-ui.icon name="book-open" size="16" /></span>
                                     <span class="admin-nav-label">Training</span>
-                                </span>
+                                </a>
+                                @endcan
                             </div>
                         </div>
-                    @endcan
+                    @endcanany
                     @canany(['assets.view', 'assets.manage', 'assets.inspect'])
                         @php($assetMenuOpen = request()->routeIs('admin.assets.*', 'admin.asset-kinds.*', 'assets.inspections.*'))
                         <div @class(['admin-nav-group', 'is-open' => $assetMenuOpen]) data-admin-nav-group>
@@ -284,45 +320,7 @@
                 </header>
 
                 <main id="admin-content" class="admin-content" tabindex="-1">
-                    @if (session('success'))
-                        <button
-                            type="button"
-                            hidden
-                            data-flash-toast
-                            data-toast="{{ session('success') }}"
-                            data-toast-type="success"
-                        ></button>
-                    @endif
-
-                    @if (session('warning'))
-                        <button
-                            type="button"
-                            hidden
-                            data-flash-toast
-                            data-toast="{{ session('warning') }}"
-                            data-toast-type="warning"
-                        ></button>
-                    @endif
-
-                    @if (session('error'))
-                        <button
-                            type="button"
-                            hidden
-                            data-flash-toast
-                            data-toast="{{ session('error') }}"
-                            data-toast-type="danger"
-                        ></button>
-                    @endif
-
-                    @if ($errors->any())
-                        <button
-                            type="button"
-                            hidden
-                            data-flash-toast
-                            data-toast="{{ implode(' • ', $errors->all()) }}"
-                            data-toast-type="danger"
-                        ></button>
-                    @endif
+                    <x-ui.feedback />
 
                     @yield('content')
                 </main>
@@ -386,7 +384,8 @@
 
         <x-ui.loading />
         <x-ui.toast-stack />
-        <script src="{{ asset('templates/welding-school/components.js') }}" defer></script>
+        <script src="{{ asset('templates/welding-school/components.js') }}?v={{ filemtime(public_path('templates/welding-school/components.js')) }}" defer></script>
+        <script src="{{ asset('templates/welding-school/form-feedback.js') }}?v={{ filemtime(public_path('templates/welding-school/form-feedback.js')) }}" defer></script>
         <script src="{{ asset('templates/welding-school/admin.js') }}" defer></script>
         @can('assets.inspect')
             @vite('resources/js/asset-scanner.js')

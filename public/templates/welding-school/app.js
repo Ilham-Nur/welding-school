@@ -17,187 +17,38 @@
     Number(backend.billing?.administrationFee || 0),
   );
 
-  let programs = [
-    {
-      id: "smaw",
-      code: "SMAW",
-      title: "SMAW Welder",
-      subtitle: "Shielded Metal Arc Welding",
-      description:
-        "Program intensif untuk menguasai teknik las elektroda terbungkus dari fondasi keselamatan hingga pengujian kompetensi.",
-      duration: "80 Jam",
-      theory: "20 Jam",
-      practice: "60 Jam",
-      seats: 12,
-      price: 3500000,
-      level: "Pemula",
-      positions: ["1G", "2G", "3G", "4G"],
-      imagePosition: "68% center",
-      popular: true,
-    },
-    {
-      id: "fcaw",
-      code: "FCAW",
-      title: "FCAW Welder",
-      subtitle: "Flux Cored Arc Welding",
-      description:
-        "Pelatihan pengelasan produktivitas tinggi untuk kebutuhan fabrikasi, konstruksi, dan pekerjaan lapangan.",
-      duration: "80 Jam",
-      theory: "20 Jam",
-      practice: "60 Jam",
-      seats: 12,
-      price: 3800000,
-      level: "Menengah",
-      positions: ["1G", "2G", "3G"],
-      imagePosition: "79% center",
-    },
-    {
-      id: "gtaw",
-      code: "GTAW",
-      title: "GTAW Welder",
-      subtitle: "Gas Tungsten Arc Welding",
-      description:
-        "Penguasaan teknik TIG untuk hasil presisi tinggi pada carbon steel dan stainless steel.",
-      duration: "80 Jam",
-      theory: "20 Jam",
-      practice: "60 Jam",
-      seats: 10,
-      price: 4000000,
-      level: "Lanjutan",
-      positions: ["1G", "2G", "5G", "6G"],
-      imagePosition: "88% center",
-    },
-    {
-      id: "gmaw",
-      code: "GMAW",
-      title: "GMAW Welder",
-      subtitle: "Gas Metal Arc Welding",
-      description:
-        "Pelatihan pengelasan MIG/MAG untuk manufaktur, otomotif, dan fabrikasi modern.",
-      duration: "80 Jam",
-      theory: "20 Jam",
-      practice: "60 Jam",
-      seats: 12,
-      price: 3800000,
-      level: "Menengah",
-      positions: ["1G", "2G", "3G"],
-      imagePosition: "84% center",
-    },
-    {
-      id: "wqt",
-      code: "WQT",
-      title: "Welder Qualification Test",
-      subtitle: "Uji Kompetensi Welder",
-      description:
-        "Paket persiapan dan pelaksanaan uji kompetensi bagi welder berpengalaman.",
-      duration: "16 Jam",
-      theory: "4 Jam",
-      practice: "12 Jam",
-      seats: 8,
-      price: 2000000,
-      level: "Lanjutan",
-      positions: ["3G", "4G", "6G"],
-      imagePosition: "73% center",
-    },
-    {
-      id: "inspector",
-      code: "WID",
-      title: "Welding Inspector Dasar",
-      subtitle: "Basic Welding Inspector",
-      description:
-        "Program fondasi inspeksi visual, pemahaman WPS, dan dokumentasi kualitas pengelasan.",
-      duration: "40 Jam",
-      theory: "28 Jam",
-      practice: "12 Jam",
-      seats: 15,
-      price: 3000000,
-      level: "Pemula",
-      positions: ["Visual", "WPS", "Report"],
-      imagePosition: "91% center",
-    },
-  ];
-
-  const databaseProgramCodes = {
-    smaw: "SMAW-3G",
-    fcaw: "FCAW-3G",
-    gtaw: "GTAW-6G",
-    gmaw: "GMAW-2G",
-    wqt: "WQT-6G",
-    inspector: "WI-BASIC",
-  };
-  const catalogPrograms = backend.catalog?.programs || [];
-  programs.forEach((program) => {
-    const databaseProgram = catalogPrograms.find(
-      (item) => item.code === databaseProgramCodes[program.id],
-    );
-    if (!databaseProgram) return;
-    program.databaseId = databaseProgram.id;
-    program.databaseCode = databaseProgram.code;
-    program.databaseBatches = databaseProgram.batches || [];
-  });
-  if (catalogPrograms.length) {
-    programs = programs.filter((program) => program.databaseId);
-    catalogPrograms.forEach((databaseProgram) => {
-      if (
-        programs.some(
-          (program) => Number(program.databaseId) === Number(databaseProgram.id),
-        )
-      ) {
-        return;
-      }
-
-      programs.push({
-        id: `database-program-${databaseProgram.id}`,
-        code: databaseProgram.code,
-        title: databaseProgram.title,
-        subtitle: databaseProgram.category,
-        description:
-          "Program pelatihan terstruktur untuk meningkatkan kompetensi, keselamatan, dan kesiapan kerja di industri pengelasan.",
-        duration: `${databaseProgram.duration_hours} Jam`,
-        theory: "Materi kelas",
-        practice: "Praktik workshop",
-        seats: 12,
-        price: Number(databaseProgram.price),
-        level: "Pemula",
-        positions: ["Teori", "Praktik", "Evaluasi"],
-        imagePosition: "75% center",
-        databaseId: databaseProgram.id,
-        databaseCode: databaseProgram.code,
-        databaseBatches: databaseProgram.batches || [],
-      });
-    });
+  function catalogProgram(program) {
+    return {
+      id: `database-program-${program.id}`, databaseId: program.id,
+      code: program.code, title: program.title, subtitle: program.category || "",
+      duration: program.duration_hours == null ? "Belum ditentukan" : `${program.duration_hours} Jam`,
+      databaseBatches: program.batches || [],
+      price: program.price == null ? null : Number(program.price),
+      imagePosition: "75% center",
+    };
   }
 
-  const fallbackBatches = [
-    {
-      id: "batch-2608",
-      label: "Batch Agustus 2026",
-      start: "10 Agustus 2026",
-      end: "21 Agustus 2026",
-      schedule: "Senin sampai Jumat, 08.00 sampai 16.00 WIB",
-      location: "Workshop Batam Centre · Area 1",
-      seatsLeft: 5,
-      recommended: true,
-    },
-    {
-      id: "batch-2609",
-      label: "Batch September 2026",
-      start: "7 September 2026",
-      end: "18 September 2026",
-      schedule: "Senin sampai Jumat, 08.00 sampai 16.00 WIB",
-      location: "Workshop Batam Centre · Area 2",
-      seatsLeft: 9,
-    },
-    {
-      id: "batch-weekend",
-      label: "Batch Weekend September",
-      start: "5 September 2026",
-      end: "4 Oktober 2026",
-      schedule: "Sabtu sampai Minggu, 08.00 sampai 16.00 WIB",
-      location: "Workshop Batam Centre · Area 1",
-      seatsLeft: 3,
-    },
-  ];
+  let programs = (backend.catalog?.programs || []).map(catalogProgram);
+
+  const unavailableProgram = {
+    id: "unavailable-program", databaseId: null, databaseBatches: [],
+    code: "", title: "Belum ada program tersedia", subtitle: "", description: "",
+    duration: "Belum ditentukan", theory: "Belum ditentukan", practice: "Belum ditentukan",
+    seats: 0, price: null, level: "", positions: [], imagePosition: "75% center",
+  };
+
+  function registrationPrograms() {
+    return programs.filter((program) => programBatches(program).length > 0);
+  }
+
+  function applicationProgram(application) {
+    return catalogProgram({
+      ...application.program, id: application.training_program_id,
+      title: application.program?.title || "Program pelatihan",
+      price: application.quoted_price ?? application.program?.price,
+      batches: programs.find((program) => Number(program.databaseId) === Number(application.training_program_id))?.databaseBatches || [],
+    });
+  }
 
   const unavailableBatch = {
     id: "unavailable-batch",
@@ -222,17 +73,21 @@
   }
 
   function programBatches(program) {
-    if (!Array.isArray(program?.databaseBatches)) return fallbackBatches;
+    if (!Array.isArray(program?.databaseBatches)) return [];
 
     return program.databaseBatches.map((batch, index) => ({
       id: `database-batch-${batch.id}`,
       databaseId: batch.id,
+      price: Number(batch.price),
+      administrationFee: Number(batch.administration_fee || 0),
       code: batch.code,
       label: batch.name,
       start: catalogDate(batch.start_date),
       end: catalogDate(batch.end_date),
-      schedule: "Jadwal pelatihan sesuai informasi dari admin",
-      location: "Workshop PT. Alpha Teknik Pratama",
+      schedule: "Rincian sesi tersedia di Pelatihan Saya setelah akses aktif",
+      location: batch.locations?.join(", ") || "Lokasi belum diumumkan",
+      year: batch.start_date?.slice(0, 4) || "",
+      deadline: catalogDate(batch.registration_deadline),
       seatsLeft: Math.max(
         0,
         Number(batch.capacity) - Number(batch.applications_count || 0),
@@ -241,7 +96,20 @@
     }));
   }
 
-  let batches = programBatches(programs[0]);
+  let batches = programBatches(registrationPrograms()[0] || programs[0]);
+
+  function programPriceLabel(program) {
+    const totals = programBatches(program).map((batch) => batch.price + batch.administrationFee);
+    return totals.length ? `Mulai ${money(Math.min(...totals))}` : "Harga belum tersedia";
+  }
+
+  function selectedPricing() {
+    const application = state.application;
+    if (application && Number(application.training_batch_id) === Number(state.selectedBatch?.databaseId) && application.quoted_price != null) {
+      return { price: Number(application.quoted_price), adminFee: Number(application.quoted_administration_fee || 0) };
+    }
+    return { price: state.selectedBatch?.price ?? state.selectedProgram.price, adminFee: state.selectedBatch?.administrationFee ?? administrationFee };
+  }
 
   const academyNews = (Array.isArray(backend.activities)
     ? backend.activities
@@ -754,16 +622,18 @@
 
   const savedParticipantSidebar =
     window.localStorage.getItem("welding-participant-sidebar");
+  // Restore a participant view when returning from a server-rendered training page.
+  let participantDestination = new URL(window.location.href).searchParams;
   const state = {
     step: 0,
     loggedIn: Boolean(backend.auth?.authenticated),
     dashboardView: "home",
     openPaymentAfterLoad: Boolean(
-      backend.flash?.status?.toLowerCase().includes("pembayaran"),
+      backend.flash?.paymentApplicationId,
     ),
     trainingSection: "overview",
     programOrigin: "public",
-    selectedProgram: programs[0],
+    selectedProgram: registrationPrograms()[0] || programs[0] || unavailableProgram,
     selectedBatch: batches[0] || unavailableBatch,
     accountMode: "login",
     applicationStatus: "not-started",
@@ -777,7 +647,7 @@
     paymentMethod: "va-bca",
     uploadedFiles: {},
     search: "",
-    level: "Semua Level",
+    level: "Semua Kategori",
     selectedArticle: sharedAcademyActivity || featuredAcademyActivity,
     activityQuery: "",
     activityCategory: "Semua",
@@ -850,9 +720,9 @@
     if (!value) return "-";
 
     return new Intl.DateTimeFormat("id-ID", {
+      timeZone: "Asia/Jakarta",
       dateStyle: "long",
       timeStyle: "short",
-      timeZone: "Asia/Jakarta",
     }).format(new Date(value));
   }
 
@@ -873,6 +743,7 @@
   }
 
   function showToast(message, tone) {
+    if (window.AppToast?.show) return window.AppToast.show(message, tone);
     window.clearTimeout(toastTimer);
     toast.className = `toast ${tone ? `toast--${tone}` : ""}`;
     toast.textContent = message;
@@ -901,6 +772,7 @@
   }
 
   async function backendRequest(url, payload = {}) {
+    const requestForm = window.AppFeedback?.currentForm();
     if (!url) {
       throw new Error("Endpoint autentikasi belum tersedia.");
     }
@@ -924,11 +796,12 @@
         const result = await response.json().catch(() => ({}));
 
         if (!response.ok) {
+          if (result.errors) window.AppFeedback?.applyErrors(requestForm, result.errors, { notify: false });
           const validationMessage = Object.values(result.errors || {})
             .flat()
             .find(Boolean);
           const error = new Error(
-            validationMessage ||
+            (result.errors && window.AppFeedback ? "Data belum tersimpan. Periksa bagian yang ditandai pada formulir." : validationMessage) ||
               result.message ||
               "Permintaan tidak dapat diproses. Silakan coba kembali.",
           );
@@ -958,7 +831,8 @@
     return result;
   }
 
-  async function backendFormRequest(url, formData) {
+  async function backendFormRequest(url, formData, form = null) {
+    const requestForm = form || window.AppFeedback?.currentForm();
     if (!url) throw new Error("Endpoint pendaftaran belum tersedia.");
 
     return withGlobalLoading(
@@ -979,14 +853,18 @@
         const result = await response.json().catch(() => ({}));
 
         if (!response.ok) {
+          if (result.errors) window.AppFeedback?.applyErrors(requestForm, result.errors, { notify: false });
           const validationMessage = Object.values(result.errors || {})
             .flat()
             .find(Boolean);
-          throw new Error(
-            validationMessage ||
+          const error = new Error(
+            (result.errors && window.AppFeedback ? "Data belum tersimpan. Periksa bagian yang ditandai pada formulir." : validationMessage) ||
               result.message ||
               "Pendaftaran tidak dapat dikirim.",
           );
+          error.data = result;
+          error.status = response.status;
+          throw error;
         }
 
         return result;
@@ -1061,17 +939,20 @@
     state.invoice = application.invoice || null;
     state.enrollment = application.enrollment || null;
 
-    const program = programs.find(
-      (item) => Number(item.databaseId) === Number(application.training_program_id),
-    );
+    const program = applicationProgram(application);
     if (program) {
       state.selectedProgram = program;
       batches = programBatches(program);
-      state.selectedBatch =
-        batches.find(
-          (batch) =>
-            Number(batch.databaseId) === Number(application.training_batch_id),
-        ) || batches[0] || unavailableBatch;
+      state.selectedBatch = application.batch ? {
+        ...unavailableBatch,
+        id: `database-batch-${application.training_batch_id}`,
+        databaseId: application.training_batch_id,
+        label: application.batch.name, code: application.batch.code,
+        start: catalogDate(application.batch.start_date), end: catalogDate(application.batch.end_date),
+        location: application.batch.locations?.join(", ") || "Lokasi belum diumumkan",
+        schedule: "Lihat rincian sesi pada Pelatihan Saya",
+        price: application.quoted_price ?? application.program?.price, administrationFee: application.quoted_administration_fee ?? administrationFee,
+      } : unavailableBatch;
     }
   }
 
@@ -1107,8 +988,34 @@
   function applicationForProgram(program) {
     return state.applications.find(
       (application) =>
-        Number(application.training_program_id) === Number(program?.databaseId),
+        Number(application.training_program_id) === Number(program?.databaseId)
+        && ["submitted", "under_review", "approved"].includes(application.status),
     );
+  }
+
+  function applyParticipantDestination() {
+    if (!participantDestination) return;
+    const view = participantDestination.get("participant_view");
+    const allowedViews = ["home", "programs", "applications", "payments", "training", "training-detail", "help", "profile"];
+    if (!allowedViews.includes(view)) return;
+    state.dashboardView = view;
+    if (view === "training-detail") {
+      const batchId = participantDestination.get("training_batch");
+      const application = state.applications.find((item) => String(item.training_batch_id) === batchId && item.enrollment);
+      if (application) {
+        selectApplication(application);
+        const section = participantDestination.get("training_section");
+        state.trainingSection = ["overview", "materials", "schedule", "attendance", "logbook", "competency", "certificate"].includes(section) ? section : "overview";
+      } else {
+        state.dashboardView = "training";
+      }
+    }
+    state.step = steps.findIndex((step) => step.id === "member-programs");
+    participantDestination = null;
+    const destinationUrl = new URL(window.location.href);
+    ["participant_view", "training_batch", "training_section"].forEach((key) => destinationUrl.searchParams.delete(key));
+    destinationUrl.hash = "member-programs";
+    window.history.replaceState(null, "", destinationUrl);
   }
 
   async function loadCurrentApplication(showMessage = false) {
@@ -1116,12 +1023,19 @@
 
     try {
       const result = await backendGet(backend.routes?.applicationCurrent);
+      if (result.profile) applyParticipantProfile(result.profile);
+      if (result.catalog) programs = (result.catalog.programs || []).map(catalogProgram);
       applyApplications(
         result.applications ||
           (result.application ? [result.application] : []),
       );
-      if (state.openPaymentAfterLoad && state.invoice?.status === "paid") {
-        state.dashboardView = "payment-detail";
+      applyParticipantDestination();
+      if (state.openPaymentAfterLoad) {
+        const paidApplication = state.applications.find((application) => Number(application.id) === Number(backend.flash?.paymentApplicationId));
+        if (paidApplication) {
+          selectApplication(paidApplication);
+          state.dashboardView = paidApplication.invoice?.status === "paid" ? "payment-detail" : "payments";
+        }
         state.openPaymentAfterLoad = false;
       }
       render();
@@ -1133,8 +1047,10 @@
           "info",
         );
       }
+      return true;
     } catch (error) {
-      if (showMessage) showToast(error.message, "danger");
+      showToast(`Data terbaru belum dapat dimuat. ${error.message}`, "danger");
+      return false;
     }
   }
 
@@ -1204,7 +1120,9 @@
   }
 
   function dashboardHeaderActions() {
-    const expanded = !state.dashboardSidebarCollapsed;
+    const expanded = window.matchMedia("(max-width: 720px)").matches
+      ? state.dashboardSidebarOpen
+      : !state.dashboardSidebarCollapsed;
     return `
       <div class="dashboard-header-actions">
         <button
@@ -1231,14 +1149,12 @@
   }
 
   function participantSidebar(activeSection) {
-    const hasEnrollment = state.applications.some(
-      (application) => application.enrollment?.status === "active",
-    );
+    const hasEnrollment = state.applications.some((application) => application.enrollment);
     const hasPayments = state.applications.some(
       (application) => application.invoice,
     );
     const participantLabel = hasEnrollment
-      ? "Peserta Aktif"
+      ? "Peserta Pelatihan"
       : state.applications.length
         ? "Calon Peserta"
         : "Akun Peserta";
@@ -1380,21 +1296,21 @@
       <article class="program-card">
         <div class="program-card__image" style="background-position:${program.imagePosition}">
           ${program.popular ? '<span class="badge badge--orange">Populer</span>' : ""}
-          <span class="program-code">${program.code}</span>
+          <span class="program-code">${escapeHtml(program.code)}</span>
         </div>
         <div class="program-card__body">
           <div class="program-card__heading">
             <div>
-              <h2>${program.title}</h2>
-              <p>${program.subtitle}</p>
+              <h2>${escapeHtml(program.title)}</h2>
+              <p>${escapeHtml(program.subtitle)}</p>
             </div>
-            <span class="level-chip">${program.level}</span>
+
           </div>
           <dl class="program-facts">
-            <div><dt>Durasi</dt><dd>${program.duration}</dd></div>
-            <div><dt>Praktik</dt><dd>${program.practice}</dd></div>
-            <div><dt>Kuota</dt><dd>${program.seats} Peserta</dd></div>
-            <div><dt>Biaya</dt><dd>${money(program.price)}</dd></div>
+            <div><dt>Durasi</dt><dd>${escapeHtml(program.duration)}</dd></div>
+            <div><dt>Batch dibuka</dt><dd>${programBatches(program).length}</dd></div>
+            <div><dt>Sisa kursi seluruh batch</dt><dd>${programBatches(program).reduce((sum, batch) => sum + batch.seatsLeft, 0)} Peserta</dd></div>
+            <div><dt>Biaya</dt><dd>${programPriceLabel(program)}</dd></div>
           </dl>
           <div class="program-card__actions">
             <button class="button button--outline" data-action="select-program" data-id="${program.id}" type="button">Lihat Detail</button>
@@ -1448,7 +1364,7 @@
   }
 
   function renderHome() {
-    const featuredPrograms = programs.slice(0, 3);
+    const featuredPrograms = registrationPrograms().slice(0, 3);
 
     return `
       <section class="company-hero">
@@ -2608,13 +2524,13 @@
   }
 
   function renderPrograms() {
-    const filtered = programs.filter((program) => {
+    const filtered = registrationPrograms().filter((program) => {
       const matchesSearch =
         `${program.title} ${program.subtitle} ${program.code}`
           .toLowerCase()
           .includes(state.search.toLowerCase());
       const matchesLevel =
-        state.level === "Semua Level" || program.level === state.level;
+        state.level === "Semua Kategori" || program.subtitle === state.level;
       return matchesSearch && matchesLevel;
     });
 
@@ -2640,12 +2556,12 @@
             <input id="program-search" type="search" value="${escapeHtml(state.search)}" placeholder="Cari nama atau proses pelatihan..." aria-label="Cari program">
           </label>
           <label class="select-box">
-            <span>LEVEL</span>
-            <select id="level-filter" aria-label="Filter level">
-              ${["Semua Level", "Pemula", "Menengah", "Lanjutan"]
+            <span>KATEGORI</span>
+            <select id="level-filter" aria-label="Filter kategori">
+              ${["Semua Kategori", ...new Set(registrationPrograms().map((program) => program.subtitle).filter(Boolean))]
                 .map(
                   (level) =>
-                    `<option ${state.level === level ? "selected" : ""}>${level}</option>`,
+                    `<option ${state.level === level ? "selected" : ""}>${escapeHtml(level)}</option>`,
                 )
                 .join("")}
             </select>
@@ -2661,7 +2577,7 @@
         ${
           filtered.length
             ? `<div class="program-grid">${filtered.map(programCard).join("")}</div>`
-            : `<div class="empty-state"><span>⌕</span><h2>Program tidak ditemukan</h2><p>Coba kata kunci atau level yang berbeda.</p></div>`
+            : `<div class="empty-state"><span>⌕</span><h2>${registrationPrograms().length ? "Program tidak ditemukan" : "Belum ada pendaftaran dibuka"}</h2><p>${registrationPrograms().length ? "Coba kata kunci atau kategori yang berbeda." : "Program akan muncul setelah batch siap dan pendaftarannya dibuka."}</p></div>`
         }
       </section>
     `;
@@ -2669,68 +2585,39 @@
 
   function renderDetailPage() {
     const program = state.selectedProgram;
+    const available = programBatches(program);
+    const nearest = available[0];
     return `
-      ${pageHeader(
-        "LANGKAH 1 DARI 4 · DETAIL PROGRAM",
-        program.title,
-        "Pelajari materi, jadwal, fasilitas, dan biaya sebelum memilih batch.",
-      )}
+      ${pageHeader("LANGKAH 1 DARI 4 · DETAIL PROGRAM", escapeHtml(program.title), "Periksa durasi, jadwal, kuota, dan biaya sebelum memilih batch.")}
       <section class="page-shell detail-layout">
         <article class="detail-main">
           <div class="detail-cover" style="background-position:${program.imagePosition}">
-            <span class="badge badge--orange">${program.code}</span>
-            <div>
-              <small>${program.level}</small>
-              <h2>${program.subtitle}</h2>
+            <span class="badge badge--orange">${escapeHtml(program.code)}</span>
+            <div><h2>${escapeHtml(program.subtitle)}</h2></div>
+          </div>
+          <div class="detail-section">
+            <h2>Informasi program</h2>
+            <div class="feature-cards">
+              <div><span>◷</span><strong>${escapeHtml(program.duration)}</strong><small>Total durasi program</small></div>
+              <div><span>▤</span><strong>${available.length}</strong><small>Batch dibuka</small></div>
+              <div><span>◉</span><strong>${available.reduce((sum, batch) => sum + batch.seatsLeft, 0)}</strong><small>Sisa kursi seluruh batch</small></div>
             </div>
           </div>
           <div class="detail-section">
-            <h2>Tentang program</h2>
-            <p>${program.description}</p>
-            <div class="feature-cards">
-              <div><span>◷</span><strong>${program.duration}</strong><small>Total pelatihan</small></div>
-              <div><span>▤</span><strong>${program.theory}</strong><small>Materi teori</small></div>
-              <div><span>⚒</span><strong>${program.practice}</strong><small>Praktik workshop</small></div>
-              <div><span>◉</span><strong>${program.seats}</strong><small>Peserta per kelas</small></div>
-            </div>
-          </div>
-          <div class="detail-columns">
-            <div>
-              <h3>Materi yang dipelajari</h3>
-              <ul class="check-list">
-                <li>Prinsip dasar proses ${program.code}</li>
-                <li>Keselamatan dan kesehatan kerja pengelasan</li>
-                <li>Persiapan material dan mesin las</li>
-                <li>Teknik posisi pengelasan</li>
-                <li>Inspeksi visual dan perbaikan cacat</li>
-                <li>Persiapan uji kompetensi</li>
-              </ul>
-            </div>
-            <div>
-              <h3>Fasilitas pelatihan</h3>
-              <ul class="check-list">
-                <li>Ruang kelas ber-AC</li>
-                <li>Booth las individual</li>
-                <li>APD dan consumable praktik</li>
-                <li>Modul digital dan logbook</li>
-                <li>Sertifikat pelatihan</li>
-              </ul>
-            </div>
-          </div>
-          <div class="position-strip">
-            <span>POSISI PENGELASAN</span>
-            <div>${program.positions.map((position) => `<strong>${position}</strong>`).join("")}</div>
+            <h3>Materi dan jadwal sesi</h3>
+            <p>Materi dan rincian sesi mengikuti batch yang dipilih. Setelah akses pelatihan aktif, materi yang dibagikan trainer dan jadwal yang diterbitkan admin dapat dilihat di Pelatihan Saya.</p>
           </div>
         </article>
         <aside class="booking-card">
-          <span class="booking-card__label">BIAYA PROGRAM</span>
-          <strong class="booking-card__price">${money(program.price)}</strong>
-          <small>Termasuk materi, praktik, APD, dan sertifikat.</small>
+          <span class="booking-card__label">TOTAL BIAYA PER PESERTA</span>
+          <strong class="booking-card__price">${programPriceLabel(program)}</strong>
+          <small>Periksa harga masing-masing batch pada langkah berikutnya.</small>
           <div class="booking-card__divider"></div>
-          <div class="booking-fact"><span>Jadwal terdekat</span><strong>10 Agustus 2026</strong></div>
-          <div class="booking-fact"><span>Kuota tersedia</span><strong class="text-green">5 kursi</strong></div>
-          <div class="booking-fact"><span>Lokasi</span><strong>Workshop Batam Centre</strong></div>
-          <button class="button button--primary button--large" data-action="select-detail-program" type="button">Pilih Program &amp; Jadwal <span>→</span></button>
+          <div class="booking-fact"><span>Batch terdekat</span><strong>${escapeHtml(nearest?.label || "Belum tersedia")}</strong></div>
+          <div class="booking-fact"><span>Tanggal mulai</span><strong>${escapeHtml(nearest?.start || "Belum ditentukan")}</strong></div>
+          <div class="booking-fact"><span>Sisa kursi batch terdekat</span><strong>${nearest?.seatsLeft ?? 0} kursi</strong></div>
+          <div class="booking-fact"><span>Lokasi</span><strong>${escapeHtml(nearest?.location || "Belum diumumkan")}</strong></div>
+          <button class="button button--primary button--large" data-action="select-detail-program" type="button" ${available.length ? "" : "disabled"}>Pilih Program &amp; Jadwal <span>→</span></button>
           <button class="text-button" data-action="back-program-list" type="button">← Kembali ke daftar program</button>
         </aside>
       </section>
@@ -2744,7 +2631,7 @@
       "programs",
       "Detail Program",
       state.selectedProgram.title,
-      "Pelajari materi, fasilitas, durasi, dan biaya sebelum memilih jadwal batch.",
+      "Periksa durasi, jadwal, kuota, dan biaya sebelum memilih batch.",
       `<div class="dashboard-embedded-program-page">${renderDetailPage()}</div>`,
     );
   }
@@ -2757,7 +2644,7 @@
         ${pageHeader(
           "LANGKAH 2 DARI 4 · PILIH BATCH",
           "Pilih jadwal yang paling sesuai",
-          `Program ${state.selectedProgram.title} · ${state.selectedProgram.duration}`,
+          `Program ${escapeHtml(state.selectedProgram.title)} · ${escapeHtml(state.selectedProgram.duration)}`,
         )}
         <section class="page-shell selection-layout">
           <div class="empty-state">
@@ -2774,13 +2661,13 @@
       ${pageHeader(
         "LANGKAH 2 DARI 4 · PILIH BATCH",
         "Pilih jadwal yang paling sesuai",
-        `Program ${state.selectedProgram.title} · ${state.selectedProgram.duration}`,
+        `Program ${escapeHtml(state.selectedProgram.title)} · ${escapeHtml(state.selectedProgram.duration)}`,
       )}
       <section class="page-shell selection-layout">
         <div class="selection-main">
           <div class="notice notice--blue">
             <span>i</span>
-            <div><strong>Kursi belum dipesan pada tahap ini</strong><p>Reservasi kursi dimulai setelah invoice dibuat dan berlaku selama 24 jam.</p></div>
+            <div><strong>Kursi belum dipesan pada tahap ini</strong><p>Ketersediaan kursi diperiksa kembali saat pendaftaran dikirim. Batas pembayaran akan tercantum pada invoice.</p></div>
           </div>
           <div class="batch-list">
             ${batches
@@ -2788,16 +2675,17 @@
                 (batch) => `
                   <button class="batch-card ${selected.id === batch.id ? "is-selected" : ""}" data-action="select-batch" data-id="${batch.id}" type="button">
                     <span class="radio-mark"></span>
-                    <div class="batch-date"><strong>${batch.start.split(" ")[0]}</strong><span>${batch.start.split(" ")[1].slice(0, 3).toUpperCase()}</span><small>2026</small></div>
+                    <div class="batch-date"><strong>${batch.start.split(" ")[0]}</strong><span>${(batch.start.split(" ")[1] || "").slice(0, 3).toUpperCase()}</span><small>${escapeHtml(batch.year)}</small></div>
                     <div class="batch-card__content">
                       <div>
-                        <h2>${batch.label}</h2>
-                        ${batch.recommended ? '<span class="badge badge--green">Direkomendasikan</span>' : ""}
+                        <h2>${escapeHtml(batch.label)}</h2>
+                        ${batch.recommended ? '<span class="badge badge--green">Jadwal terdekat</span>' : ""}
                       </div>
                       <dl>
-                        <div><dt>Periode</dt><dd>${batch.start} sampai ${batch.end}</dd></div>
-                        <div><dt>Jadwal</dt><dd>${batch.schedule}</dd></div>
-                        <div><dt>Lokasi</dt><dd>${batch.location}</dd></div>
+                        <div><dt>Periode</dt><dd>${escapeHtml(batch.start)} sampai ${escapeHtml(batch.end)}</dd></div>
+                        <div><dt>Batas pendaftaran</dt><dd>${escapeHtml(batch.deadline)}</dd></div>
+                        <div><dt>Lokasi</dt><dd>${escapeHtml(batch.location)}</dd></div>
+                        <div><dt>Total biaya</dt><dd>${money((batch.price ?? state.selectedProgram.price) + (batch.administrationFee ?? administrationFee))}</dd></div>
                       </dl>
                     </div>
                     <div class="seat-info"><span>Sisa kuota</span><strong>${batch.seatsLeft} kursi</strong></div>
@@ -2811,15 +2699,15 @@
           <span class="eyebrow">PILIHAN ANDA</span>
           <div class="summary-program">
             <span class="summary-program__thumb"></span>
-            <div><strong>${state.selectedProgram.title}</strong><small>${state.selectedProgram.subtitle}</small></div>
+            <div><strong>${escapeHtml(state.selectedProgram.title)}</strong><small>${escapeHtml(state.selectedProgram.subtitle)}</small></div>
           </div>
           <dl class="summary-list">
-            <div><dt>Batch</dt><dd>${selected.label}</dd></div>
-            <div><dt>Tanggal</dt><dd>${selected.start}</dd></div>
-            <div><dt>Jadwal</dt><dd>${selected.schedule}</dd></div>
-            <div><dt>Lokasi</dt><dd>${selected.location}</dd></div>
+            <div><dt>Batch</dt><dd>${escapeHtml(selected.label)}</dd></div>
+            <div><dt>Tanggal</dt><dd>${escapeHtml(selected.start)}</dd></div>
+            <div><dt>Jadwal</dt><dd>${escapeHtml(selected.schedule)}</dd></div>
+            <div><dt>Lokasi</dt><dd>${escapeHtml(selected.location)}</dd></div>
           </dl>
-          <div class="summary-total"><span>Total biaya</span><strong>${money(state.selectedProgram.price)}</strong></div>
+          <div class="summary-total"><span>Total biaya</span><strong>${money((selected.price ?? state.selectedProgram.price) + (selected.administrationFee ?? administrationFee))}</strong></div>
           <button class="button button--primary button--large" data-action="next" type="button">Daftar Sekarang <span>→</span></button>
           <button class="text-button" data-action="back" type="button">← Kembali ke detail</button>
         </aside>
@@ -2834,7 +2722,7 @@
       "application",
       "Pemilihan Batch",
       "Pilih jadwal yang paling sesuai",
-      `Program ${state.selectedProgram.title} · ${state.selectedProgram.duration}`,
+      `Program ${escapeHtml(state.selectedProgram.title)} · ${escapeHtml(state.selectedProgram.duration)}`,
       `<div class="dashboard-embedded-program-page">${renderBatchPage()}</div>`,
     );
   }
@@ -3066,6 +2954,48 @@
     `;
   }
 
+  function invoiceStatus(invoice) {
+    return invoice?.status === "unpaid" && invoice.due_at && new Date(invoice.due_at).getTime() <= Date.now()
+      ? "expired" : invoice?.status;
+  }
+
+  function trainingStatus(application) {
+    const labels = { active: "Kepesertaan aktif", completed: "Kepesertaan selesai", cancelled: "Kepesertaan dibatalkan" };
+    if (application.enrollment?.status !== "active") return labels[application.enrollment?.status] || "Akses belum aktif";
+    return application.batch?.operational_label || "Status batch belum tersedia";
+  }
+
+  function trainingSectionContent() {
+    const application = state.application;
+    if (!application) return "";
+    const section = state.trainingSection;
+    if (section === "overview") return `
+      <h3>${escapeHtml(trainingStatus(application))}</h3>
+      <dl class="order-detail-grid">
+        <div><dt>Status kepesertaan</dt><dd>${escapeHtml(({ active: "Aktif", completed: "Selesai", cancelled: "Dibatalkan" })[state.enrollment?.status] || "Belum aktif")}</dd></div>
+        <div><dt>Periode batch</dt><dd>${escapeHtml(state.selectedBatch.start)} sampai ${escapeHtml(state.selectedBatch.end)}</dd></div>
+        <div><dt>Lokasi sesi</dt><dd>${escapeHtml(state.selectedBatch.location)}</dd></div>
+        <div><dt>Sesi diterbitkan</dt><dd>${application.training_access ? (application.sessions || []).length : "Akses belum tersedia"}</dd></div>
+      </dl><p>Jadwal dan materi mengikuti publikasi admin atau trainer untuk batch ini.</p>`;
+    if (["materials", "schedule", "attendance", "logbook"].includes(section) && !application.training_access) return '<h3>Akses pelatihan belum tersedia</h3><p>Akses membutuhkan kepesertaan aktif, pembayaran lunas, dan batch yang tidak dibatalkan.</p>';
+    if (section === "logbook") return `<h3>Tugas & logbook praktik</h3><p>Pilih hasil, tambahkan foto jika diminta, lalu kirim. Satu pengiriman menjadi tugas sekaligus catatan logbook, tanpa mengetik ulang data sesi.</p>${application.practice_url ? `<a class="button button--primary" href="${escapeHtml(application.practice_url)}">Buka tugas & logbook</a>` : ""}`;
+    if (section === "attendance") return `<h3>Kehadiran & absensi selfie</h3><p>Absen masuk dan keluar dengan kamera di area sesi yang ditentukan. Hasil diperiksa trainer sebelum masuk rekap.</p>${application.attendance_url ? `<a class="button button--primary" href="${escapeHtml(application.attendance_url)}">Buka kehadiran & absensi</a>` : ""}`;
+    if (section === "materials") return `<h3>Materi batch</h3><p>Materi yang telah dibagikan trainer tersedia pada halaman materi batch.</p>${backend.routes?.trainingMaterials ? `<a class="button button--primary" href="${escapeHtml(backend.routes.trainingMaterials.replace("__BATCH__", encodeURIComponent(application.training_batch_id)))}">Buka materi batch</a>` : ""}`;
+    if (section === "schedule") {
+      const sessions = application.sessions || [];
+      return sessions.length ? `<h3>Jadwal sesi pelatihan</h3><p>Waktu ditampilkan dalam WIB (Asia/Jakarta).</p><div class="table-scroll"><table class="invoice-table"><thead><tr><th>Sesi</th><th>Waktu</th><th>Trainer</th><th>Lokasi</th></tr></thead><tbody>${sessions.map((session) => `<tr><td><strong>${escapeHtml(session.title)}</strong><small>${escapeHtml(session.type)}</small></td><td>${escapeHtml(formatDateTime(session.starts_at))}<small>sampai ${escapeHtml(formatDateTime(session.ends_at))}</small></td><td>${escapeHtml(session.trainer || "Belum ditentukan")}</td><td>${escapeHtml(session.location || "Belum ditentukan")}</td></tr>`).join("")}</tbody></table></div>` : '<h3>Jadwal belum diterbitkan</h3><p>Jadwal akan muncul setelah admin menerbitkan sesi untuk batch ini.</p>';
+    }
+    return '<h3>Fitur belum tersedia</h3><p>Penilaian kompetensi dan penerbitan sertifikat belum diaktifkan pada sistem ini.</p>';
+  }
+
+  function invoiceDocumentLinks(invoice) {
+    if (!invoice?.invoice_pdf_url) return "";
+    return `<div class="billing-document-actions">
+      <a class="button button--outline button--full" href="${escapeHtml(invoice.invoice_pdf_url)}" data-loading-download data-loading-title="Menyiapkan invoice PDF">${invoice.status === "paid" ? "Unduh Invoice LUNAS (PDF)" : "Unduh Invoice (PDF)"}</a>
+      ${invoice.status === "paid" && invoice.receipt_pdf_url ? `<a class="button button--outline button--full" href="${escapeHtml(invoice.receipt_pdf_url)}" data-loading-download data-loading-title="Menyiapkan kuitansi PDF">Unduh Kuitansi (PDF)</a>` : ""}
+    </div>`;
+  }
+
   function paidPaymentDetailContent(includeToolbar = false) {
     const invoice = state.invoice;
 
@@ -3099,7 +3029,7 @@
       ${toolbar}
       <section class="payment-layout payment-layout--paid${includeToolbar ? " dashboard-payment-detail" : ""}">
         <article class="checkout-card checkout-card--paid">
-          <div class="notice notice--green"><span>✓</span><div><strong>Status pembayaran: Lunas</strong><p>Kursi pelatihan telah diamankan dan akses pelatihan sudah aktif.</p></div></div>
+          <div class="notice notice--green"><span>✓</span><div><strong>Status pembayaran: Lunas</strong><p>Pembayaran tercatat lunas. Status kepesertaan dan batch dapat dilihat di Pelatihan Saya.</p></div></div>
           <div class="paid-payment-overview">
             <div class="order-program paid-payment-program">
               <span class="order-program__image" style="background-position:${state.selectedProgram.imagePosition}"></span>
@@ -3117,6 +3047,7 @@
           <h2>${escapeHtml(state.selectedProgram.title)}</h2>
           <p>${escapeHtml(state.selectedBatch.label)}</p>
           <div class="payment-summary__total"><span>Total pembayaran</span><strong>${money(total)}</strong></div>
+          ${invoiceDocumentLinks(invoice)}
           <button class="button button--primary button--large button--full" data-action="show-dashboard-training" type="button">Buka Pelatihan Saya <span>→</span></button>
           <button class="button button--outline button--full" data-action="show-dashboard-programs" type="button">Lihat Program Lain</button>
           <button class="text-button" data-action="show-dashboard-payments" type="button">← Kembali ke daftar pembayaran</button>
@@ -3147,18 +3078,19 @@
         ? "training"
         : state.dashboardView;
     const activeEnrollments = state.applications.filter(
-      (application) => application.enrollment?.status === "active",
+      (application) => application.enrollment?.status === "active" && application.invoice?.status === "paid"
+        && !["cancelled", "completed"].includes(application.batch?.operational_status),
     );
     const paymentApplications = state.applications.filter(
       (application) => application.invoice,
     );
-    const filtered = programs.filter((program) => {
+    const filtered = registrationPrograms().filter((program) => {
       const matchesSearch =
         `${program.title} ${program.subtitle} ${program.code}`
           .toLowerCase()
           .includes(state.search.toLowerCase());
       const matchesLevel =
-        state.level === "Semua Level" || program.level === state.level;
+        state.level === "Semua Kategori" || program.subtitle === state.level;
       return matchesSearch && matchesLevel;
     });
 
@@ -3176,12 +3108,12 @@
               <input id="program-search" type="search" value="${escapeHtml(state.search)}" placeholder="Cari program..." aria-label="Cari program">
             </label>
             <label class="select-box">
-              <span>LEVEL</span>
-              <select id="level-filter" aria-label="Filter level">
-                ${["Semua Level", "Pemula", "Menengah", "Lanjutan"]
+              <span>KATEGORI</span>
+              <select id="level-filter" aria-label="Filter kategori">
+                ${["Semua Kategori", ...new Set(registrationPrograms().map((program) => program.subtitle).filter(Boolean))]
                   .map(
                     (level) =>
-                      `<option ${state.level === level ? "selected" : ""}>${level}</option>`,
+                      `<option ${state.level === level ? "selected" : ""}>${escapeHtml(level)}</option>`,
                   )
                   .join("")}
               </select>
@@ -3191,7 +3123,7 @@
         ${
           filtered.length
             ? `<div class="program-grid member-program-grid">${filtered.map(programCard).join("")}</div>`
-            : `<div class="empty-state"><span>⌕</span><h2>Program tidak ditemukan</h2><p>Coba kata kunci atau level yang berbeda.</p></div>`
+            : `<div class="empty-state"><span>⌕</span><h2>${registrationPrograms().length ? "Program tidak ditemukan" : "Belum ada pendaftaran dibuka"}</h2><p>${registrationPrograms().length ? "Coba kata kunci atau kategori yang berbeda." : "Program akan muncul setelah batch siap dan pendaftarannya dibuka."}</p></div>`
         }
       </section>
     `;
@@ -3279,12 +3211,7 @@
       refunded: "Dikembalikan",
     };
     const recordCard = (application, section) => {
-      const program =
-        programs.find(
-          (item) =>
-            Number(item.databaseId) ===
-            Number(application.training_program_id),
-        ) || state.selectedProgram;
+      const program = applicationProgram(application);
       const programBatch = programBatches(program).find(
         (batch) =>
           Number(batch.databaseId) ===
@@ -3294,11 +3221,9 @@
       const enrollment = application.enrollment;
       const status =
         section === "payments"
-          ? invoiceStatusLabels[invoice?.status] || "Invoice belum dibuat"
+          ? invoiceStatusLabels[invoiceStatus(invoice)] || "Invoice belum dibuat"
           : section === "training"
-            ? enrollment?.status === "active"
-              ? "Pelatihan aktif"
-              : "Belum aktif"
+            ? trainingStatus(application)
             : applicationStatusLabels[application.status] || application.status;
       const action =
         section === "payments"
@@ -3356,8 +3281,8 @@
               isApproved
                 ? state.invoice
                   ? isPaid
-                    ? `Invoice ${escapeHtml(state.invoice.invoice_number)} sudah lunas dan pelatihan Anda telah aktif.`
-                    : `Invoice ${escapeHtml(state.invoice.invoice_number)} sudah dibuat dan menunggu pembayaran.`
+                    ? `Invoice ${escapeHtml(state.invoice.invoice_number)} sudah lunas. Status batch: ${escapeHtml(trainingStatus(state.application))}.`
+                    : `Invoice ${escapeHtml(state.invoice.invoice_number)}: ${escapeHtml(invoiceStatusLabels[invoiceStatus(state.invoice)] || state.invoice.status)}.`
                   : "Silakan periksa ringkasan biaya dan buat invoice untuk mengamankan kursi."
                 : isRejected
                   ? escapeHtml(state.application?.verification_notes || "Silakan hubungi admin untuk mengetahui data yang perlu diperbaiki.")
@@ -3367,15 +3292,15 @@
           <span class="badge ${isApproved ? "badge--green" : isRejected ? "badge--red-soft" : "badge--orange-soft"}">${isApproved ? "Disetujui" : isRejected ? "Ditolak" : "Dalam Review"}</span>
         </div>
         <div class="application-overview">
-          <div><span>Program</span><strong>${state.selectedProgram.title}</strong><small>${state.selectedProgram.subtitle}</small></div>
-          <div><span>Batch</span><strong>${state.selectedBatch.label}</strong><small>${state.selectedBatch.start}</small></div>
-          <div><span>Lokasi</span><strong>Workshop Batam Centre</strong><small>${state.selectedBatch.location}</small></div>
+          <div><span>Program</span><strong>${escapeHtml(state.selectedProgram.title)}</strong><small>${escapeHtml(state.selectedProgram.subtitle)}</small></div>
+          <div><span>Batch</span><strong>${escapeHtml(state.selectedBatch.label)}</strong><small>${escapeHtml(state.selectedBatch.start)}</small></div>
+          <div><span>Lokasi</span><strong>${escapeHtml(state.selectedBatch.location)}</strong><small>Sesuai sesi yang diterbitkan</small></div>
           <div><span>Nomor Pendaftaran</span><strong>${escapeHtml(state.application?.registration_number || "Diproses")}</strong><small>${state.application?.submitted_at ? new Date(state.application.submitted_at).toLocaleDateString("id-ID") : "Baru dikirim"}</small></div>
         </div>
         <ol class="application-progress-dashboard" aria-label="Status pendaftaran">
           <li class="is-done"><span>✓</span><div><strong>Akun dibuat</strong><small>Email terdaftar</small></div></li>
           <li class="is-done"><span>✓</span><div><strong>Data &amp; dokumen</strong><small>Sudah dikirim</small></div></li>
-          <li class="${isApproved ? "is-done" : "is-current"}"><span>${isApproved ? "✓" : "3"}</span><div><strong>Persetujuan admin</strong><small>${isApproved ? "Disetujui" : "Sedang diperiksa"}</small></div></li>
+          <li class="${isApproved ? "is-done" : "is-current"}"><span>${isApproved ? "✓" : "3"}</span><div><strong>Persetujuan admin</strong><small>${isApproved ? "Disetujui" : isRejected ? "Ditolak" : "Sedang diperiksa"}</small></div></li>
           <li class="${isPaid ? "is-done" : isApproved ? "is-current" : ""}"><span>${isPaid ? "✓" : "4"}</span><div><strong>Pembayaran</strong><small>${isPaid ? "Lunas" : state.invoice ? "Invoice sudah dibuat" : isApproved ? "Siap dilanjutkan" : "Menunggu persetujuan"}</small></div></li>
         </ol>
         <div class="application-status-actions">
@@ -3386,7 +3311,7 @@
                 ? '<button class="button button--outline" data-action="show-dashboard-programs" type="button">Lihat Program Lain</button>'
                 : '<button class="button button--outline" data-action="refresh-application" type="button">↻ Muat Status Terbaru</button>'
           }
-          <p>Notifikasi perubahan status juga akan dikirim ke <strong>${escapeHtml(state.registration.email)}</strong>.</p>
+          <p>Pantau perubahan status melalui dashboard ini.</p>
         </div>
       </section>
     `;
@@ -3423,8 +3348,8 @@
       <div class="dashboard-metrics applicant-metrics">
         <article><span class="metric-icon metric-icon--green">${activeEnrollments.length}</span><div><small>Pelatihan Aktif</small><strong>${activeEnrollments.length}</strong><span>Program sudah lunas</span></div></article>
         <article><span class="metric-icon metric-icon--orange">▤</span><div><small>Pendaftaran</small><strong>${state.applications.length}</strong><span>Semua program Anda</span></div></article>
-        <article><span class="metric-icon metric-icon--blue">◇</span><div><small>Invoice</small><strong>${paymentApplications.length}</strong><span>${paymentApplications.filter((application) => application.invoice?.status === "unpaid").length} menunggu pembayaran</span></div></article>
-        <article><span class="metric-icon metric-icon--slate">+</span><div><small>Program Tersedia</small><strong>${programs.length}</strong><span>Anda boleh mengambil program berbeda</span></div></article>
+        <article><span class="metric-icon metric-icon--blue">◇</span><div><small>Invoice</small><strong>${paymentApplications.length}</strong><span>${paymentApplications.filter((application) => invoiceStatus(application.invoice) === "unpaid").length} menunggu pembayaran</span></div></article>
+        <article><span class="metric-icon metric-icon--slate">+</span><div><small>Program Tersedia</small><strong>${registrationPrograms().length}</strong><span>Anda boleh mengambil program berbeda</span></div></article>
       </div>
       ${
         state.applications.length
@@ -3442,13 +3367,13 @@
       ["materials", "Materi"],
       ["schedule", "Jadwal"],
       ["attendance", "Kehadiran"],
-      ["logbook", "Logbook"],
+      ["logbook", "Tugas & Logbook"],
       ["competency", "Kompetensi"],
       ["certificate", "Sertifikat"],
     ];
     const trainingSectionLabels = Object.fromEntries(trainingSections);
     const trainingAccessPanel =
-      showingTrainingDetail && state.enrollment?.status === "active"
+      showingTrainingDetail && state.enrollment
         ? `
           <section class="participant-detail-toolbar">
             <button class="participant-detail-back" data-action="back-to-training" type="button">
@@ -3462,20 +3387,20 @@
           <section class="training-access-panel">
             <div class="training-access-panel__heading">
               <div><span class="eyebrow">AKSES PER PELATIHAN</span><h2>${escapeHtml(state.selectedProgram.title)}</h2><p>${escapeHtml(state.selectedBatch.label)} · ${escapeHtml(state.enrollment.enrollment_number)}</p></div>
-              <span class="badge badge--green">AKTIF</span>
+              <span class="badge ${state.application?.training_access ? "badge--green" : "badge--orange-soft"}">${escapeHtml(trainingStatus(state.application))}</span>
             </div>
             <nav class="training-access-tabs" aria-label="Menu ${escapeHtml(state.selectedProgram.title)}">
               ${trainingSections
                 .map(
                   ([section, label]) =>
-                    `<button class="${state.trainingSection === section ? "is-active" : ""}" data-action="select-training-section" data-section="${section}" type="button">${label}</button>`,
+                    section === "logbook" && state.application?.practice_url
+                      ? `<a class="${state.trainingSection === section ? "is-active" : ""}" href="${escapeHtml(state.application.practice_url)}">${label}</a>`
+                      : `<button class="${state.trainingSection === section ? "is-active" : ""}" data-action="select-training-section" data-section="${section}" type="button">${label}</button>`,
                 )
                 .join("")}
             </nav>
             <div class="training-access-content">
-              <span class="eyebrow">${escapeHtml(trainingSectionLabels[state.trainingSection] || "Ringkasan")}</span>
-              <h3>${state.trainingSection === "overview" ? "Pelatihan siap diikuti" : `${escapeHtml(trainingSectionLabels[state.trainingSection])} ${escapeHtml(state.selectedProgram.code)}`}</h3>
-              <p>${state.trainingSection === "overview" ? "Pembayaran telah lunas. Informasi materi, jadwal, kehadiran, logbook, kompetensi, dan sertifikat tersimpan khusus untuk program ini." : "Konten pada bagian ini mengikuti program dan batch yang sedang dipilih."}</p>
+              ${trainingSectionContent()}
             </div>
           </section>
         `
@@ -3504,15 +3429,15 @@
       : showingApplications
         ? "Pantau proses persetujuan setiap program yang Anda daftarkan."
         : showingApplicationDetail
-          ? `Status lengkap pendaftaran ${state.selectedProgram.title}.`
+          ? `Status lengkap pendaftaran ${escapeHtml(state.selectedProgram.title)}.`
         : showingPayments
           ? "Buka kembali invoice dan status pembayaran untuk setiap program."
           : showingPaymentDetail
             ? "Rincian pembayaran lunas dan akses pelatihan Anda."
           : showingTraining
-            ? "Akses program yang sudah lunas dan aktif secara terpisah."
+            ? "Lihat status, jadwal, materi, dan riwayat setiap pelatihan."
             : showingTrainingDetail
-              ? `Akses materi dan aktivitas khusus ${state.selectedProgram.title}.`
+              ? `Akses materi dan aktivitas khusus ${escapeHtml(state.selectedProgram.title)}.`
             : showingHelp
               ? `Tim ${branding.name} siap membantu pendaftaran dan pelatihan Anda.`
             : showingProfile
@@ -3541,14 +3466,14 @@
           : showingTraining
             ? recordsPanel(
                 "training",
-                activeEnrollments,
-                "Pelatihan aktif",
+                state.applications.filter((application) => application.enrollment),
+                "Pelatihan dan riwayat",
                 "Setiap program memiliki akses pelatihan dan jadwalnya sendiri.",
               )
             : showingTrainingDetail
               ? trainingAccessPanel
             : showingHelp
-              ? '<section class="dashboard-start-card"><div><span class="eyebrow">PUSAT BANTUAN</span><h2>Butuh bantuan?</h2><p>Hubungi tim kami untuk bantuan pendaftaran, pembayaran, atau akses pelatihan.</p><a class="button button--primary" href="tel:0254123456">Hubungi 0254-123456</a></div></section>'
+              ? '<section class="dashboard-start-card"><div><span class="eyebrow">PUSAT BANTUAN</span><h2>Butuh bantuan?</h2><p>Hubungi tim kami untuk bantuan pendaftaran, pembayaran, atau akses pelatihan.</p><a class="button button--primary" href="tel:+62895603502918">Hubungi +62 895-6035-02918</a></div></section>'
             : showingProfile
               ? profileContent
               : homeContent;
@@ -3652,9 +3577,9 @@
               <button class="button button--outline" data-action="go-batch" type="button">Ubah Program / Batch</button>
             </section>
             <section class="dashboard-selection-strip" aria-label="Program dan batch yang dipilih">
-              <div><span>Program</span><strong>${state.selectedProgram.title}</strong><small>${state.selectedProgram.subtitle}</small></div>
-              <div><span>Batch</span><strong>${state.selectedBatch.label}</strong><small>${state.selectedBatch.start}</small></div>
-              <div><span>Lokasi</span><strong>Workshop Batam Centre</strong><small>${state.selectedBatch.location}</small></div>
+              <div><span>Program</span><strong>${escapeHtml(state.selectedProgram.title)}</strong><small>${escapeHtml(state.selectedProgram.subtitle)}</small></div>
+              <div><span>Batch</span><strong>${escapeHtml(state.selectedBatch.label)}</strong><small>${escapeHtml(state.selectedBatch.start)}</small></div>
+              <div><span>Lokasi</span><strong>${escapeHtml(state.selectedBatch.location)}</strong><small>Sesuai sesi yang diterbitkan</small></div>
             </section>
             ${content}
           </div>
@@ -3735,8 +3660,8 @@
     return `
       <aside class="application-sidebar">
         <span class="eyebrow">STATUS PENDAFTARAN</span>
-        <h2>${state.selectedProgram.title}</h2>
-        <p>${state.selectedBatch.label}</p>
+        <h2>${escapeHtml(state.selectedProgram.title)}</h2>
+        <p>${escapeHtml(state.selectedBatch.label)}</p>
         <ol>
           ${items
             .map(
@@ -3749,7 +3674,7 @@
             )
             .join("")}
         </ol>
-        <div class="support-box"><span>?</span><div><strong>Butuh bantuan?</strong><small>Tim kami siap membantu proses pendaftaran Anda.</small><a href="tel:0254123456">0254-123456</a></div></div>
+        <div class="support-box"><span>?</span><div><strong>Butuh bantuan?</strong><small>Tim kami siap membantu proses pendaftaran Anda.</small><a href="tel:+62895603502918">+62 895-6035-02918</a></div></div>
       </aside>
     `;
   }
@@ -3767,7 +3692,7 @@
           ${uploaded ? `<small>${escapeHtml(uploadedName)} · Siap dikirim</small>` : ""}
         </div>
         <label class="upload-button">
-          <input type="file" data-upload="${id}" accept=".jpg,.jpeg,.png,.pdf">
+          <input type="file" name="documents[${id}]" aria-label="${escapeHtml(title)}" data-upload="${id}" accept=".jpg,.jpeg,.png,.pdf">
           ${uploaded ? "Ganti file" : "Pilih file"}
         </label>
       </div>
@@ -3782,7 +3707,7 @@
         "Format JPG, PNG, atau PDF dengan ukuran maksimal 5 MB per dokumen.",
       )}
       <section class="page-shell form-layout">
-        <div class="form-card">
+        <form class="form-card" data-form="documents" data-no-loading>
           <div class="document-summary">
             <div><span>Dokumen wajib</span><strong>${Object.keys(state.uploadedFiles).filter((key) => ["id", "photo", "education"].includes(key)).length} / 3</strong></div>
             <div class="document-progress"><i style="width:${Math.min(100, Object.keys(state.uploadedFiles).length * 25)}%"></i></div>
@@ -3801,7 +3726,7 @@
             <button class="button button--outline" data-action="back" type="button">← Kembali</button>
             <button class="button button--primary button--large" data-action="submit-documents" type="button">Kirim untuk Diverifikasi <span>→</span></button>
           </div>
-        </div>
+        </form>
         ${renderApplicationSidebar(2)}
       </section>
     `;
@@ -3816,10 +3741,21 @@
     );
   }
 
+  function applicationParticipant() {
+    const saved = state.application?.participant || {};
+    return {
+      fullName: saved.full_name ?? state.registration.fullName,
+      email: saved.email ?? state.registration.email,
+      phone: saved.phone ?? state.registration.phone,
+      education: saved.education ?? state.registration.education,
+    };
+  }
+
   function renderSummary() {
+    const participant = applicationParticipant();
     const program = state.selectedProgram;
-    const adminFee = administrationFee;
-    const total = program.price + adminFee;
+    const { price, adminFee } = selectedPricing();
+    const total = price + adminFee;
     return `
       ${pageHeader(
         "LANGKAH 4 DARI 4 · RINGKASAN PESANAN",
@@ -3829,25 +3765,25 @@
       <section class="page-shell checkout-layout">
         <div class="checkout-main">
           <article class="checkout-card">
-            <div class="checkout-card__title"><span>01</span><h2>Program dan batch</h2><button data-action="go-batch" type="button">Ubah</button></div>
+            <div class="checkout-card__title"><span>01</span><h2>Program dan batch</h2></div>
             <div class="order-program">
               <span class="order-program__image" style="background-position:${program.imagePosition}"></span>
-              <div><span class="badge badge--blue">${program.code}</span><h3>${program.title}</h3><p>${program.subtitle}</p></div>
+              <div><span class="badge badge--blue">${escapeHtml(program.code)}</span><h3>${escapeHtml(program.title)}</h3><p>${escapeHtml(program.subtitle)}</p></div>
             </div>
             <dl class="order-detail-grid">
-              <div><dt>Batch</dt><dd>${state.selectedBatch.label}</dd></div>
-              <div><dt>Periode</dt><dd>${state.selectedBatch.start} sampai ${state.selectedBatch.end}</dd></div>
-              <div><dt>Jadwal</dt><dd>${state.selectedBatch.schedule}</dd></div>
-              <div><dt>Lokasi</dt><dd>${state.selectedBatch.location}</dd></div>
+              <div><dt>Batch</dt><dd>${escapeHtml(state.selectedBatch.label)}</dd></div>
+              <div><dt>Periode</dt><dd>${escapeHtml(state.selectedBatch.start)} sampai ${escapeHtml(state.selectedBatch.end)}</dd></div>
+              <div><dt>Jadwal</dt><dd>${escapeHtml(state.selectedBatch.schedule)}</dd></div>
+              <div><dt>Lokasi</dt><dd>${escapeHtml(state.selectedBatch.location)}</dd></div>
             </dl>
           </article>
           <article class="checkout-card">
-            <div class="checkout-card__title"><span>02</span><h2>Data peserta</h2><button data-action="go-registration" type="button">Ubah</button></div>
+            <div class="checkout-card__title"><span>02</span><h2>Data peserta</h2></div>
             <dl class="order-detail-grid">
-              <div><dt>Nama lengkap</dt><dd>${state.registration.fullName}</dd></div>
-              <div><dt>Email</dt><dd>${state.registration.email}</dd></div>
-              <div><dt>Nomor HP</dt><dd>${state.registration.phone}</dd></div>
-              <div><dt>Pendidikan</dt><dd>${state.registration.education}</dd></div>
+              <div><dt>Nama lengkap</dt><dd>${escapeHtml(participant.fullName)}</dd></div>
+              <div><dt>Email</dt><dd>${escapeHtml(participant.email)}</dd></div>
+              <div><dt>Nomor HP</dt><dd>${escapeHtml(participant.phone)}</dd></div>
+              <div><dt>Pendidikan</dt><dd>${escapeHtml(participant.education)}</dd></div>
             </dl>
           </article>
           <article class="refund-policy">
@@ -3865,20 +3801,20 @@
         <aside class="price-card">
           <span class="eyebrow">RINCIAN BIAYA</span>
           <dl>
-            <div><dt>Biaya program</dt><dd>${money(program.price)}</dd></div>
-            <div><dt>Biaya administrasi</dt><dd>${money(adminFee)}</dd></div>
-            <div class="discount"><dt>Diskon early bird</dt><dd>− ${money(0)}</dd></div>
+            <div><dt>Biaya pelatihan</dt><dd>${money(price)}</dd></div>
+            ${adminFee > 0 ? `<div><dt>Biaya administrasi</dt><dd>${money(adminFee)}</dd></div>` : ""}
           </dl>
           <div class="price-card__total"><span>Total pembayaran</span><strong>${money(total)}</strong></div>
           <label class="agreement"><input type="checkbox" id="order-agreement" checked><span>Saya telah membaca dan menyetujui kebijakan pembatalan, refund, serta tata tertib pelatihan.</span></label>
           <button class="button button--primary button--large button--full" data-action="create-invoice" type="button">Buat Invoice <span>→</span></button>
-          <small class="price-note">Kursi akan ditahan selama 24 jam setelah invoice dibuat.</small>
+          <small class="price-note">Batas pembayaran mengikuti waktu jatuh tempo pada invoice.</small>
         </aside>
       </section>
     `;
   }
 
   function renderInvoice() {
+    const participant = applicationParticipant();
     const invoice = state.invoice;
 
     if (!invoice) {
@@ -3949,14 +3885,14 @@
             <p>${invoice.due_at ? `Sampai ${escapeHtml(formatDateTime(invoice.due_at))}.` : "Ikuti batas pembayaran yang ditentukan admin."}</p>
           </div>
           <div class="invoice-address">
-            <div><span>DITAGIHKAN KEPADA</span><strong>${state.registration.fullName}</strong><p>${state.registration.email}<br>${state.registration.phone}</p></div>
+            <div><span>DITAGIHKAN KEPADA</span><strong>${escapeHtml(participant.fullName)}</strong><p>${escapeHtml(participant.email)}<br>${escapeHtml(participant.phone)}</p></div>
             <div><span>PENYELENGGARA</span><strong>${escapeHtml(branding.name)}</strong><p>Komplek PT. Komoko Batam Centre<br>Blok A No. 7, Batam</p></div>
           </div>
           <table class="invoice-table">
             <thead><tr><th>Deskripsi</th><th>Jumlah</th></tr></thead>
             <tbody>
-              <tr><td><strong>${state.selectedProgram.title}</strong><small>${state.selectedBatch.label} · ${state.selectedBatch.start}</small></td><td>${money(subtotal)}</td></tr>
-              <tr><td>Biaya administrasi</td><td>${money(invoiceAdministrationFee)}</td></tr>
+              <tr><td><strong>${escapeHtml(state.selectedProgram.title)}</strong><small>${escapeHtml(state.selectedBatch.label)} · ${escapeHtml(state.selectedBatch.start)}</small></td><td>${money(subtotal)}</td></tr>
+              ${invoiceAdministrationFee > 0 ? `<tr><td>Biaya administrasi</td><td>${money(invoiceAdministrationFee)}</td></tr>` : ""}
               ${discount > 0 ? `<tr><td>Diskon</td><td>− ${money(discount)}</td></tr>` : ""}
             </tbody>
             <tfoot><tr><td>Total tagihan</td><td>${money(total)}</td></tr></tfoot>
@@ -3974,8 +3910,8 @@
               : '<button class="button button--primary button--large button--full" data-action="show-dashboard-payments" type="button">Kembali ke Pembayaran</button>'
           }
           ${displayStatus === "paid" ? '<button class="button button--outline button--full" data-action="show-dashboard-programs" type="button">Lihat Program Lain</button>' : ""}
-          <button class="button button--outline button--full" data-action="download-invoice" type="button">Unduh Invoice</button>
-          <small>Butuh bantuan? Hubungi 0254-123456</small>
+          ${invoiceDocumentLinks(invoice)}
+          <small>Butuh bantuan? Hubungi +62 895-6035-02918</small>
         </aside>
       </section>
     `;
@@ -3990,6 +3926,8 @@
     const invoiceAdministrationFee = Number(
       invoice.administration_fee || 0,
     );
+
+    if (invoiceStatus(invoice) !== "unpaid" && invoice.status !== "paid") return renderInvoice();
 
     if (invoice.status === "paid") {
       return `
@@ -4033,20 +3971,22 @@
           </div>
           ${
             state.paymentMethod === "qris"
-              ? `<div class="method-info"><span>QR</span><p>QR pembayaran akan tampil setelah Anda menekan tombol bayar. Kode berlaku selama 15 menit.</p></div>`
+              ? `<div class="method-info"><span>QR</span><p>QR pembayaran akan tampil setelah Anda menekan tombol bayar. Batas berlaku kode mengikuti instruksi di Midtrans.</p></div>`
               : `<div class="method-info"><span>i</span><p>Nomor virtual account atau instruksi transfer akan dibuat khusus untuk transaksi ini.</p></div>`
           }
         </div>
         <aside class="payment-summary">
           <span class="eyebrow">RINGKASAN PEMBAYARAN</span>
-          <div class="payment-summary__program"><span class="summary-program__thumb"></span><div><strong>${state.selectedProgram.title}</strong><small>${state.selectedBatch.label}</small></div></div>
+          <div class="payment-summary__program"><span class="summary-program__thumb"></span><div><strong>${escapeHtml(state.selectedProgram.title)}</strong><small>${escapeHtml(state.selectedBatch.label)}</small></div></div>
           <dl>
             <div><dt>Subtotal</dt><dd>${money(subtotal)}</dd></div>
-            <div><dt>Administrasi</dt><dd>${money(invoiceAdministrationFee)}</dd></div>
+            ${invoiceAdministrationFee > 0 ? `<div><dt>Administrasi</dt><dd>${money(invoiceAdministrationFee)}</dd></div>` : ""}
+            ${Number(invoice.discount_amount) > 0 ? `<div><dt>Diskon</dt><dd>− ${money(invoice.discount_amount)}</dd></div>` : ""}
           </dl>
           <div class="payment-summary__total"><span>Total</span><strong>${money(total)}</strong></div>
           <button class="button button--primary button--large button--full" data-action="pay-now" type="button">Bayar Sekarang <span>→</span></button>
           <button class="text-button" data-action="back" type="button">← Kembali ke invoice</button>
+          ${invoiceDocumentLinks(invoice)}
           <div class="payment-security"><span>◇</span><p>Pembayaran diproses melalui kanal resmi dan aman.</p></div>
         </aside>
       </section>
@@ -4054,27 +3994,51 @@
   }
 
   function renderSuccess() {
+    if (state.invoice?.status !== "paid") return renderInvoice();
     return `
       <section class="success-page">
         <div class="success-card">
           <div class="success-icon"><span>✓</span></div>
           <span class="eyebrow">PEMBAYARAN BERHASIL</span>
           <h1>Selamat, Anda resmi menjadi peserta!</h1>
-          <p>Pembayaran telah terkonfirmasi dan kursi pada ${state.selectedBatch.label} sudah diamankan.</p>
+          <p>Pembayaran telah terkonfirmasi dan kursi pada ${escapeHtml(state.selectedBatch.label)} sudah diamankan.</p>
           <div class="success-receipt">
-            <div><span>Nomor transaksi</span><strong>WS-PAY-260723-0921</strong></div>
-            <div><span>Program</span><strong>${state.selectedProgram.title}</strong></div>
-            <div><span>Batch</span><strong>${state.selectedBatch.label}</strong></div>
+            <div><span>Nomor invoice</span><strong>${escapeHtml(state.invoice.invoice_number)}</strong></div>
+            <div><span>Program</span><strong>${escapeHtml(state.selectedProgram.title)}</strong></div>
+            <div><span>Batch</span><strong>${escapeHtml(state.selectedBatch.label)}</strong></div>
             <div><span>Total dibayar</span><strong>${money(state.invoice?.total_amount || 0)}</strong></div>
           </div>
           <div class="next-steps">
             <h2>Langkah berikutnya</h2>
-            <div><span>1</span><p><strong>Periksa email Anda</strong><small>Kuitansi dan detail pelatihan telah dikirim.</small></p></div>
+            <div><span>1</span><p><strong>Simpan nomor invoice</strong><small>Pantau konfirmasi dan informasi dari admin.</small></p></div>
             <div><span>2</span><p><strong>Lengkapi profil peserta</strong><small>Pastikan data untuk sertifikat sudah benar.</small></p></div>
             <div><span>3</span><p><strong>Masuk ke dashboard</strong><small>Lihat jadwal, materi orientasi, dan pengumuman.</small></p></div>
           </div>
           <button class="button button--primary button--large" data-action="next" type="button">Masuk Dashboard Peserta <span>→</span></button>
-          <button class="button button--outline" data-action="download-receipt" type="button">Unduh Kuitansi</button>
+          ${invoiceDocumentLinks(state.invoice)}
+        </div>
+      </section>
+    `;
+  }
+
+  const participantCheckoutTitles = {
+    summary: "Ringkasan Pesanan",
+    invoice: "Invoice",
+    payment: "Pembayaran",
+    success: "Konfirmasi Pembayaran",
+  };
+
+  function renderParticipantCheckout(id, content) {
+    return `
+      <section class="${dashboardShellClasses("applicant-dashboard participant-checkout")}">
+        ${participantSidebar("payments")}
+        <button class="dashboard-sidebar-backdrop" data-action="toggle-dashboard-sidebar" type="button" aria-label="Tutup sidebar"></button>
+        <div class="dashboard-body">
+          <header>
+            <div><span>Portal peserta</span><strong>${participantCheckoutTitles[id]}</strong></div>
+            ${dashboardHeaderActions()}
+          </header>
+          <div class="dashboard-content participant-checkout-content">${content}</div>
         </div>
       </section>
     `;
@@ -4106,7 +4070,9 @@
       success: renderSuccess,
       dashboard: renderMemberPrograms,
     };
-    app.innerHTML = views[id]();
+    const participantCheckout = state.loggedIn && Object.hasOwn(participantCheckoutTitles, id);
+    const content = views[id]();
+    app.innerHTML = participantCheckout ? renderParticipantCheckout(id, content) : content;
     document.querySelectorAll("[data-public-route]").forEach((link) => {
       const activeRoute =
         id === "home"
@@ -4123,7 +4089,7 @@
       link.classList.toggle("is-active", link.dataset.publicRoute === activeRoute);
     });
     const dashboardMode =
-      ["dashboard", "member-programs", "registration", "documents"].includes(id) ||
+      ["dashboard", "member-programs", "registration", "documents"].includes(id) || participantCheckout ||
       (state.loggedIn && ["detail", "batch"].includes(id));
     document.body.classList.toggle("dashboard-mode", dashboardMode);
     const whatsappRoutes = [
@@ -4489,7 +4455,7 @@
     const action = button.dataset.action;
 
     if (action === "toggle-dashboard-sidebar") {
-      if (window.matchMedia("(max-width: 620px)").matches) {
+      if (window.matchMedia("(max-width: 720px)").matches) {
         state.dashboardSidebarOpen = !state.dashboardSidebarOpen;
       } else {
         state.dashboardSidebarCollapsed =
@@ -4740,8 +4706,11 @@
 
     if (action === "select-program" || action === "quick-select-program") {
       const selectedProgram =
-        programs.find((program) => program.id === button.dataset.id) ||
-        programs[0];
+        registrationPrograms().find((program) => program.id === button.dataset.id);
+      if (!selectedProgram) {
+        showToast("Program belum memiliki batch yang tersedia untuk pendaftaran.", "warning");
+        return;
+      }
       const existingApplication = applicationForProgram(selectedProgram);
 
       if (action === "quick-select-program" && existingApplication) {
@@ -4821,7 +4790,7 @@
         batches[0] ||
         unavailableBatch;
       render();
-      showToast(`${state.selectedBatch.label} dipilih.`, "success");
+      showToast(`${escapeHtml(state.selectedBatch.label)} dipilih.`, "success");
     }
 
     if (action === "account-mode") {
@@ -4884,6 +4853,7 @@
         const formData = new FormData();
         formData.append("training_program_id", state.selectedProgram.databaseId);
         formData.append("training_batch_id", state.selectedBatch.databaseId);
+        formData.append("expected_price", state.selectedBatch.price ?? state.selectedProgram.price);
         formData.append("full_name", state.registration.fullName);
         formData.append("phone", state.registration.phone);
         formData.append("birth_place", state.registration.birthPlace);
@@ -4905,6 +4875,7 @@
         const result = await backendFormRequest(
           backend.routes?.applicationStore,
           formData,
+          button.closest('form'),
         );
         applyApplication(result.application);
         state.uploadedFiles = {};
@@ -4929,6 +4900,10 @@
       } else {
         navigate(state.invoice ? "invoice" : "summary");
       }
+    }
+
+    if (["show-dashboard-home", "show-dashboard-programs", "show-dashboard-applications", "show-dashboard-payments", "show-dashboard-training", "open-application-record", "open-payment-record", "open-training-record", "show-dashboard-profile", "select-training-section"].includes(action)) {
+      if (!await loadCurrentApplication()) return;
     }
 
     if (action === "show-dashboard-home") {
@@ -5065,13 +5040,6 @@
       }
     }
 
-    if (action === "download-invoice" || action === "download-receipt") {
-      showToast(
-        "File PDF akan dibuat oleh backend pada versi terintegrasi.",
-        "info",
-      );
-    }
-
     if (action === "verify-certificate") {
       showToast(
         "Form verifikasi sertifikat akan dihubungkan pada tahap backend berikutnya.",
@@ -5199,7 +5167,7 @@
         file,
       };
       render();
-      showToast(`${file.name} berhasil dipilih.`, "success");
+      showToast(`File ${file.name} siap dikirim. Tekan Kirim untuk menyimpan pendaftaran.`, "info");
     }
   });
 

@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\AssetExternalLoanController;
 use App\Http\Controllers\Admin\AssetKindController;
 use App\Http\Controllers\Admin\AssetLabelController;
 use App\Http\Controllers\Admin\AuditDocumentController;
+use App\Http\Controllers\Admin\BatchOperationsController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EmployeeController;
 use App\Http\Controllers\Admin\EmployeePositionController;
@@ -23,6 +24,7 @@ use App\Http\Controllers\Admin\StorageTransactionController;
 use App\Http\Controllers\Admin\StorageUnitController;
 use App\Http\Controllers\Admin\TrainingApplicationController;
 use App\Http\Controllers\Admin\TrainingBatchController;
+use App\Http\Controllers\Admin\TrainingBudgetController;
 use App\Http\Controllers\Admin\TrainingProgramController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
@@ -41,6 +43,9 @@ Route::prefix('admin')
     ->middleware(['auth', 'verified', 'permission:admin.access'])
     ->group(function (): void {
         Route::get('/', DashboardController::class)->name('dashboard');
+        require __DIR__.'/training-materials.php';
+        require __DIR__.'/attendance.php';
+        require __DIR__.'/practice.php';
 
         Route::get('/users', [UserController::class, 'index'])
             ->middleware('permission:users.view')
@@ -144,10 +149,33 @@ Route::prefix('admin')
             ->middlewareFor(['index'], 'permission:programs.view')
             ->middlewareFor(['create', 'store', 'edit', 'update', 'destroy'], 'permission:programs.manage');
 
+        Route::post('/budgets/preview', [TrainingBudgetController::class, 'preview'])
+            ->middleware('permission:budgets.manage')->name('budgets.preview');
+        Route::resource('budgets', TrainingBudgetController::class)
+            ->except(['destroy'])
+            ->middlewareFor(['index', 'show'], 'permission:budgets.view')
+            ->middlewareFor(['create', 'store', 'edit', 'update'], 'permission:budgets.manage');
+        Route::post('/budgets/{budget}/transition', [TrainingBudgetController::class, 'transition'])
+            ->middleware('permission:budgets.view')->name('budgets.transition');
+
         Route::resource('batches', TrainingBatchController::class)
             ->except(['show'])
             ->middlewareFor(['index'], 'permission:batches.view')
             ->middlewareFor(['create', 'store', 'edit', 'update', 'destroy'], 'permission:batches.manage');
+
+        Route::prefix('batch-operations')->name('operations.')->middleware('permission:operations.view')->group(function (): void {
+            Route::get('/', [BatchOperationsController::class, 'index'])->name('index');
+            Route::get('/{batch}', [BatchOperationsController::class, 'show'])->name('show');
+            Route::post('/{batch}/team', [BatchOperationsController::class, 'assign'])->name('team.store');
+            Route::delete('/{batch}/team/{assignment}', [BatchOperationsController::class, 'unassign'])->name('team.destroy');
+            Route::get('/{batch}/sessions/create', [BatchOperationsController::class, 'createSession'])->name('sessions.create');
+            Route::post('/{batch}/sessions', [BatchOperationsController::class, 'storeSession'])->name('sessions.store');
+            Route::get('/{batch}/sessions/{session}/edit', [BatchOperationsController::class, 'editSession'])->name('sessions.edit');
+            Route::put('/{batch}/sessions/{session}', [BatchOperationsController::class, 'updateSession'])->name('sessions.update');
+            Route::patch('/{batch}/sessions/{session}/cancel', [BatchOperationsController::class, 'cancelSession'])->name('sessions.cancel');
+            Route::put('/{batch}/checklist/{item}', [BatchOperationsController::class, 'checklist'])->name('checklist.update');
+            Route::patch('/{batch}/status', [BatchOperationsController::class, 'status'])->name('status');
+        });
 
         Route::resource('activities', ActivityController::class)
             ->except(['show'])

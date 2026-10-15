@@ -110,6 +110,7 @@ class PaymentFlowTest extends TestCase
                 'order_id' => $payment->payment_reference,
             ]))
             ->assertRedirect(route('home').'#member-programs')
+            ->assertSessionHas('payment_application_id', $invoice->training_application_id)
             ->assertSessionHas(
                 'auth_status',
                 'Pembayaran berhasil dikonfirmasi. Selamat, pendaftaran Anda sudah aktif.',

@@ -10,8 +10,8 @@
             <h1>Batch pelatihan</h1>
             <p>Atur periode pendaftaran, jadwal pelaksanaan, kapasitas, dan status setiap batch.</p>
         </div>
-        @can('batches.manage')
-            <a class="button button--primary admin-button" href="{{ route('admin.batches.create') }}">+ Tambah batch</a>
+        @can('budgets.manage')
+            <a class="button button--primary admin-button" href="{{ route('admin.budgets.create') }}">+ Susun RAB & rencana batch</a>
         @endcan
     </section>
 
@@ -48,7 +48,7 @@
             <div class="admin-empty">
                 <span aria-hidden="true">▦</span>
                 <h2>Batch tidak ditemukan</h2>
-                <p>Tambahkan batch baru atau ubah filter pencarian.</p>
+                <p>Susun dan setujui RAB untuk membentuk batch baru, atau ubah filter pencarian.</p>
             </div>
         @else
             <x-ui.table class="admin-table-wrap">
@@ -67,7 +67,10 @@
                         @foreach ($batches as $batch)
                             @php
                                 $batchDeleteBlocked = $batch->applications_count > 0
-                                    || $batch->enrollments_count > 0;
+                                    || $batch->enrollments_count > 0
+                                    || $batch->assignments_count > 0
+                                    || $batch->sessions_count > 0
+                                    || $batch->activity_logs_count > 0;
                             @endphp
                             <tr>
                                 <td>
@@ -87,6 +90,9 @@
                                 <td><x-admin.status-badge :status="$batch->status" /></td>
                                 <td>
                                     <div class="admin-action-group">
+                                        @if (auth()->user()->can('operations.view') && (auth()->user()->can('operations.manage-all') || $batch->assignments()->where('user_id', auth()->id())->exists()))
+                                            <a class="admin-action-button admin-action-button--view" href="{{ route('admin.operations.show', $batch) }}"><x-ui.icon name="clipboard-check" size="14" /> Operasional</a>
+                                        @endif
                                         <button class="admin-action-button admin-action-button--view" type="button" data-modal-open="detail-batch-{{ $batch->id }}">
                                             <x-ui.icon name="eye" size="14" /> Detail
                                         </button>
@@ -120,7 +126,10 @@
     @foreach ($batches as $batch)
         @php
             $batchDeleteBlocked = $batch->applications_count > 0
-                || $batch->enrollments_count > 0;
+                || $batch->enrollments_count > 0
+                || $batch->assignments_count > 0
+                || $batch->sessions_count > 0
+                || $batch->activity_logs_count > 0;
         @endphp
 
         <x-ui.modal :id="'detail-batch-'.$batch->id" title="Detail batch pelatihan" :description="$batch->code">
